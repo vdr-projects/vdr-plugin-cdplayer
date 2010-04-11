@@ -1,0 +1,61 @@
+# CD-Player plugin language source file.
+# Copyright (C) 2009 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+# This file is distributed under the same license as the VDR package.
+# Ulrich Eckhardt
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VDR 1.7.x\n"
+"Report-Msgid-Bugs-To: <see README>\n"
+"POT-Creation-Date: 2010-04-10 19:23+0200\n"
+"PO-Revision-Date: 2010-04-02 17:05+0200\n"
+"Last-Translator: Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "ARRANGER"
+msgstr ""
+
+msgid "COMPOSER"
+msgstr ""
+
+msgid "DISCID"
+msgstr ""
+
+msgid "GENRE"
+msgstr ""
+
+msgid "MESSAGE"
+msgstr ""
+
+msgid "ISRC"
+msgstr ""
+
+msgid "PERFORMER"
+msgstr ""
+
+msgid "SIZE_INFO"
+msgstr ""
+
+msgid "SONGWRITER"
+msgstr ""
+
+msgid "TITLE"
+msgstr ""
+
+msgid "TOC_INFO"
+msgstr ""
+
+msgid "TOC_INFO2"
+msgstr ""
+
+msgid "UPC_EAN"
+msgstr ""
+
+msgid "Invalid"
+msgstr ""
+
+msgid "CD-Player"
+msgstr ""
