@@ -18,7 +18,7 @@ using namespace std;
 static const int CCDIO_MAX_BLOCKS=50;
 
 typedef map<int, string> StringMap;
-typedef int TRACK_IDX_T;
+typedef unsigned int TRACK_IDX_T;
 
 class cTrackInfo {
 private:
@@ -49,7 +49,7 @@ private:
     StringMap       mCdText;       // CD-Text for entire CD
     TrackInfoVector mTrackInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
-
+    bool           mTrackChange;  // Indication for external track change
     void GetCDText(const track_t track_no, StringMap &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
 
@@ -68,6 +68,17 @@ public:
     }
     bool GetData (uint8_t *data);
     void Action(void);
+    void SetTrack (TRACK_IDX_T newtrack);
+    void NextTrack(void) {
+        if (mCurrTrackIdx < GetNumTracks()) SetTrack(mCurrTrackIdx+1);
+    };
+    void PrevTrack(void) {
+        if (mCurrTrackIdx > 0) SetTrack(mCurrTrackIdx-1);
+    };
+    void Stop(void) {
+        Cancel(0);
+        CloseDevice();
+    }
 };
 
 #endif

@@ -1,9 +1,15 @@
 /*
- * pes_audio_converter.h: Convert raw
+ * Plugin for VDR to act as CD-Player
  *
- * See the README file for copyright information and how to reach the author.
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This class implements a simple converter which converts the raw
+ * data received from the CD-Rom to a PES stream.
  */
+
 
 #ifndef _PES_AUDIO_CONVERTER_H
 #define _PES_AUDIO_CONVERTER_H
@@ -28,7 +34,7 @@ typedef enum _pcm_freq {
     PCM_FREQ_96000 = 0x10,
     PCM_FREQ_44100 = 0x20,
     PCM_FREQ_32000 = 0x30
-} PCM_REQ_T;
+} PCM_FREQ_T;
 
 typedef enum _pcm_channel {
     PCM_CHAN1 = 0,
@@ -78,14 +84,16 @@ typedef struct _pes_pcm_stream {
 
 class cPesAudioConverter {
   private:
-    PES_PCM_STREAM_T m_pes_pcm_stream;
-    int m_peslen;
+    PES_PCM_STREAM_T mPesPcmStream;
+    int mPeslen;
+    PCM_FREQ_T mFreq;
   public:
     // Default initialization suitable for CD
     cPesAudioConverter() ;
     void SetData(const uint8_t *payload, int length);
-    int GetPesLength(void) { return m_peslen; };
-    uint8_t *GetPesData(void) {return (uint8_t *)&m_pes_pcm_stream; };
+    void SetFreq(PCM_FREQ_T newfreq) { mFreq = newfreq; };
+    int GetPesLength(void) { return mPeslen; };
+    uint8_t *GetPesData(void) {return (uint8_t *)&mPesPcmStream; };
 
 };
 

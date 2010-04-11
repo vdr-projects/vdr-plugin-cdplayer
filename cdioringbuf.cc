@@ -1,4 +1,17 @@
+/*
+ * Plugin for VDR to act as CD-Player
+ *
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This class implements a simple ringbuffer which stores blocks
+ * of size CDIO_CD_FRAMESIZE_RAW for buffering the output of the
+ * CD-Rom device
+ */
 
+#include <string.h>
 #include "cdioringbuf.h"
 
 cCdIoRingBuffer::cCdIoRingBuffer()
@@ -11,16 +24,16 @@ cCdIoRingBuffer::cCdIoRingBuffer()
 
 cCdIoRingBuffer::cCdIoRingBuffer(int blocks)
 {
-    mData = malloc(CDIO_CD_FRAMESIZE_RAW * blocks);
+    mData = (uint8_t *)malloc(CDIO_CD_FRAMESIZE_RAW * blocks);
     if (mData == NULL) {
-        esyslog ("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
+        esyslog ("%s %d Out of memory", __FILE__, __LINE__);
         exit(-1);
     }
     mPutIdx = 0;
     mGetIdx = 0;
     mBlocks = blocks;
-    mGetAllowed.Deny(); // No data available, so lock get call
-    mPutAllowed.Allow(); // Allow Put
+    mGetAllowed.Deny();  // No data available, so lock GetBlock
+    mPutAllowed.Allow(); // Allow PutBlock
 }
 
 cCdIoRingBuffer::~cCdIoRingBuffer()
@@ -28,14 +41,22 @@ cCdIoRingBuffer::~cCdIoRingBuffer()
     free(mData);
 }
 
-void cCdIoRingBuffer::GetBlock(uint8_t *block)
+/*
+ * Get a block from the ringbuffer, wait if
+ * currently no data is avalable
+ */
+
+bool cCdIoRingBuffer::GetBlock(uint8_t *block)
 {
     int idx = mGetIdx * CDIO_CD_FRAMESIZE_RAW;
-    mGetAllowed.WaitAllow();
+
+    if (!mGetAllowed.WaitAllow()) {
+        return false;
+    }
     mBufferMutex.Lock();
-    (void)memcpy (block, &mData[idx], CDIO_CD_FRAMESIZE_RAW);
+    memcpy (block, &mData[idx], CDIO_CD_FRAMESIZE_RAW);
     mGetIdx++;
-    if (mGetIdx > mBlocks) {
+    if (mGetIdx >= mBlocks) {
         mGetIdx = 0;
     }
     if (mGetIdx == mPutIdx) { // All data in buffer fetched
@@ -43,16 +64,23 @@ void cCdIoRingBuffer::GetBlock(uint8_t *block)
     }
     mPutAllowed.Allow();
     mBufferMutex.Unlock();
+    return true;
 }
 
-void cCdIoRingBuffer::PutBlock(uint8_t *block)
+/*
+ * Put a block to the ringbuffer, wait if
+ * no space is left on the buffer
+ */
+
+void cCdIoRingBuffer::PutBlock(const uint8_t *block)
 {
     int idx = mPutIdx * CDIO_CD_FRAMESIZE_RAW;
+
     mPutAllowed.WaitAllow();
     mBufferMutex.Lock();
-    (void)memcpy (&mData[idx], block, CDIO_CD_FRAMESIZE_RAW);
+    memcpy (&mData[idx], block, CDIO_CD_FRAMESIZE_RAW);
     mPutIdx++;
-    if (mPutIdx > mBlocks) {
+    if (mPutIdx >= mBlocks) {
         mPutIdx = 0;
     }
     if (mGetIdx == mPutIdx) { // Buffer is full
@@ -61,6 +89,10 @@ void cCdIoRingBuffer::PutBlock(uint8_t *block)
     mGetAllowed.Allow();
     mBufferMutex.Unlock();
 }
+
+/*
+ * Clear and reset ringbuffer
+ */
 
 void cCdIoRingBuffer::Clear(void)
 {

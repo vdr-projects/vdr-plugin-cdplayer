@@ -66,20 +66,20 @@ void cBufferedCdio::CloseDevice(void)
 
 bool cBufferedCdio::GetData (uint8_t *data)
 {
-    int cnt = CDIO_CD_FRAMESIZE_RAW;
-    uchar *ptr;
-
-   /* while ((ptr = mRingBuffer.Get(cnt)) == NULL) {
-        if (!Active()) {
-            dsyslog("%s %d Thread ends", __FILE__, __LINE__);
-            return false;
+    bool ret;
+    if (pCdio == NULL) {
+        return false;
+    }
+    ret = mRingBuffer.GetBlock(data);
+    if (!ret) {
+        if (Active()) {
+            esyslog("%s %d Timeout", __FILE__, __LINE__);
         }
-        printf("No data cnt=%d",cnt);
-        usleep (1000);
-        cnt = CDIO_CD_FRAMESIZE_RAW;
-    }*/
-    mRingBuffer.GetBlock(data);
-    return true;
+        else {
+            dsyslog("%s %d Thread ends", __FILE__, __LINE__);
+        }
+    }
+    return ret;
 }
 
 bool cBufferedCdio::OpenDevice (const string &FileName)
@@ -120,30 +120,52 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
     dsyslog("%s %d Read Track %d Start %d End %d",
             __FILE__, __LINE__, trackidx, currlsn, ti.GetCDDAEndLsn());
     while (currlsn < ti.GetCDDAEndLsn()) {
-        if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1)
-                != DRIVER_OP_SUCCESS) {
+        if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1) != DRIVER_OP_SUCCESS) {
             return false;
         }
-        mRingBuffer.PutData(buf);
+        mRingBuffer.PutBlock(buf);
         currlsn++;
+        if (!Running()) {
+            return false;
+        }
+        if (mTrackChange) {
+            return true;
+        }
     }
     return true;
 }
 //
 // Thread for reading from CDDA
 //
+
+
 void cBufferedCdio::Action(void)
 {
     TRACK_IDX_T numTracks = GetNumTracks();
     mRingBuffer.Clear();
-    mCurrTrackIdx=2;
+    mCurrTrackIdx=0;
     while (mCurrTrackIdx < numTracks) {
+        mTrackChange = false;
         if (!ReadTrack (mCurrTrackIdx)) {
             return;
         }
         if (!Running()) {
             return;
         }
-        mCurrTrackIdx++;
+        if (mTrackChange) {
+            mRingBuffer.Clear();
+        }
+        else {
+            mCurrTrackIdx++;
+        }
     }
+}
+
+void cBufferedCdio::SetTrack (TRACK_IDX_T newtrack)
+{
+  if (newtrack > GetNumTracks()) {
+      return;
+  }
+  mCurrTrackIdx = newtrack;
+  mTrackChange = true;
 }
