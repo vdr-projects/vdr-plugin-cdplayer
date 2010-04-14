@@ -1,3 +1,13 @@
+/*
+ * Plugin for VDR to act as CD-Player
+ *
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This module implements the cControl and cPlayer for the cd player.
+ */
 
 #ifndef _CD_CONTROL_H
 #define _CD_CONTROL_H
@@ -18,6 +28,7 @@ protected:
     int mStillBufLen;
     int mSpeed;
     static const PCM_FREQ_T mSpeedTypes[MAX_SPEED+1];
+    cMutex mPlayerMutex;
     virtual void Activate(bool On);
     void Action(void);
 
@@ -32,17 +43,29 @@ public:
     void SpeedNormal(void) {mSpeed = 0;};
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;};
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;};
+    const TRACK_IDX_T GetNumTracks (void) { return cdio.GetNumTracks(); };
+    const cTrackInfo &GetTrackInfo (const TRACK_IDX_T track) {
+        return cdio.GetTrackInfo(track);
+    }
+    const TRACK_IDX_T GetCurrTrack(void) { return cdio.GetCurrTrack(); };
+    const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
+        return cdio.GetCdTextFields(track);
+    };
 };
 
 class cCdControl: public cControl {
 private:
     cCdPlayer *mCdPlayer;
+    //cSkinDisplayReplay *mpo_mnuReplay;
+    cSkinDisplayMenu *mMenuPlaylist;
+    cMutex mControlMutex;
 public:
     cCdControl(void);
-    virtual ~cCdControl() { };
+    virtual ~cCdControl();
     virtual void Hide(void);
     virtual cOsdObject *GetInfo(void);
     virtual eOSState ProcessKey(eKeys Key);
+    void ShowPlaylist(void);
 };
 
 #endif

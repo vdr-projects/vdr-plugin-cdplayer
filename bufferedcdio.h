@@ -1,3 +1,16 @@
+/*
+ * Plugin for VDR to act as CD-Player
+ *
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This class implements buffered access to the audio cd via
+ * libcdda and gets all track information via CD-Text or cddb.
+ *
+ */
+
 #ifndef __BUFFEREDCDIO_H__
 #define __BUFFEREDCDIO_H__
 
@@ -15,18 +28,20 @@
 
 using namespace std;
 
-static const int CCDIO_MAX_BLOCKS=50;
+// Maximum number of raw blocks to buffer
+static const int CCDIO_MAX_BLOCKS=32;
 
-typedef map<int, string> StringMap;
+typedef string CD_TEXT_T[MAX_CDTEXT_FIELDS];
 typedef unsigned int TRACK_IDX_T;
 
+// Track information for each track
 class cTrackInfo {
 private:
     friend class cBufferedCdio;
     track_t mTrackNo;
     lsn_t mStartLsn;
     lsn_t mEndLsn;
-    StringMap mCdTextFields;
+    CD_TEXT_T mCdTextFields;
 public:
     cTrackInfo(void) : mTrackNo(0), mStartLsn(0), mEndLsn(0) {};
     cTrackInfo(lsn_t StartLsn, lsn_t EndLsn)
@@ -36,8 +51,10 @@ public:
     lsn_t GetCDDAEndLsn(void) { return mEndLsn; };
 };
 
+// Vector (array) containing all track information
 typedef vector<cTrackInfo> TrackInfoVector;
 
+// Class for accessing the audio cd
 class cBufferedCdio: public cThread {
 private:
     static const char *cd_text_field[MAX_CDTEXT_FIELDS+1];
@@ -46,11 +63,12 @@ private:
     track_t         mNumOfTracks;    // CDIO number of tracks
 
     TRACK_IDX_T     mCurrTrackIdx; // Audio Track index
-    StringMap       mCdText;       // CD-Text for entire CD
+    CD_TEXT_T       mCdText;       // CD-Text for entire CD
     TrackInfoVector mTrackInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
-    bool           mTrackChange;  // Indication for external track change
-    void GetCDText(const track_t track_no, StringMap &cd_text);
+    bool            mTrackChange;  // Indication for external track change
+    cMutex          mCdMutex;
+    void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
 
 public:
@@ -59,25 +77,35 @@ public:
     bool OpenDevice(const string &FileName);
     void CloseDevice(void);
 
+    const TRACK_IDX_T GetCurrTrack(void) { return mCurrTrackIdx; };
     const char *GetCdTextField(const cdtext_field_t type);
+    const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
+        return mTrackInfo[track].mCdTextFields;
+    };
     const cTrackInfo &GetTrackInfo (const TRACK_IDX_T track) {
         return mTrackInfo[track];
     }
     const TRACK_IDX_T GetNumTracks (void) {
         return mTrackInfo.size();
     }
-    bool GetData (uint8_t *data);
+    bool GetData (uint8_t *data); // Get a raw audio block
     void Action(void);
     void SetTrack (TRACK_IDX_T newtrack);
     void NextTrack(void) {
+        mCdMutex.Lock();
         if (mCurrTrackIdx < GetNumTracks()) SetTrack(mCurrTrackIdx+1);
+        mCdMutex.Unlock();
     };
     void PrevTrack(void) {
+        mCdMutex.Lock();
         if (mCurrTrackIdx > 0) SetTrack(mCurrTrackIdx-1);
+        mCdMutex.Unlock();
     };
     void Stop(void) {
-        Cancel(0);
+        mCdMutex.Lock();
+        Cancel(5);
         CloseDevice();
+        mCdMutex.Unlock();
     }
 };
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-04-10 19:23+0200\n"
+"POT-Creation-Date: 2010-04-12 19:32+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -55,6 +55,9 @@ msgid "UPC_EAN"
 msgstr ""
 
 msgid "Invalid"
+msgstr ""
+
+msgid "Playlist"
 msgstr ""
 
 msgid "CD-Player"

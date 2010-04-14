@@ -1,6 +1,19 @@
+/*
+ * Plugin for VDR to act as CD-Player
+ *
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This class implements buffered access to the audio cd via
+ * libcdda and gets all track information via CD-Text or cddb.
+ *
+ */
 
 #include "bufferedcdio.h"
 
+// Translated description of the cd text field
 const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
         tr("ARRANGER"),     /**< name(s) of the arranger(s) */
         tr("COMPOSER"),     /**< name(s) of the composer(s) */
@@ -27,9 +40,12 @@ cBufferedCdio::cBufferedCdio(void) :
 
 cBufferedCdio::~cBufferedCdio(void)
 {
-    CloseDevice();
+    if (pCdio != NULL) {
+        cdio_destroy(pCdio);
+    }
 }
 
+// Get name of a CD-Text field
 const char *cBufferedCdio::GetCdTextField(const cdtext_field_t type)
 {
     if (type > MAX_CDTEXT_FIELDS) {
@@ -38,7 +54,8 @@ const char *cBufferedCdio::GetCdTextField(const cdtext_field_t type)
     return cd_text_field[type];
 }
 
-void cBufferedCdio::GetCDText (const track_t track_no, StringMap &cd_text)
+// Get all available CD-Text for a track
+void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
 {
     int i;
     const cdtext_t *cdtext = cdio_get_cdtext(pCdio, track_no);
@@ -47,23 +64,28 @@ void cBufferedCdio::GetCDText (const track_t track_no, StringMap &cd_text)
     }
     for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
         if (cdtext->field[i] != NULL) {
-            cd_text[i] = cdtext->field[i];
+            cd_text[i] = cdtext->field[i];;
             dsyslog ("CD-Text %d: %s", i, cdtext->field[i]);
         }
     }
 }
 
+// Close access and destroy and reset all internal buffers
 void cBufferedCdio::CloseDevice(void)
 {
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
+        pCdio = NULL;
     }
-    mCdText.clear();
+    for (int i = 0; i < MAX_CDTEXT_FIELDS; i++) {
+        mCdText[i].clear();
+    }
     mTrackInfo.clear();
     mRingBuffer.Clear();
     mCurrTrackIdx = 0;
 }
 
+// Get a block of raw audio data from buffer
 bool cBufferedCdio::GetData (uint8_t *data)
 {
     bool ret;
@@ -81,6 +103,10 @@ bool cBufferedCdio::GetData (uint8_t *data)
     }
     return ret;
 }
+
+// Open access to the audio cd and retrieve all available CD-Text
+// information
+// @TODO implement CDDB
 
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
@@ -112,6 +138,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     return true;
 }
 
+// Read an audio track from CD and buffer the output into ringbuffer
 bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 {
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
@@ -120,9 +147,16 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
     dsyslog("%s %d Read Track %d Start %d End %d",
             __FILE__, __LINE__, trackidx, currlsn, ti.GetCDDAEndLsn());
     while (currlsn < ti.GetCDDAEndLsn()) {
-        if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1) != DRIVER_OP_SUCCESS) {
+        mCdMutex.Lock();
+        if (pCdio == NULL) {
+            mCdMutex.Unlock();
             return false;
         }
+        if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1) != DRIVER_OP_SUCCESS) {
+            mCdMutex.Unlock();
+            return false;
+        }
+        mCdMutex.Unlock();
         mRingBuffer.PutBlock(buf);
         currlsn++;
         if (!Running()) {
@@ -134,11 +168,10 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
     }
     return true;
 }
+
 //
 // Thread for reading from CDDA
 //
-
-
 void cBufferedCdio::Action(void)
 {
     TRACK_IDX_T numTracks = GetNumTracks();
@@ -161,6 +194,7 @@ void cBufferedCdio::Action(void)
     }
 }
 
+// Set new track
 void cBufferedCdio::SetTrack (TRACK_IDX_T newtrack)
 {
   if (newtrack > GetNumTracks()) {
