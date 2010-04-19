@@ -1,10 +1,10 @@
 This is a "plugin" for the Video Disk Recorder (VDR).
 
-Written by:                  Your Name <email@host.dom>
+Written by:                  Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
 
-Project's homepage:          URL
+Project's homepage:          http://www.uli-eckhardt.de/vdr
 
-Latest version available at: URL
+Latest version available at: http://www.uli-eckhardt.de/vdr
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,3 +13,7 @@ the Free Software Foundation; either version 2 of the License, or
 See the file COPYING for more information.
 
 Description:
+
+A CD-Player plugin which supports CD-Text and (later) CDDB-Database.
+
+

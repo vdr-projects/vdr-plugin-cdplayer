@@ -13,9 +13,11 @@ static const char *DESCRIPTION    = trNOOP("CD-Player");
 
 class cPluginCdplayer: public cPlugin {
 private:
-    // Add any member variables or functions you may need here.
+    static std::string mDevice;
+    static std::string mStillPicture;
+    static std::string mcfgDir;
 public:
-    cPluginCdplayer(void) {};
+    cPluginCdplayer(void);
     virtual ~cPluginCdplayer() {};
     virtual const char *Version(void) { return VERSION; }
     virtual const char *Description(void) { return tr(DESCRIPTION); }
@@ -36,6 +38,10 @@ public:
     virtual const char **SVDRPHelpPages(void);
     virtual cString SVDRPCommand(const char *Command, const char *Option,
             int &ReplyCode);
+    static const std::string GetStillPicName(void) {
+        const std::string cfdir = cPlugin::ConfigDirectory();
+        return cfdir + "/" + mcfgDir + "/" + mStillPicture;
+    }
 };
 
 #endif

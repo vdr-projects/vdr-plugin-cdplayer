@@ -56,12 +56,12 @@ eOSState cCdControl::ProcessKey(eKeys Key)
             mCdPlayer->SpeedNormal();
             state = osContinue;
             break;
-        case kRight:
+        case kDown:
         case kNext:
             mCdPlayer->NextTrack();
             state = osContinue;
             break;
-        case kLeft:
+        case kUp:
         case kPrev:
             mCdPlayer->PrevTrack();
             state = osContinue;
@@ -128,7 +128,7 @@ void cCdPlayer::DisplayStillPicture (void)
         DeviceStillPicture((const uchar *)pStillBuf, mStillBufLen);
     }
 }
-void cCdPlayer::LoadStillPicture (char *FileName)
+void cCdPlayer::LoadStillPicture (const std::string FileName)
 {
     int fd;
     int len;
@@ -140,10 +140,10 @@ void cCdPlayer::LoadStillPicture (char *FileName)
     pStillBuf = NULL;
     mStillBufLen = 0;
 
-    fd = open(FileName, O_RDONLY);
+    fd = open(FileName.c_str(), O_RDONLY);
     if (fd < 0) {
         esyslog("%s %d Can not open still picture %s",
-                __FILE__, __LINE__, FileName);
+                __FILE__, __LINE__, FileName.c_str());
         mPlayerMutex.Unlock();
         return;
     }
@@ -187,8 +187,10 @@ void cCdPlayer::Activate(bool On)
     mPlayerMutex.Lock();
     printf("%.16s (%d) Activate On=%s\n", __FILE__, __LINE__, On ? "true" : "false");
     if (On) {
-        printf("\n\nStarting Player\n");
-        LoadStillPicture ((const char *)"/video/conf/plugins/radio/radio.mpg");
+
+        std::string file = cPluginCdplayer::GetStillPicName();
+        printf("\n\nStarting Player %s\n", file.c_str());
+        LoadStillPicture (file);
         Start ();
         DevicePlay();
     }

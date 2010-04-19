@@ -35,7 +35,7 @@ protected:
 public:
     cCdPlayer(void);
     virtual ~cCdPlayer();
-    void LoadStillPicture (char *FileName);
+    void LoadStillPicture (const std::string FileName);
     void DisplayStillPicture (void);
     void NextTrack(void) {cdio.NextTrack();};
     void PrevTrack(void) {cdio.PrevTrack();};
@@ -56,7 +56,6 @@ public:
 class cCdControl: public cControl {
 private:
     cCdPlayer *mCdPlayer;
-    //cSkinDisplayReplay *mpo_mnuReplay;
     cSkinDisplayMenu *mMenuPlaylist;
     cMutex mControlMutex;
 public:

@@ -3,7 +3,7 @@
  *
  * See the README file for copyright information and how to reach the author.
  *
- * $Id$
+ *
  */
 
 #include <getopt.h>
@@ -11,17 +11,48 @@
 #include "cdplayer.h"
 
 static const char *MAINMENUENTRY  = trNOOP("CD-Player");
+std::string cPluginCdplayer::mDevice ="/dev/cdrom";
+std::string cPluginCdplayer::mStillPicture = "cd.mpg";
+std::string cPluginCdplayer::mcfgDir = "cdplayer";
 
+cPluginCdplayer::cPluginCdplayer(void)
+{
+
+};
 const char *cPluginCdplayer::CommandLineHelp(void)
 {
-  // Return a string that describes all known command line options.
-  return NULL;
+    return "-d  --device  <device>   CD-Rom Device : /dev/cdrom\n"
+            "-s  --stillpic <file>    Still-Picture : ";
 }
 
 bool cPluginCdplayer::ProcessArgs(int argc, char *argv[])
 {
-  // Implement command line argument processing here if applicable.
-  return true;
+    static struct option long_options[] =
+    {
+        { "device", required_argument, NULL, 'd' },
+        { "stillpic", required_argument, NULL, 's' },
+        { "configdir", required_argument, NULL, 'c' },
+        { NULL }
+    };
+    int c, option_index = 0;
+
+    while ((c = getopt_long(argc, argv, "d:s:c:", long_options, &option_index))
+            != -1) {
+        switch (c) {
+        case 'd':
+            mDevice.assign(optarg);
+            break;
+        case 's':
+            mStillPicture.assign(optarg);
+            break;
+        case 'c':
+            mcfgDir.assign(optarg);
+            break;
+        default:
+            return false;
+        }
+    }
+    return true;
 }
 
 bool cPluginCdplayer::Initialize(void)
