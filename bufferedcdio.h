@@ -54,6 +54,14 @@ public:
 // Vector (array) containing all track information
 typedef vector<cTrackInfo> TrackInfoVector;
 
+typedef enum _bufcdio_state {
+    BCDIO_STOP = 0,
+    BCDIO_OPEN_DEVICE,
+    BCDIO_PAUSE,
+    BCDIO_PLAY,
+    BCDIO_FAILED
+} BUFCDIO_STATE_T;
+
 // Class for accessing the audio cd
 class cBufferedCdio: public cThread {
 private:
@@ -66,7 +74,8 @@ private:
     CD_TEXT_T       mCdText;       // CD-Text for entire CD
     TrackInfoVector mTrackInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
-    bool            mTrackChange;  // Indication for external track change
+    bool           mTrackChange;  // Indication for external track change
+    BUFCDIO_STATE_T mState;
     cMutex          mCdMutex;
     void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
@@ -79,6 +88,9 @@ public:
 
     const TRACK_IDX_T GetCurrTrack(void) { return mCurrTrackIdx; };
     const char *GetCdTextField(const cdtext_field_t type);
+    const CD_TEXT_T& GetCDInfo (void) {
+        return mCdText;
+    }
     const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
         return mTrackInfo[track].mCdTextFields;
     };
@@ -89,6 +101,7 @@ public:
         return mTrackInfo.size();
     }
     bool GetData (uint8_t *data); // Get a raw audio block
+    BUFCDIO_STATE_T GetState(void)  {return mState; };
     void Action(void);
     void SetTrack (TRACK_IDX_T newtrack);
     void NextTrack(void) {
@@ -106,6 +119,10 @@ public:
         Cancel(5);
         CloseDevice();
         mCdMutex.Unlock();
+    }
+    void Pause(void) {
+        if (mState == BCDIO_PLAY) mState = BCDIO_PAUSE;
+        if (mState == BCDIO_PAUSE) mState = BCDIO_PLAY;
     }
 };
 

@@ -2,9 +2,9 @@ This is a "plugin" for the Video Disk Recorder (VDR).
 
 Written by:                  Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
 
-Project's homepage:          http://www.uli-eckhardt.de/vdr
+Project's homepage:          http://www.uli-eckhardt.de/vdr (TBD)
 
-Latest version available at: http://www.uli-eckhardt.de/vdr
+Latest version available at: http://www.uli-eckhardt.de/vdr (TBD)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,7 +13,56 @@ the Free Software Foundation; either version 2 of the License, or
 See the file COPYING for more information.
 
 Description:
-
+------------
 A CD-Player plugin which supports CD-Text and (later) CDDB-Database.
 
+Requirements:
+------------
 
+- vdr 1.6?, vdr 1.7.13
+- libcdio >= 0.8.0
+
+Install:
+------------
+Install the plugin part as usual (see vdr docs if you don't know already).
+You will need a full source tree from vdr, to build this plugins.
+Copy the source to the below defined folder.
+
+    cd $VDRSOURCE/PLUGINS/src
+    tar -xzvf vdr-cdplayer-x.x.x.tgz
+    ln -s cdplayer-x.x.x cdplayer
+    
+
+You have to create a configuration directory "cdplayer" under the
+the vdr plugin configuration directory (can be overwritten with the -c
+option). For most distributions, this is /video/plugins. Copy the still picture 
+with name cd.mpg into this directory.
+
+Options for the plugin:
+-----------------------
+  -d DEVICE, --device=DEVICE    use DEVICE as cdrom device 
+                                    (default: /dev/cdrom)
+  
+  -s FILE,   --stillpic=FILE   Still-Picture to display
+                                    (default: cd.mpg)
+  
+  -c DIR,    --configdir=DIR   Directory for config files  
+                                    (default cdplayer)
+
+Navigation
+-----------------------
+
+The following navigation keys are available 
+
+Key             Function
+-------------------------------------------------------------
+Green           1 min. backward  (TBD)
+Yellow          1 min. forward   (TBD)
+
+Back,Ok, Menu   Stop Play - Exit
+
+
+Up, kNext       skip to previous title
+Down, kPrev     skip to next title
+kFastFwd        play faster
+kFastFwd        play slower

@@ -42,6 +42,9 @@ public:
         const std::string cfdir = cPlugin::ConfigDirectory();
         return cfdir + "/" + mcfgDir + "/" + mStillPicture;
     }
+    static const std::string GetDeviceName(void) {
+        return mDevice;
+    }
 };
 
 #endif

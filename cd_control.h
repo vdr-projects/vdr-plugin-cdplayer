@@ -31,15 +31,18 @@ protected:
     cMutex mPlayerMutex;
     virtual void Activate(bool On);
     void Action(void);
+    void DisplayStillPicture (void);
 
 public:
     cCdPlayer(void);
     virtual ~cCdPlayer();
+    virtual bool GetIndex(int &Current, int &Total, bool SnapToIFrame = false);
     void LoadStillPicture (const std::string FileName);
-    void DisplayStillPicture (void);
+
     void NextTrack(void) {cdio.NextTrack();};
     void PrevTrack(void) {cdio.PrevTrack();};
-    void Stop(void) {cdio.Stop();};
+    void Stop(void) {cdio.Stop(); Cancel (1);};
+    void Pause(void) {cdio.Pause();};
     void SpeedNormal(void) {mSpeed = 0;};
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;};
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;};
@@ -51,6 +54,9 @@ public:
     const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
         return cdio.GetCdTextFields(track);
     };
+    const CD_TEXT_T& GetCDInfo (void) {
+        return cdio.GetCDInfo();
+    }
 };
 
 class cCdControl: public cControl {

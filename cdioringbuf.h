@@ -45,12 +45,12 @@ public:
         mMutex.Unlock();
     }
 
-    // Wait until access is allowed or time out after 5 seconds (returns
+    // Wait until access is allowed or time out after 15 seconds (returns
     // false in this case)
     bool WaitAllow(void)
     {
         while (!mAllowed) {
-            if (!Wait(5000)) {
+            if (!Wait(15000)) {
                 return false;
             }
         }

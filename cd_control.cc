@@ -3,109 +3,129 @@
 #include "bufferedcdio.h"
 
 cCdControl::cCdControl(void)
-    :cControl(mCdPlayer = new cCdPlayer), mMenuPlaylist(NULL)
+    :cControl(mCdPlayer = new cCdPlayer)
 {
-
+    mMenuPlaylist = NULL;
+//    mMenuPlaylist = Skins.Current()->DisplayMenu();
+//    mMenuPlaylist->SetTitle(tr("Reading CD"));
 }
 
 cCdControl::~cCdControl()
 {
-    if (mMenuPlaylist != NULL) {
-        delete mMenuPlaylist;
-    }
+    Hide();
+    delete mCdPlayer;
 }
 
 void cCdControl::Hide(void)
 {
-    printf("Hide\n");
+printf("Hide\n");
     mControlMutex.Lock();
     if (mMenuPlaylist != NULL) {
+        mMenuPlaylist->Clear();
         delete mMenuPlaylist;
     }
     mMenuPlaylist = NULL;
     mControlMutex.Unlock();
-    printf("Hide End\n");
 }
 
 cOsdObject *cCdControl::GetInfo(void)
 {
-    printf("GetInfo\n");
+printf("GetInfo\n");
     return NULL;
 }
 
 eOSState cCdControl::ProcessKey(eKeys Key)
 {
     eOSState state = cOsdObject::ProcessKey(Key);
-    printf("ProcessKey %d\n",Key);
+printf("ProcessKey %d\n",Key);
     mControlMutex.Lock();
 
-    if (mMenuPlaylist == NULL) {
-        mMenuPlaylist = Skins.Current()->DisplayMenu();
-    }
     if (state == osUnknown) {
+        state = osContinue;
         switch (Key & ~k_Repeat) {
         case kFastFwd:
             mCdPlayer->SpeedFaster();
-            state = osContinue;
             break;
         case kFastRew:
             mCdPlayer->SpeedSlower();
-            state = osContinue;
             break;
         case kPlay:
             mCdPlayer->SpeedNormal();
-            state = osContinue;
             break;
         case kDown:
         case kNext:
             mCdPlayer->NextTrack();
-            state = osContinue;
             break;
         case kUp:
         case kPrev:
             mCdPlayer->PrevTrack();
-            state = osContinue;
             break;
         case kOk:
         case kMenu:
         case kStop:
             mCdPlayer->Stop();
             state = osEnd;
+            break;
+        case kPause:
+            mCdPlayer->Pause();
+            break;
         default:
+            state = osUnknown;
             break;
         }
     }
     mControlMutex.Unlock();
-    ShowPlaylist();
+    if (state != osEnd) {
+        ShowPlaylist();
+    }
+    else {
+        mCdPlayer->Stop();
+    }
+
     return (state);
 }
 
 void cCdControl::ShowPlaylist()
 {
     mControlMutex.Lock();
-    if (mMenuPlaylist != NULL) {
-        mMenuPlaylist->Clear();
-        mMenuPlaylist->SetTitle(tr("Playlist"));
-        mMenuPlaylist->SetTabs(4, 15);
-        for (TRACK_IDX_T i = 0; i < mCdPlayer->GetNumTracks(); i++) {
-            const CD_TEXT_T text = mCdPlayer->GetCdTextFields(i);
-            string artist = text[CDTEXT_PERFORMER];
-            string title = text[CDTEXT_TITLE];
-            char *str;
-            asprintf(&str, "%2d\t %s\t %s", i + 1, artist.c_str(),
-                    title.c_str());
-            mMenuPlaylist->SetItem(str, i, (i == mCdPlayer->GetCurrTrack()),
-                    true);
-            free(str);
-        }
+
+    if (mMenuPlaylist == NULL) {
+        mMenuPlaylist = Skins.Current()->DisplayMenu();
     }
+
+    const CD_TEXT_T cd_info = mCdPlayer->GetCDInfo();
+    string cdtitle = cd_info[CDTEXT_TITLE];
+    if (cdtitle.empty()) {
+        mMenuPlaylist->SetTitle(tr("Playlist"));
+    } else {
+        mMenuPlaylist->SetTitle(cdtitle.c_str());
+    }
+    mMenuPlaylist->SetTabs(4, 15);
+    for (TRACK_IDX_T i = 0; i < mCdPlayer->GetNumTracks(); i++) {
+        const CD_TEXT_T text = mCdPlayer->GetCdTextFields(i);
+        string artist = text[CDTEXT_PERFORMER];
+        string title = text[CDTEXT_TITLE];
+        char *str;
+        asprintf(&str, "%2d\t %s\t %s", i + 1, artist.c_str(), title.c_str());
+        mMenuPlaylist->SetItem(str, i, (i == mCdPlayer->GetCurrTrack()), true);
+        if (i == mCdPlayer->GetCurrTrack()) {
+            cStatus::MsgReplaying(this, title.c_str(), NULL, true);
+        }
+        free(str);
+    }
+ //   mMenuPlaylist->SetButtons("Red", "Green", "Yellow", "Blue");
+
     mControlMutex.Unlock();
 }
 
 
 // ------------- Player -----------------------
 
-const PCM_FREQ_T cCdPlayer::mSpeedTypes[] = {PCM_FREQ_44100, PCM_FREQ_48000, PCM_FREQ_96000};
+const PCM_FREQ_T cCdPlayer::mSpeedTypes[] = {
+        PCM_FREQ_44100,
+        PCM_FREQ_48000,
+        PCM_FREQ_96000
+};
 
 cCdPlayer::cCdPlayer(void)
 {
@@ -118,8 +138,15 @@ cCdPlayer::~cCdPlayer()
 {
     mPlayerMutex.Lock();
     Detach();
-    free (pStillBuf);
+    free(pStillBuf);
     mPlayerMutex.Unlock();
+}
+
+bool cCdPlayer::GetIndex(int &Current, int &Total, bool SnapToIFrame)
+{
+    Current = GetCurrTrack();
+    Total = GetNumTracks();
+    return (true);
 }
 
 void cCdPlayer::DisplayStillPicture (void)
@@ -185,17 +212,15 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
 void cCdPlayer::Activate(bool On)
 {
     mPlayerMutex.Lock();
-    printf("%.16s (%d) Activate On=%s\n", __FILE__, __LINE__, On ? "true" : "false");
+printf("%.16s (%d) Activate On=%s\n", __FILE__, __LINE__, On ? "true" : "false");
     if (On) {
-
         std::string file = cPluginCdplayer::GetStillPicName();
-        printf("\n\nStarting Player %s\n", file.c_str());
-        LoadStillPicture (file);
-        Start ();
+        LoadStillPicture(file);
+        Start();
         DevicePlay();
     }
     else {
-        Cancel(0);
+        Stop();
     }
     mPlayerMutex.Unlock();
 }
@@ -213,28 +238,31 @@ void cCdPlayer::Action(void)
     int peslen;
     int chunksize = CDIO_CD_FRAMESIZE_RAW / FRAME_DIV;
 
-    cdio.OpenDevice ("/dev/sr0");
+    if (!cdio.OpenDevice (cPluginCdplayer::GetDeviceName())) {
+        play = false;
+        return;
+    }
     cdio.Start();
+    cDevice::PrimaryDevice()->SetCurrentAudioTrack(ttAudio);
     while (play) {
         if (!cdio.GetData(buf)) {
             play = false;
         }
         int i = 0;
-        while (i < FRAME_DIV) {
+        while ((i < FRAME_DIV) && (play)) {
             if (DevicePoll(oPoller, 100)) {
                 converter.SetFreq(mSpeedTypes[mSpeed]);
                 converter.SetData(&buf[i * chunksize], chunksize);
                 pesdata = converter.GetPesData();
                 peslen = converter.GetPesLength();
+
                 if (PlayPes(pesdata, peslen, false) < 0) {
                     play = false;
-                    break;
                 }
                 i++;
             }
             if (!Running()) {
                 play = false;
-                break;
             }
         }
     }

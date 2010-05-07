@@ -22,7 +22,8 @@ cPluginCdplayer::cPluginCdplayer(void)
 const char *cPluginCdplayer::CommandLineHelp(void)
 {
     return "-d  --device  <device>   CD-Rom Device : /dev/cdrom\n"
-            "-s  --stillpic <file>    Still-Picture : ";
+            "-s  --stillpic <file>    Still-Picture : cd.mpg"
+            "-c  --configdir <dir>    Directory for config files : cdplayer";
 }
 
 bool cPluginCdplayer::ProcessArgs(int argc, char *argv[])
@@ -102,8 +103,8 @@ const char *cPluginCdplayer::MainMenuEntry(void)
 
 cOsdObject *cPluginCdplayer::MainMenuAction(void)
 {
-  cControl::Launch(new cCdControl());
-  return NULL;
+    cControl::Launch(new cCdControl());
+    return NULL;
 }
 
 cMenuSetupPage *cPluginCdplayer::SetupMenu(void)

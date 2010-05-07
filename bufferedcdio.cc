@@ -36,10 +36,12 @@ cBufferedCdio::cBufferedCdio(void) :
 {
     pCdio = NULL;
     mCurrTrackIdx = 0;
+    mState = BCDIO_STOP;
 };
 
 cBufferedCdio::~cBufferedCdio(void)
 {
+    mState = BCDIO_STOP;
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
     }
@@ -73,6 +75,7 @@ void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
 // Close access and destroy and reset all internal buffers
 void cBufferedCdio::CloseDevice(void)
 {
+    mState = BCDIO_STOP;
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
         pCdio = NULL;
@@ -111,8 +114,10 @@ bool cBufferedCdio::GetData (uint8_t *data)
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
     CloseDevice();
+    mState = BCDIO_OPEN_DEVICE;
     pCdio = cdio_open(FileName.c_str(), DRIVER_DEVICE);
     if (pCdio == NULL) {
+        mState = BCDIO_FAILED;
         esyslog("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
         return false;
     }
@@ -147,18 +152,26 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
     dsyslog("%s %d Read Track %d Start %d End %d",
             __FILE__, __LINE__, trackidx, currlsn, ti.GetCDDAEndLsn());
     while (currlsn < ti.GetCDDAEndLsn()) {
-        mCdMutex.Lock();
-        if (pCdio == NULL) {
-            mCdMutex.Unlock();
-            return false;
+        if (mState == BCDIO_PAUSE) {
+            cCondWait::SleepMs(250);
         }
-        if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1) != DRIVER_OP_SUCCESS) {
+        else {
+            mCdMutex.Lock();
+            if (pCdio == NULL) {
+                mCdMutex.Unlock();
+                mState = BCDIO_FAILED;
+                return false;
+            }
+            if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1)
+                                                        != DRIVER_OP_SUCCESS) {
+                mState = BCDIO_FAILED;
+                mCdMutex.Unlock();
+                return false;
+            }
             mCdMutex.Unlock();
-            return false;
+            mRingBuffer.PutBlock(buf);
+            currlsn++;
         }
-        mCdMutex.Unlock();
-        mRingBuffer.PutBlock(buf);
-        currlsn++;
         if (!Running()) {
             return false;
         }
@@ -177,6 +190,7 @@ void cBufferedCdio::Action(void)
     TRACK_IDX_T numTracks = GetNumTracks();
     mRingBuffer.Clear();
     mCurrTrackIdx=0;
+    mState = BCDIO_PLAY;
     while (mCurrTrackIdx < numTracks) {
         mTrackChange = false;
         if (!ReadTrack (mCurrTrackIdx)) {
