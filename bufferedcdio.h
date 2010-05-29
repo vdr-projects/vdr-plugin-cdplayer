@@ -79,6 +79,7 @@ private:
     cMutex          mCdMutex;
     void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
+    string mErrtxt;
 
 public:
     cBufferedCdio(void);
@@ -86,6 +87,7 @@ public:
     bool OpenDevice(const string &FileName);
     void CloseDevice(void);
 
+    const string &GetErrorText(void) { return mErrtxt; };
     const TRACK_IDX_T GetCurrTrack(void) { return mCurrTrackIdx; };
     const char *GetCdTextField(const cdtext_field_t type);
     const CD_TEXT_T& GetCDInfo (void) {

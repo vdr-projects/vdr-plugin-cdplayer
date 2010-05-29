@@ -74,7 +74,9 @@ public:
     BUFCDIO_STATE_T GetState(void) {
         return cdio.GetState();
     }
-
+    const string &GetErrorText(void) {
+        return cdio.GetErrorText();
+    }
 };
 
 class cCdControl: public cControl {

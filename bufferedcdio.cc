@@ -94,8 +94,10 @@ void cBufferedCdio::CloseDevice(void)
 // Get a block of raw audio data from buffer
 bool cBufferedCdio::GetData (uint8_t *data)
 {
-    bool ret;
     if (pCdio == NULL) {
+        return false;
+    }
+    if ((mState == BCDIO_FAILED) || (mState == BCDIO_STOP)) {
         return false;
     }
     while (!mRingBuffer.GetBlock(data))
@@ -114,24 +116,54 @@ bool cBufferedCdio::GetData (uint8_t *data)
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
     CloseDevice();
+    string txt;
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
     pCdio = cdio_open(FileName.c_str(), DRIVER_DEVICE);
     if (pCdio == NULL) {
         mState = BCDIO_FAILED;
+        txt = tr("Can not open");
+        mErrtxt = txt  + " " + FileName;
         esyslog("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
         return false;
     }
+    dsyslog("The driver selected is %s", cdio_get_driver_name(pCdio));
+    dsyslog("The default device for this driver is %s",
+            cdio_get_default_device(pCdio));
 
     mFirstTrackNum = cdio_get_first_track_num(pCdio);
+    if (mFirstTrackNum == CDIO_INVALID_TRACK) {
+        txt = tr("No disc in drive");
+        mErrtxt = txt + " " + FileName;
+        mState = BCDIO_FAILED;
+        esyslog("%s %d Problem on read first track %s",
+                __FILE__, __LINE__, FileName.c_str());
+        return false;
+    }
     mNumOfTracks = cdio_get_num_tracks(pCdio);
-    printf("CD-ROM Track List (%d - %d)\n", mFirstTrackNum, mNumOfTracks);
+    if (mNumOfTracks == CDIO_INVALID_TRACK) {
+        mState = BCDIO_FAILED;
+        txt = tr("Problem on read");
+        mErrtxt = txt + " " + FileName;
+        esyslog("%s %d Problem on read no of tracks %s",
+                __FILE__, __LINE__, FileName.c_str());
+        return false;
+    }
+    dsyslog("CD-ROM Track List (%d - %d)\n", mFirstTrackNum, mNumOfTracks);
 
     GetCDText (0, mCdText);
     for (int i = 0; i < mNumOfTracks; i++) {
         track_t track_no = (track_t)i + mFirstTrackNum;
         lsn_t startlsn = cdio_get_track_lsn(pCdio, track_no);
         lsn_t endlsn = cdio_get_track_last_lsn(pCdio, track_no);
+        if (endlsn == CDIO_INVALID_LSN) {
+            mState = BCDIO_FAILED;
+            txt = tr("Problem on read lsn");
+            mErrtxt = txt + " " + FileName;
+            esyslog("%s %d Problem on read last lsn %s",
+                     __FILE__, __LINE__, FileName.c_str());
+            return false;
+        }
         track_format_t fmt = cdio_get_track_format(pCdio, track_no);
         if ((fmt == TRACK_FORMAT_AUDIO) && (startlsn != CDIO_INVALID_LSN)) {
             dsyslog ("get_track_info for track %d S %d E %d",
@@ -165,6 +197,7 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
             }
             if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1)
                                                         != DRIVER_OP_SUCCESS) {
+                mErrtxt = tr("Read error");
                 mState = BCDIO_FAILED;
                 mCdMutex.Unlock();
                 return false;
@@ -199,9 +232,11 @@ void cBufferedCdio::Action(void)
     while (mCurrTrackIdx < numTracks) {
         mTrackChange = false;
         if (!ReadTrack (mCurrTrackIdx)) {
+            mState = BCDIO_FAILED;
             return;
         }
         if (!Running()) {
+            mState = BCDIO_STOP;
             return;
         }
         if (mTrackChange) {
@@ -211,6 +246,7 @@ void cBufferedCdio::Action(void)
             mCurrTrackIdx++;
         }
     }
+    mState = BCDIO_STOP;
 }
 
 // Set new track

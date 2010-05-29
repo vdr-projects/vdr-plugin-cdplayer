@@ -70,20 +70,24 @@ eOSState cCdControl::ProcessKey(eKeys Key)
         break;
     }
 
+    if (mCdPlayer->GetState() == BCDIO_FAILED) {
+        cStatus::MsgOsdStatusMessage(mCdPlayer->GetErrorText().c_str());
+        cSkinDisplay::Current()->SetMessage(mtError, mCdPlayer->GetErrorText().c_str());
+        sleep(3);
+        state = osEnd;
+    }
     if (state != osEnd) {
         ShowPlaylist();
     }
     else {
         if (mMenuPlaylist != NULL) {
-            cStatus::MsgOsdClear();
             mMenuPlaylist->SetTitle("----");
+            cStatus::MsgOsdTitle("----");
         }
-printf("Stopping CD\n");
-        mCdPlayer->Stop();
         Hide();
+        mCdPlayer->Stop();
         cStatus::MsgOsdMenuDestroy();
     }
-
     return (state);
 }
 
@@ -293,7 +297,6 @@ void cCdPlayer::Action(void)
     int chunksize = CDIO_CD_FRAMESIZE_RAW / FRAME_DIV;
 
     if (!cdio.OpenDevice (cPluginCdplayer::GetDeviceName())) {
-        play = false;
         return;
     }
     cdio.Start();
