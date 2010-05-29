@@ -101,7 +101,9 @@ public:
         return mTrackInfo.size();
     }
     bool GetData (uint8_t *data); // Get a raw audio block
-    BUFCDIO_STATE_T GetState(void)  {return mState; };
+    BUFCDIO_STATE_T GetState(void)  {
+        return mState;
+    };
     void Action(void);
     void SetTrack (TRACK_IDX_T newtrack);
     void NextTrack(void) {
@@ -115,14 +117,14 @@ public:
         mCdMutex.Unlock();
     };
     void Stop(void) {
-        mCdMutex.Lock();
+        mState = BCDIO_STOP;
         Cancel(5);
         CloseDevice();
-        mCdMutex.Unlock();
+
     }
     void Pause(void) {
         if (mState == BCDIO_PLAY) mState = BCDIO_PAUSE;
-        if (mState == BCDIO_PAUSE) mState = BCDIO_PLAY;
+        else if (mState == BCDIO_PAUSE) mState = BCDIO_PLAY;
     }
 };
 

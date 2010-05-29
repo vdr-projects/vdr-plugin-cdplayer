@@ -34,6 +34,7 @@ const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
 cBufferedCdio::cBufferedCdio(void) :
         mRingBuffer(CCDIO_MAX_BLOCKS)
 {
+    cMutexLock MutexLock(&mCdMutex);
     pCdio = NULL;
     mCurrTrackIdx = 0;
     mState = BCDIO_STOP;
@@ -41,6 +42,7 @@ cBufferedCdio::cBufferedCdio(void) :
 
 cBufferedCdio::~cBufferedCdio(void)
 {
+    cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_STOP;
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
@@ -75,6 +77,7 @@ void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
 // Close access and destroy and reset all internal buffers
 void cBufferedCdio::CloseDevice(void)
 {
+    cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_STOP;
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
@@ -95,16 +98,13 @@ bool cBufferedCdio::GetData (uint8_t *data)
     if (pCdio == NULL) {
         return false;
     }
-    ret = mRingBuffer.GetBlock(data);
-    if (!ret) {
-        if (Active()) {
-            esyslog("%s %d Timeout", __FILE__, __LINE__);
-        }
-        else {
-            dsyslog("%s %d Thread ends", __FILE__, __LINE__);
+    while (!mRingBuffer.GetBlock(data))
+    {
+        if (!Running()) {
+            return false;
         }
     }
-    return ret;
+    return true;
 }
 
 // Open access to the audio cd and retrieve all available CD-Text
@@ -114,6 +114,7 @@ bool cBufferedCdio::GetData (uint8_t *data)
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
     CloseDevice();
+    cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
     pCdio = cdio_open(FileName.c_str(), DRIVER_DEVICE);
     if (pCdio == NULL) {
@@ -169,7 +170,11 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                 return false;
             }
             mCdMutex.Unlock();
-            mRingBuffer.PutBlock(buf);
+            while (!mRingBuffer.PutBlock(buf)) {
+                if (!Running()) {
+                    return false;
+                }
+            }
             currlsn++;
         }
         if (!Running()) {

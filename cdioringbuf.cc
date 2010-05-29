@@ -72,11 +72,13 @@ bool cCdIoRingBuffer::GetBlock(uint8_t *block)
  * no space is left on the buffer
  */
 
-void cCdIoRingBuffer::PutBlock(const uint8_t *block)
+bool cCdIoRingBuffer::PutBlock(const uint8_t *block)
 {
     int idx = mPutIdx * CDIO_CD_FRAMESIZE_RAW;
 
-    mPutAllowed.WaitAllow();
+    if (!mPutAllowed.WaitAllow()) {
+        return false;
+    }
     mBufferMutex.Lock();
     memcpy (&mData[idx], block, CDIO_CD_FRAMESIZE_RAW);
     mPutIdx++;
@@ -88,6 +90,7 @@ void cCdIoRingBuffer::PutBlock(const uint8_t *block)
     }
     mGetAllowed.Allow();
     mBufferMutex.Unlock();
+    return true;
 }
 
 /*

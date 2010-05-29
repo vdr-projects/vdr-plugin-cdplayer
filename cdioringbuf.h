@@ -45,12 +45,12 @@ public:
         mMutex.Unlock();
     }
 
-    // Wait until access is allowed or time out after 15 seconds (returns
+    // Wait until access is allowed or time out after 2 seconds (returns
     // false in this case)
     bool WaitAllow(void)
     {
         while (!mAllowed) {
-            if (!Wait(15000)) {
+            if (!Wait(2000)) {
                 return false;
             }
         }
@@ -74,7 +74,7 @@ public:
     cCdIoRingBuffer(int blocks);
     ~cCdIoRingBuffer();
     bool GetBlock(uint8_t *block);
-    void PutBlock(const uint8_t *block);
+    bool PutBlock(const uint8_t *block);
     void Clear(void);
 };
 

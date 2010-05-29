@@ -23,6 +23,7 @@
 
 class cCdPlayer: public cPlayer, public cThread {
 protected:
+
     cBufferedCdio cdio;
     uchar *pStillBuf;
     int mStillBufLen;
@@ -37,26 +38,43 @@ public:
     cCdPlayer(void);
     virtual ~cCdPlayer();
     virtual bool GetIndex(int &Current, int &Total, bool SnapToIFrame = false);
+    virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
     void NextTrack(void) {cdio.NextTrack();};
     void PrevTrack(void) {cdio.PrevTrack();};
-    void Stop(void) {cdio.Stop(); Cancel (1);};
+    void Stop(void);
     void Pause(void) {cdio.Pause();};
     void SpeedNormal(void) {mSpeed = 0;};
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;};
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;};
-    const TRACK_IDX_T GetNumTracks (void) { return cdio.GetNumTracks(); };
+    const TRACK_IDX_T GetNumTracks (void) {
+        cMutexLock MutexLock(&mPlayerMutex);
+        return cdio.GetNumTracks();
+    };
     const cTrackInfo &GetTrackInfo (const TRACK_IDX_T track) {
+        cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetTrackInfo(track);
     }
-    const TRACK_IDX_T GetCurrTrack(void) { return cdio.GetCurrTrack(); };
+    const TRACK_IDX_T GetCurrTrack(void) {
+        cMutexLock MutexLock(&mPlayerMutex);
+        return cdio.GetCurrTrack();
+    };
     const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
+        cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetCdTextFields(track);
     };
     const CD_TEXT_T& GetCDInfo (void) {
+        cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetCDInfo();
     }
+    int GetSpeed(void) {
+        return mSpeed;
+    }
+    BUFCDIO_STATE_T GetState(void) {
+        return cdio.GetState();
+    }
+
 };
 
 class cCdControl: public cControl {
@@ -64,6 +82,7 @@ private:
     cCdPlayer *mCdPlayer;
     cSkinDisplayMenu *mMenuPlaylist;
     cMutex mControlMutex;
+    static const char *menutitle;
 public:
     cCdControl(void);
     virtual ~cCdControl();

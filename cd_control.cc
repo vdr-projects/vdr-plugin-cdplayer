@@ -1,31 +1,32 @@
 #include "cdplayer.h"
 #include "pes_audio_converter.h"
 #include "bufferedcdio.h"
+#include <time.h>
+
+const char *cCdControl::menutitle = "CD Player";
 
 cCdControl::cCdControl(void)
-    :cControl(mCdPlayer = new cCdPlayer)
+    :cControl(mCdPlayer = new cCdPlayer), mMenuPlaylist(NULL)
 {
-    mMenuPlaylist = NULL;
-//    mMenuPlaylist = Skins.Current()->DisplayMenu();
-//    mMenuPlaylist->SetTitle(tr("Reading CD"));
+
 }
 
 cCdControl::~cCdControl()
 {
+    cMutexLock MutexLock(&mControlMutex);
     Hide();
+    cStatus::MsgOsdClear();
     delete mCdPlayer;
 }
 
 void cCdControl::Hide(void)
 {
-printf("Hide\n");
-    mControlMutex.Lock();
+    cMutexLock MutexLock(&mControlMutex);
     if (mMenuPlaylist != NULL) {
         mMenuPlaylist->Clear();
         delete mMenuPlaylist;
     }
     mMenuPlaylist = NULL;
-    mControlMutex.Unlock();
 }
 
 cOsdObject *cCdControl::GetInfo(void)
@@ -36,50 +37,51 @@ printf("GetInfo\n");
 
 eOSState cCdControl::ProcessKey(eKeys Key)
 {
-    eOSState state = cOsdObject::ProcessKey(Key);
-printf("ProcessKey %d\n",Key);
-    mControlMutex.Lock();
+    eOSState state = osContinue; //cOsdObject::ProcessKey(Key);
 
-    if (state == osUnknown) {
-        state = osContinue;
-        switch (Key & ~k_Repeat) {
-        case kFastFwd:
-            mCdPlayer->SpeedFaster();
-            break;
-        case kFastRew:
-            mCdPlayer->SpeedSlower();
-            break;
-        case kPlay:
-            mCdPlayer->SpeedNormal();
-            break;
-        case kDown:
-        case kNext:
-            mCdPlayer->NextTrack();
-            break;
-        case kUp:
-        case kPrev:
-            mCdPlayer->PrevTrack();
-            break;
-        case kOk:
-        case kMenu:
-        case kStop:
-            mCdPlayer->Stop();
-            state = osEnd;
-            break;
-        case kPause:
-            mCdPlayer->Pause();
-            break;
-        default:
-            state = osUnknown;
-            break;
-        }
+    switch (Key & ~k_Repeat) {
+    case kFastFwd:
+        mCdPlayer->SpeedFaster();
+        break;
+    case kFastRew:
+        mCdPlayer->SpeedSlower();
+        break;
+    case kPlay:
+        mCdPlayer->SpeedNormal();
+        break;
+    case kDown:
+    case kNext:
+        mCdPlayer->NextTrack();
+        break;
+    case kUp:
+    case kPrev:
+        mCdPlayer->PrevTrack();
+        break;
+    case kOk:
+    case kMenu:
+    case kStop:
+        state = osEnd;
+        break;
+    case kPause:
+        mCdPlayer->Pause();
+        break;
+    default:
+        state = osUnknown;
+        break;
     }
-    mControlMutex.Unlock();
+
     if (state != osEnd) {
         ShowPlaylist();
     }
     else {
+        if (mMenuPlaylist != NULL) {
+            cStatus::MsgOsdClear();
+            mMenuPlaylist->SetTitle("----");
+        }
+printf("Stopping CD\n");
         mCdPlayer->Stop();
+        Hide();
+        cStatus::MsgOsdMenuDestroy();
     }
 
     return (state);
@@ -87,35 +89,74 @@ printf("ProcessKey %d\n",Key);
 
 void cCdControl::ShowPlaylist()
 {
-    mControlMutex.Lock();
+    cMutexLock MutexLock(&mControlMutex);
 
     if (mMenuPlaylist == NULL) {
         mMenuPlaylist = Skins.Current()->DisplayMenu();
     }
 
     const CD_TEXT_T cd_info = mCdPlayer->GetCDInfo();
+    string title;
     string cdtitle = cd_info[CDTEXT_TITLE];
-    if (cdtitle.empty()) {
-        mMenuPlaylist->SetTitle(tr("Playlist"));
-    } else {
-        mMenuPlaylist->SetTitle(cdtitle.c_str());
+    string perform = cd_info[CDTEXT_PERFORMER];
+    if (!cdtitle.empty()) {
+        title = cdtitle;
     }
+    else if (!perform.empty()) {
+        title = perform;
+    } else {
+        title = tr("Playlist");
+
+    }
+
+    title += "  ";
+    switch (mCdPlayer->GetState()) {
+    case BCDIO_STOP:
+    case BCDIO_PAUSE:
+        title += "||";
+        break;
+    case BCDIO_PLAY:
+        title += ">>";
+        break;
+    default:
+        break;
+    }
+
+    switch (mCdPlayer->GetSpeed()) {
+    case 1:
+        title += "  x1,1";
+        break;
+    case 2:
+        title += "  x2";
+        break;
+    default:
+        break;
+    }
+    mMenuPlaylist->SetTitle(title.c_str());
     mMenuPlaylist->SetTabs(4, 15);
+    cStatus::MsgOsdMenuDisplay(menutitle);
+    cStatus::MsgOsdClear();
+    cStatus::MsgOsdTitle(title.c_str());
+    string curr;
     for (TRACK_IDX_T i = 0; i < mCdPlayer->GetNumTracks(); i++) {
         const CD_TEXT_T text = mCdPlayer->GetCdTextFields(i);
         string artist = text[CDTEXT_PERFORMER];
         string title = text[CDTEXT_TITLE];
         char *str;
+
         asprintf(&str, "%2d\t %s\t %s", i + 1, artist.c_str(), title.c_str());
         mMenuPlaylist->SetItem(str, i, (i == mCdPlayer->GetCurrTrack()), true);
+        free(str);
+        asprintf(&str, "%2d %s", i + 1, title.c_str());
+        cStatus::MsgOsdItem(str, i + 1);
         if (i == mCdPlayer->GetCurrTrack()) {
-            cStatus::MsgReplaying(this, title.c_str(), NULL, true);
+            curr = str;
         }
         free(str);
     }
+    cStatus::MsgOsdCurrentItem (curr.c_str());
  //   mMenuPlaylist->SetButtons("Red", "Green", "Yellow", "Blue");
 
-    mControlMutex.Unlock();
 }
 
 
@@ -136,14 +177,32 @@ cCdPlayer::cCdPlayer(void)
 
 cCdPlayer::~cCdPlayer()
 {
-    mPlayerMutex.Lock();
+    cMutexLock MutexLock(&mPlayerMutex);
     Detach();
     free(pStillBuf);
-    mPlayerMutex.Unlock();
+}
+
+void cCdPlayer::Stop(void) {
+    Cancel(10);
+    DeviceClear();
+    Detach();
+};
+
+bool cCdPlayer::GetReplayMode(bool &Play, bool &Forward, int &Speed)
+{
+    cMutexLock MutexLock(&mPlayerMutex);
+    Play = (GetState() == BCDIO_PLAY);
+    Forward = true;
+    Speed = -1;
+    if (GetSpeed() != 0) {
+        Speed = GetSpeed();
+    }
+    return (true);
 }
 
 bool cCdPlayer::GetIndex(int &Current, int &Total, bool SnapToIFrame)
 {
+    cMutexLock MutexLock(&mPlayerMutex);
     Current = GetCurrTrack();
     Total = GetNumTracks();
     return (true);
@@ -155,12 +214,14 @@ void cCdPlayer::DisplayStillPicture (void)
         DeviceStillPicture((const uchar *)pStillBuf, mStillBufLen);
     }
 }
+
 void cCdPlayer::LoadStillPicture (const std::string FileName)
 {
     int fd;
     int len;
     int size = MAXFRAMESIZE;
-    mPlayerMutex.Lock();
+    cMutexLock MutexLock(&mPlayerMutex);
+
     if (pStillBuf != NULL) {
         free (pStillBuf);
     }
@@ -171,7 +232,6 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
     if (fd < 0) {
         esyslog("%s %d Can not open still picture %s",
                 __FILE__, __LINE__, FileName.c_str());
-        mPlayerMutex.Unlock();
         return;
     }
 
@@ -179,7 +239,6 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
     if (pStillBuf == NULL) {
         esyslog("%s %d Out of memory", __FILE__, __LINE__);
         close(fd);
-        mPlayerMutex.Unlock();
         return;
     }
     do {
@@ -187,7 +246,6 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
         if (len < 0) {
             esyslog ("%s %d read error %d", __FILE__, __LINE__, errno);
             close(fd);
-            mPlayerMutex.Unlock();
             return;
         }
         if (len > 0) {
@@ -198,21 +256,18 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
                 if (pStillBuf == NULL) {
                     close(fd);
                     esyslog("%s %d Out of memory", __FILE__, __LINE__);
-                    mPlayerMutex.Unlock();
                     return;
                 }
             }
         }
     } while (len > 0);
     close(fd);
-    mPlayerMutex.Unlock();
     DisplayStillPicture();
 }
 
 void cCdPlayer::Activate(bool On)
 {
-    mPlayerMutex.Lock();
-printf("%.16s (%d) Activate On=%s\n", __FILE__, __LINE__, On ? "true" : "false");
+    cMutexLock MutexLock(&mPlayerMutex);
     if (On) {
         std::string file = cPluginCdplayer::GetStillPicName();
         LoadStillPicture(file);
@@ -222,7 +277,6 @@ printf("%.16s (%d) Activate On=%s\n", __FILE__, __LINE__, On ? "true" : "false")
     else {
         Stop();
     }
-    mPlayerMutex.Unlock();
 }
 
 #define FRAME_DIV 4
@@ -251,6 +305,7 @@ void cCdPlayer::Action(void)
         int i = 0;
         while ((i < FRAME_DIV) && (play)) {
             if (DevicePoll(oPoller, 100)) {
+                cMutexLock MutexLock(&mPlayerMutex);
                 converter.SetFreq(mSpeedTypes[mSpeed]);
                 converter.SetData(&buf[i * chunksize], chunksize);
                 pesdata = converter.GetPesData();

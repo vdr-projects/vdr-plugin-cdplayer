@@ -13,7 +13,7 @@ PLUGIN = cdplayer
 
 ### The version number of this plugin (taken from the main source file):
 
-VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).cc | awk '{ print $$6 }' | sed -e 's/[";]//g')
+VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).h | awk '{ print $$6 }' | sed -e 's/[";]//g')
 
 ### The C++ compiler and options:
 
@@ -28,7 +28,7 @@ TMPDIR = /tmp
 
 ### Make sure that necessary options are included:
 
-include $(VDRDIR)/Make.global
+-include $(VDRDIR)/Make.global
 
 ### Allow user defined options to overwrite defaults:
 
