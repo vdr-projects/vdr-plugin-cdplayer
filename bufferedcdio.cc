@@ -7,7 +7,7 @@
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
  *
  * This class implements buffered access to the audio cd via
- * libcdda and gets all track information via CD-Text or cddb.
+ * libcdda.
  *
  */
 
@@ -86,7 +86,7 @@ void cBufferedCdio::CloseDevice(void)
     for (int i = 0; i < MAX_CDTEXT_FIELDS; i++) {
         mCdText[i].clear();
     }
-    mTrackInfo.clear();
+    mCdInfo.Clear();
     mRingBuffer.Clear();
     mCurrTrackIdx = 0;
 }
@@ -115,8 +115,10 @@ bool cBufferedCdio::GetData (uint8_t *data)
 
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
-    CloseDevice();
+    bool hasaudiotrack = false;
     string txt;
+
+    CloseDevice();
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
     pCdio = cdio_open(FileName.c_str(), DRIVER_DEVICE);
@@ -166,13 +168,23 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
         }
         track_format_t fmt = cdio_get_track_format(pCdio, track_no);
         if ((fmt == TRACK_FORMAT_AUDIO) && (startlsn != CDIO_INVALID_LSN)) {
+            CD_TEXT_T cdtextfields;
             dsyslog ("get_track_info for track %d S %d E %d",
                      track_no, startlsn, endlsn);
-            cTrackInfo ti(startlsn, endlsn);
-            GetCDText (track_no, ti.mCdTextFields);
-            mTrackInfo.push_back(ti);
+            GetCDText (track_no, cdtextfields);
+            mCdInfo.Add(startlsn, endlsn, cdtextfields);
+            hasaudiotrack = true;
         }
     }
+    if (!hasaudiotrack) {
+        mState = BCDIO_FAILED;
+        txt = tr("Not an audio disk");
+        mErrtxt = txt + " " + FileName;
+        esyslog("%s %d no audio track found %s",
+                __FILE__, __LINE__, FileName.c_str());
+        return false;
+    }
+    mCdInfo.Start(); // Start CDDB query
     return true;
 }
 
@@ -180,11 +192,12 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
 bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 {
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
-    cTrackInfo ti = GetTrackInfo(trackidx);
-    lsn_t currlsn = ti.GetCDDAStartLsn();
+  //  cTrackInfo ti = GetTrackInfo(trackidx);
+    lsn_t currlsn = GetEndLsn(trackidx);
+    lsn_t endlsn = GetEndLsn(trackidx);
     dsyslog("%s %d Read Track %d Start %d End %d",
-            __FILE__, __LINE__, trackidx, currlsn, ti.GetCDDAEndLsn());
-    while (currlsn < ti.GetCDDAEndLsn()) {
+            __FILE__, __LINE__, trackidx, currlsn, endlsn);
+    while (currlsn < endlsn) {
         if (mState == BCDIO_PAUSE) {
             cCondWait::SleepMs(250);
         }

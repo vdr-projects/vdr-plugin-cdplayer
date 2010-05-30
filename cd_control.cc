@@ -3,7 +3,8 @@
 #include "bufferedcdio.h"
 #include <time.h>
 
-const char *cCdControl::menutitle = "CD Player";
+const char *cCdControl::menutitle = tr("CD Player");
+const char *cCdControl::menukind = "CDPLAYER";
 
 cCdControl::cCdControl(void)
     :cControl(mCdPlayer = new cCdPlayer), mMenuPlaylist(NULL)
@@ -137,8 +138,8 @@ void cCdControl::ShowPlaylist()
         break;
     }
     mMenuPlaylist->SetTitle(title.c_str());
-    mMenuPlaylist->SetTabs(4, 15);
-    cStatus::MsgOsdMenuDisplay(menutitle);
+    mMenuPlaylist->SetTabs(3, 6, 10);
+    cStatus::MsgOsdMenuDisplay(menukind);
     cStatus::MsgOsdClear();
     cStatus::MsgOsdTitle(title.c_str());
     string curr;
@@ -147,11 +148,13 @@ void cCdControl::ShowPlaylist()
         string artist = text[CDTEXT_PERFORMER];
         string title = text[CDTEXT_TITLE];
         char *str;
-
-        asprintf(&str, "%2d\t %s\t %s", i + 1, artist.c_str(), title.c_str());
+        int min, sec;
+        mCdPlayer->GetTrackTime(i, &min, &sec);
+        asprintf(&str, "%2d\t%2d:%02d\t%s\t %s",
+                  i + 1, min, sec, artist.c_str(), title.c_str());
         mMenuPlaylist->SetItem(str, i, (i == mCdPlayer->GetCurrTrack()), true);
         free(str);
-        asprintf(&str, "%2d %s", i + 1, title.c_str());
+        asprintf(&str, "%2d %2d:%02d %s", i + 1, min, sec, title.c_str());
         cStatus::MsgOsdItem(str, i + 1);
         if (i == mCdPlayer->GetCurrTrack()) {
             curr = str;

@@ -15,44 +15,16 @@
 #define __BUFFEREDCDIO_H__
 
 #include <string>
-#include <map>
-#include <vector>
-
 #include <stdio.h>
 #include <stdint.h>
 #include <vdr/plugin.h>
-#include <cdio/cdio.h>
-#include <cdio/cd_types.h>
-
 #include "cdioringbuf.h"
+#include "cdinfo.h"
 
 using namespace std;
 
 // Maximum number of raw blocks to buffer
 static const int CCDIO_MAX_BLOCKS=32;
-
-typedef string CD_TEXT_T[MAX_CDTEXT_FIELDS];
-typedef unsigned int TRACK_IDX_T;
-
-// Track information for each track
-class cTrackInfo {
-private:
-    friend class cBufferedCdio;
-    track_t mTrackNo;
-    lsn_t mStartLsn;
-    lsn_t mEndLsn;
-    CD_TEXT_T mCdTextFields;
-public:
-    cTrackInfo(void) : mTrackNo(0), mStartLsn(0), mEndLsn(0) {};
-    cTrackInfo(lsn_t StartLsn, lsn_t EndLsn)
-                : mTrackNo(0), mStartLsn(StartLsn), mEndLsn(EndLsn) {};
-    track_t GetCDDATrack(void) { return mTrackNo; };
-    lsn_t GetCDDAStartLsn(void) { return mStartLsn; };
-    lsn_t GetCDDAEndLsn(void) { return mEndLsn; };
-};
-
-// Vector (array) containing all track information
-typedef vector<cTrackInfo> TrackInfoVector;
 
 typedef enum _bufcdio_state {
     BCDIO_STOP = 0,
@@ -72,7 +44,7 @@ private:
 
     TRACK_IDX_T     mCurrTrackIdx; // Audio Track index
     CD_TEXT_T       mCdText;       // CD-Text for entire CD
-    TrackInfoVector mTrackInfo;    // CD Information per audio track
+    cCdInfo         mCdInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
     bool           mTrackChange;  // Indication for external track change
     BUFCDIO_STATE_T mState;
@@ -94,13 +66,19 @@ public:
         return mCdText;
     }
     const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
-        return mTrackInfo[track].mCdTextFields;
+        return mCdInfo.GetCdTextFields(track);
     };
-    const cTrackInfo &GetTrackInfo (const TRACK_IDX_T track) {
-        return mTrackInfo[track];
+    lsn_t GetStartLsn (const TRACK_IDX_T track) {
+        return mCdInfo.GetStartLsn(track);
+    }
+    lsn_t GetEndLsn (const TRACK_IDX_T track) {
+        return mCdInfo.GetEndLsn(track);
+    }
+    void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
+        return mCdInfo.GetTrackTime (track, min, sec);
     }
     const TRACK_IDX_T GetNumTracks (void) {
-        return mTrackInfo.size();
+        return mCdInfo.GetNumTracks();
     }
     bool GetData (uint8_t *data); // Get a raw audio block
     BUFCDIO_STATE_T GetState(void)  {

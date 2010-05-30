@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-05-29 18:44+0200\n"
+"POT-Creation-Date: 2010-05-30 13:04+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -19,7 +19,7 @@ msgid "ARRANGER"
 msgstr ""
 
 msgid "COMPOSER"
-msgstr ""
+msgstr "Komponist"
 
 msgid "DISCID"
 msgstr ""
@@ -58,10 +58,10 @@ msgid "Invalid"
 msgstr ""
 
 msgid "Can not open"
-msgstr ""
+msgstr "Kann device nicht öffnen"
 
 msgid "No disc in drive"
-msgstr ""
+msgstr "Keine CD im Laufwerk"
 
 msgid "Problem on read"
 msgstr ""
@@ -69,7 +69,13 @@ msgstr ""
 msgid "Problem on read lsn"
 msgstr ""
 
+msgid "Not an audio disk"
+msgstr "Keine Audio disk"
+
 msgid "Read error"
+msgstr ""
+
+msgid "CD Player"
 msgstr ""
 
 msgid "Playlist"

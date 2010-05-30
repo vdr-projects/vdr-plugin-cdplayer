@@ -52,10 +52,6 @@ public:
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetNumTracks();
     };
-    const cTrackInfo &GetTrackInfo (const TRACK_IDX_T track) {
-        cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetTrackInfo(track);
-    }
     const TRACK_IDX_T GetCurrTrack(void) {
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetCurrTrack();
@@ -77,6 +73,9 @@ public:
     const string &GetErrorText(void) {
         return cdio.GetErrorText();
     }
+    void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
+        cdio.GetTrackTime (track, min, sec);
+    }
 };
 
 class cCdControl: public cControl {
@@ -85,6 +84,7 @@ private:
     cSkinDisplayMenu *mMenuPlaylist;
     cMutex mControlMutex;
     static const char *menutitle;
+    static const char *menukind;
 public:
     cCdControl(void);
     virtual ~cCdControl();
