@@ -43,7 +43,6 @@ private:
     track_t         mNumOfTracks;    // CDIO number of tracks
 
     TRACK_IDX_T     mCurrTrackIdx; // Audio Track index
-    CD_TEXT_T       mCdText;       // CD-Text for entire CD
     cCdInfo         mCdInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
     bool           mTrackChange;  // Indication for external track change
@@ -62,11 +61,11 @@ public:
     const string &GetErrorText(void) { return mErrtxt; };
     const TRACK_IDX_T GetCurrTrack(void) { return mCurrTrackIdx; };
     const char *GetCdTextField(const cdtext_field_t type);
-    const CD_TEXT_T& GetCDInfo (void) {
-        return mCdText;
+    void GetCdInfo (CD_TEXT_T &txt) {
+       mCdInfo.GetCdInfo(txt);
     }
-    const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
-        return mCdInfo.GetCdTextFields(track);
+    void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &txt) {
+        mCdInfo.GetCdTextFields(track, txt);
     };
     lsn_t GetStartLsn (const TRACK_IDX_T track) {
         return mCdInfo.GetStartLsn(track);

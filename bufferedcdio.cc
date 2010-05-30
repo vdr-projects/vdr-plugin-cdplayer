@@ -83,9 +83,6 @@ void cBufferedCdio::CloseDevice(void)
         cdio_destroy(pCdio);
         pCdio = NULL;
     }
-    for (int i = 0; i < MAX_CDTEXT_FIELDS; i++) {
-        mCdText[i].clear();
-    }
     mCdInfo.Clear();
     mRingBuffer.Clear();
     mCurrTrackIdx = 0;
@@ -111,12 +108,12 @@ bool cBufferedCdio::GetData (uint8_t *data)
 
 // Open access to the audio cd and retrieve all available CD-Text
 // information
-// @TODO implement CDDB
 
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
     bool hasaudiotrack = false;
     string txt;
+    CD_TEXT_T cdtxt;
 
     CloseDevice();
     cMutexLock MutexLock(&mCdMutex);
@@ -153,11 +150,14 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     }
     dsyslog("CD-ROM Track List (%d - %d)\n", mFirstTrackNum, mNumOfTracks);
 
-    GetCDText (0, mCdText);
+    GetCDText (0, cdtxt);
+    mCdInfo.SetCdInfo (cdtxt);
+
     for (int i = 0; i < mNumOfTracks; i++) {
         track_t track_no = (track_t)i + mFirstTrackNum;
         lsn_t startlsn = cdio_get_track_lsn(pCdio, track_no);
         lsn_t endlsn = cdio_get_track_last_lsn(pCdio, track_no);
+        lba_t lba = cdio_get_track_lba(pCdio, track_no);
         if (endlsn == CDIO_INVALID_LSN) {
             mState = BCDIO_FAILED;
             txt = tr("Problem on read lsn");
@@ -166,13 +166,21 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
                      __FILE__, __LINE__, FileName.c_str());
             return false;
         }
+        if (lba == CDIO_INVALID_LBA) {
+            mState = BCDIO_FAILED;
+            txt = tr("Problem on read lba");
+            mErrtxt = txt + " " + FileName;
+            esyslog("%s %d Problem on read lba %s",
+                    __FILE__, __LINE__, FileName.c_str());
+            return false;
+        }
         track_format_t fmt = cdio_get_track_format(pCdio, track_no);
         if ((fmt == TRACK_FORMAT_AUDIO) && (startlsn != CDIO_INVALID_LSN)) {
             CD_TEXT_T cdtextfields;
-            dsyslog ("get_track_info for track %d S %d E %d",
-                     track_no, startlsn, endlsn);
+            dsyslog ("get_track_info for track %d S %d E %d L %d",
+                     track_no, startlsn, endlsn, lba);
             GetCDText (track_no, cdtextfields);
-            mCdInfo.Add(startlsn, endlsn, cdtextfields);
+            mCdInfo.Add(startlsn, endlsn, lba, cdtextfields);
             hasaudiotrack = true;
         }
     }
@@ -184,6 +192,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
                 __FILE__, __LINE__, FileName.c_str());
         return false;
     }
+    mCdInfo.SetLeadOut (cdio_get_track_lba(pCdio, CDIO_CDROM_LEADOUT_TRACK));
     mCdInfo.Start(); // Start CDDB query
     return true;
 }
@@ -192,8 +201,8 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
 bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 {
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
-  //  cTrackInfo ti = GetTrackInfo(trackidx);
-    lsn_t currlsn = GetEndLsn(trackidx);
+
+    lsn_t currlsn = GetStartLsn(trackidx);
     lsn_t endlsn = GetEndLsn(trackidx);
     dsyslog("%s %d Read Track %d Start %d End %d",
             __FILE__, __LINE__, trackidx, currlsn, endlsn);

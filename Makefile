@@ -53,7 +53,7 @@ DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 OBJS = $(PLUGIN).o cd_control.o pes_audio_converter.o bufferedcdio.o \
 				   cdioringbuf.o cdinfo.o
-LIBS = -lcdio
+LIBS = -lcdio -lcddb
 
 ### The main target:
 

@@ -56,13 +56,13 @@ public:
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetCurrTrack();
     };
-    const CD_TEXT_T& GetCdTextFields(const TRACK_IDX_T track) {
+    void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &txt) {
         cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetCdTextFields(track);
+        cdio.GetCdTextFields(track, txt);
     };
-    const CD_TEXT_T& GetCDInfo (void) {
+    void GetCdInfo (CD_TEXT_T &txt) {
         cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetCDInfo();
+        cdio.GetCdInfo(txt);
     }
     int GetSpeed(void) {
         return mSpeed;

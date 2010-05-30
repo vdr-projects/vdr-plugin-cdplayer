@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-05-30 13:04+0200\n"
+"POT-Creation-Date: 2010-05-30 16:11+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -67,6 +67,9 @@ msgid "Problem on read"
 msgstr ""
 
 msgid "Problem on read lsn"
+msgstr ""
+
+msgid "Problem on read lba"
 msgstr ""
 
 msgid "Not an audio disk"

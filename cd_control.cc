@@ -100,7 +100,8 @@ void cCdControl::ShowPlaylist()
         mMenuPlaylist = Skins.Current()->DisplayMenu();
     }
 
-    const CD_TEXT_T cd_info = mCdPlayer->GetCDInfo();
+    CD_TEXT_T cd_info;
+    mCdPlayer->GetCdInfo(cd_info);
     string title;
     string cdtitle = cd_info[CDTEXT_TITLE];
     string perform = cd_info[CDTEXT_PERFORMER];
@@ -144,7 +145,8 @@ void cCdControl::ShowPlaylist()
     cStatus::MsgOsdTitle(title.c_str());
     string curr;
     for (TRACK_IDX_T i = 0; i < mCdPlayer->GetNumTracks(); i++) {
-        const CD_TEXT_T text = mCdPlayer->GetCdTextFields(i);
+        CD_TEXT_T text;
+        mCdPlayer->GetCdTextFields(i, text);
         string artist = text[CDTEXT_PERFORMER];
         string title = text[CDTEXT_TITLE];
         char *str;
