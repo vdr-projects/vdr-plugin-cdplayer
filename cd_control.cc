@@ -1,3 +1,15 @@
+/*
+ * Plugin for VDR to act as CD-Player
+ *
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This class implements the control and player
+ *
+ */
+
 #include "cdplayer.h"
 #include "pes_audio_converter.h"
 #include "bufferedcdio.h"
@@ -14,9 +26,7 @@ cCdControl::cCdControl(void)
 
 cCdControl::~cCdControl()
 {
-    cMutexLock MutexLock(&mControlMutex);
     Hide();
-    cStatus::MsgOsdClear();
     delete mCdPlayer;
 }
 
@@ -26,20 +36,24 @@ void cCdControl::Hide(void)
     if (mMenuPlaylist != NULL) {
         mMenuPlaylist->Clear();
         delete mMenuPlaylist;
+        cStatus::MsgOsdClear();
+        cStatus::MsgOsdMenuDestroy();
     }
     mMenuPlaylist = NULL;
 }
 
 cOsdObject *cCdControl::GetInfo(void)
 {
-printf("GetInfo\n");
     return NULL;
 }
 
 eOSState cCdControl::ProcessKey(eKeys Key)
 {
-    eOSState state = osContinue; //cOsdObject::ProcessKey(Key);
-
+    eOSState state = cOsdObject::ProcessKey(Key);
+    if (state != osUnknown) {
+        return (state);
+    }
+    state = osContinue;
     switch (Key & ~k_Repeat) {
     case kFastFwd:
         mCdPlayer->SpeedFaster();
@@ -59,7 +73,6 @@ eOSState cCdControl::ProcessKey(eKeys Key)
         mCdPlayer->PrevTrack();
         break;
     case kOk:
-    case kMenu:
     case kStop:
         state = osEnd;
         break;
@@ -73,21 +86,15 @@ eOSState cCdControl::ProcessKey(eKeys Key)
 
     if (mCdPlayer->GetState() == BCDIO_FAILED) {
         cStatus::MsgOsdStatusMessage(mCdPlayer->GetErrorText().c_str());
-        cSkinDisplay::Current()->SetMessage(mtError, mCdPlayer->GetErrorText().c_str());
-        sleep(3);
+        Skins.QueueMessage(mtError, mCdPlayer->GetErrorText().c_str());
         state = osEnd;
     }
     if (state != osEnd) {
         ShowPlaylist();
     }
     else {
-        if (mMenuPlaylist != NULL) {
-            mMenuPlaylist->SetTitle("----");
-            cStatus::MsgOsdTitle("----");
-        }
         Hide();
         mCdPlayer->Stop();
-        cStatus::MsgOsdMenuDestroy();
     }
     return (state);
 }
@@ -96,10 +103,18 @@ void cCdControl::ShowPlaylist()
 {
     cMutexLock MutexLock(&mControlMutex);
 
-    if (mMenuPlaylist == NULL) {
-        mMenuPlaylist = Skins.Current()->DisplayMenu();
+    // If any other OSD is open then dont show Playlist menu
+    if (cOsd::IsOpen() && mMenuPlaylist == NULL) {
+        return;
     }
 
+    // Display Playlist menu
+    if (mMenuPlaylist == NULL) {
+        mMenuPlaylist = Skins.Current()->DisplayMenu();
+        cStatus::MsgOsdMenuDisplay(menukind);
+    }
+
+    // Build title information
     CD_TEXT_T cd_info;
     mCdPlayer->GetCdInfo(cd_info);
     string title;
@@ -112,11 +127,13 @@ void cCdControl::ShowPlaylist()
         title = perform;
     } else {
         title = tr("Playlist");
-
     }
 
     title += "  ";
     switch (mCdPlayer->GetState()) {
+    case BCDIO_FAILED:
+        title += "--";
+        break;
     case BCDIO_STOP:
     case BCDIO_PAUSE:
         title += "||";
@@ -139,8 +156,9 @@ void cCdControl::ShowPlaylist()
         break;
     }
     mMenuPlaylist->SetTitle(title.c_str());
+
+    // Build Playlist
     mMenuPlaylist->SetTabs(3, 6, 10);
-    cStatus::MsgOsdMenuDisplay(menukind);
     cStatus::MsgOsdClear();
     cStatus::MsgOsdTitle(title.c_str());
     string curr;
@@ -182,20 +200,23 @@ cCdPlayer::cCdPlayer(void)
     pStillBuf = NULL;
     mStillBufLen = 0;
     mSpeed = 0;
+    SetDescription ("cdplayer");
 }
 
 cCdPlayer::~cCdPlayer()
 {
     cMutexLock MutexLock(&mPlayerMutex);
-    Detach();
+    Stop();
     free(pStillBuf);
 }
 
 void cCdPlayer::Stop(void) {
-    Cancel(10);
     DeviceClear();
+    if (Active()) {
+        Cancel(10);
+    }
     Detach();
-};
+}
 
 bool cCdPlayer::GetReplayMode(bool &Play, bool &Forward, int &Speed)
 {
@@ -236,9 +257,11 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
     }
     pStillBuf = NULL;
     mStillBufLen = 0;
-
     fd = open(FileName.c_str(), O_RDONLY);
     if (fd < 0) {
+        string errtxt = tr("Can not open still picture: ");
+        errtxt += FileName;
+        Skins.QueueMessage(mtError, errtxt.c_str());
         esyslog("%s %d Can not open still picture %s",
                 __FILE__, __LINE__, FileName.c_str());
         return;
@@ -255,6 +278,9 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
         if (len < 0) {
             esyslog ("%s %d read error %d", __FILE__, __LINE__, errno);
             close(fd);
+            free (pStillBuf);
+            pStillBuf = NULL;
+            mStillBufLen = 0;
             return;
         }
         if (len > 0) {
@@ -264,6 +290,7 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
                 pStillBuf = (uchar *) realloc(pStillBuf, size);
                 if (pStillBuf == NULL) {
                     close(fd);
+                    mStillBufLen = 0;
                     esyslog("%s %d Out of memory", __FILE__, __LINE__);
                     return;
                 }
@@ -278,10 +305,12 @@ void cCdPlayer::Activate(bool On)
 {
     cMutexLock MutexLock(&mPlayerMutex);
     if (On) {
-        std::string file = cPluginCdplayer::GetStillPicName();
-        LoadStillPicture(file);
-        Start();
-        DevicePlay();
+        if (GetState() != BCDIO_PLAY) {
+            std::string file = cPluginCdplayer::GetStillPicName();
+            LoadStillPicture(file);
+            Start();
+            DevicePlay();
+        }
     }
     else {
         Stop();
@@ -313,7 +342,6 @@ void cCdPlayer::Action(void)
         int i = 0;
         while ((i < FRAME_DIV) && (play)) {
             if (DevicePoll(oPoller, 100)) {
-                cMutexLock MutexLock(&mPlayerMutex);
                 converter.SetFreq(mSpeedTypes[mSpeed]);
                 converter.SetData(&buf[i * chunksize], chunksize);
                 pesdata = converter.GetPesData();

@@ -38,6 +38,7 @@ cBufferedCdio::cBufferedCdio(void) :
     pCdio = NULL;
     mCurrTrackIdx = 0;
     mState = BCDIO_STOP;
+    SetDescription ("BufferedCdio");
 };
 
 cBufferedCdio::~cBufferedCdio(void)
@@ -64,6 +65,7 @@ void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
     int i;
     const cdtext_t *cdtext = cdio_get_cdtext(pCdio, track_no);
     if (cdtext == NULL) {
+        dsyslog ("No CD-Text found");
         return;
     }
     for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {

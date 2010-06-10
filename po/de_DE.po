@@ -1,5 +1,5 @@
 # CD-Player plugin language source file.
-# Copyright (C) 2009 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+# Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
 # This file is distributed under the same license as the VDR package.
 # Ulrich Eckhardt
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-05-30 16:11+0200\n"
+"POT-Creation-Date: 2010-06-10 11:29+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "ARRANGER"
-msgstr ""
+msgstr "Bearbeiter"
 
 msgid "COMPOSER"
 msgstr "Komponist"
@@ -25,7 +25,7 @@ msgid "DISCID"
 msgstr ""
 
 msgid "GENRE"
-msgstr ""
+msgstr "Genre"
 
 msgid "MESSAGE"
 msgstr ""
@@ -34,16 +34,16 @@ msgid "ISRC"
 msgstr ""
 
 msgid "PERFORMER"
-msgstr ""
+msgstr "Künstler"
 
 msgid "SIZE_INFO"
 msgstr ""
 
 msgid "SONGWRITER"
-msgstr ""
+msgstr "Songschreiber"
 
 msgid "TITLE"
-msgstr ""
+msgstr "Titel"
 
 msgid "TOC_INFO"
 msgstr ""
@@ -55,7 +55,7 @@ msgid "UPC_EAN"
 msgstr ""
 
 msgid "Invalid"
-msgstr ""
+msgstr "Ungültig"
 
 msgid "Can not open"
 msgstr "Kann device nicht öffnen"
@@ -64,7 +64,7 @@ msgid "No disc in drive"
 msgstr "Keine CD im Laufwerk"
 
 msgid "Problem on read"
-msgstr ""
+msgstr "Problem beim lesen"
 
 msgid "Problem on read lsn"
 msgstr ""
@@ -76,13 +76,17 @@ msgid "Not an audio disk"
 msgstr "Keine Audio disk"
 
 msgid "Read error"
-msgstr ""
+msgstr "Lesefehler"
 
 msgid "CD Player"
 msgstr ""
 
 msgid "Playlist"
 msgstr ""
+
+#, fuzzy
+msgid "Can not open still picture: "
+msgstr "Kann device nicht öffnen"
 
 msgid "CD-Player"
 msgstr ""

@@ -1,3 +1,15 @@
+/*
+ * Plugin for VDR to act as CD-Player
+ *
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This class implements the main plugin class
+ *
+ */
+
 #ifndef _CDPLAYER_H
 #define _CDPLAYER_H
 
@@ -8,7 +20,7 @@
 #include <string>
 #include "cd_control.h"
 
-static const char *VERSION        = "0.0.1";
+static const char *VERSION        = "0.0.2";
 static const char *DESCRIPTION    = trNOOP("CD-Player");
 
 class cPluginCdplayer: public cPlugin {
@@ -47,4 +59,5 @@ public:
     }
 };
 
+static inline const char *NotNull (const char *s) { return s ? s : ""; }
 #endif

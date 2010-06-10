@@ -12,6 +12,7 @@
  */
 
 #include "cdinfo.h"
+#include "cdplayer.h"
 
 /*
  * Trackinfo class holds information about a single track.
@@ -80,7 +81,9 @@ void cCdInfo::SetCdTextFields(const TRACK_IDX_T track,
     cMutexLock MutexLock(&mInfoMutex);
     int i;
     for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
-        mTrackInfo[track].mCdTextFields[i] = CdTextFields[i];
+        if (!CdTextFields[i].empty()) {
+            mTrackInfo[track].mCdTextFields[i] = CdTextFields[i];
+        }
     }
 }
 
@@ -92,13 +95,14 @@ void cCdInfo::Action(void) {
     cddb_track_t *track;
     CD_TEXT_T txt;
 
-    printf("Start CDDB query");
     cddb_conn = cddb_new();
     if (cddb_conn == NULL) {
-        dsyslog("%s %d Cddb Connection failed", __FILE__, __LINE__);
+        dsyslog("%s %d Cddb Connection failed %s",
+                __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
         return;
     }
-
+ /*   cddb_set_server_name(cddb_conn, "freedb.freedb.invalid");
+    cddb_cache_set_dir(cddb_conn, "/tmpdir");*/
    /*
 
      if (NULL == cddb_opts.server)
@@ -125,13 +129,20 @@ void cCdInfo::Action(void) {
 
     cddb_disc = cddb_disc_new();
     if (cddb_disc == NULL) {
-       esyslog("%s %d unable to create CDDB disc structure", __FILE__, __LINE__);
+       esyslog("%s %d unable to create CDDB disc structure %s",
+               __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
        cddb_destroy(cddb_conn);
        return;
      }
 
      for(i = 0; i < GetNumTracks(); i++) {
        cddb_track_t *t = cddb_track_new();
+       if (t == NULL) {
+           esyslog("%s %d cddb_track_new failed %s",
+                   __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
+           cddb_destroy(cddb_conn);
+           return;
+       }
        cddb_track_set_frame_offset(t,mTrackInfo[i].GetCDDALba());
        cddb_disc_add_track(cddb_disc, t);
      }
@@ -139,7 +150,8 @@ void cCdInfo::Action(void) {
      cddb_disc_set_length(cddb_disc, mLeadOut / CDIO_CD_FRAMES_PER_SEC);
 
      if (!cddb_disc_calc_discid(cddb_disc)) {
-       dsyslog("%s %d libcddb calc discid failed.", __FILE__, __LINE__);
+       dsyslog("%s %d libcddb calc discid failed %s.",
+               __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
        cddb_destroy(cddb_conn);
        return;
      }
@@ -151,12 +163,18 @@ void cCdInfo::Action(void) {
         cddb_destroy(cddb_conn);
         return;
      }
-     cddb_read(cddb_conn, cddb_disc);
+
+     if (cddb_read(cddb_conn, cddb_disc) == 0) {
+         dsyslog("%s %d CDDB read failed %s.",
+                 __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
+         cddb_destroy(cddb_conn);
+         return;
+     }
      GetCdInfo (txt);
 
-     txt[CDTEXT_TITLE] = cddb_disc_get_title(cddb_disc);
-     txt[CDTEXT_SONGWRITER] = cddb_disc_get_artist(cddb_disc);
-     txt[CDTEXT_PERFORMER] = cddb_disc_get_artist(cddb_disc);
+     txt[CDTEXT_TITLE] = NotNull(cddb_disc_get_title(cddb_disc));
+     txt[CDTEXT_SONGWRITER] = NotNull(cddb_disc_get_artist(cddb_disc));
+     txt[CDTEXT_PERFORMER] = NotNull(cddb_disc_get_artist(cddb_disc));
      SetCdInfo (txt);
      dsyslog("category: %s (%d) %08x",
              cddb_disc_get_category_str(cddb_disc),
@@ -169,9 +187,9 @@ void cCdInfo::Action(void) {
         track = cddb_disc_get_track(cddb_disc, i);
         if (track != NULL) {
             GetCdTextFields(i, txt);
-            txt[CDTEXT_TITLE] = cddb_track_get_title(track);
-            txt[CDTEXT_SONGWRITER] = cddb_track_get_artist(track);
-            txt[CDTEXT_PERFORMER] = cddb_track_get_artist(track);
+            txt[CDTEXT_TITLE] = NotNull(cddb_track_get_title(track));
+            txt[CDTEXT_SONGWRITER] = NotNull(cddb_track_get_artist(track));
+            txt[CDTEXT_PERFORMER] = NotNull(cddb_track_get_artist(track));
             SetCdTextFields(i, txt);
         }
      }

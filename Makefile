@@ -34,6 +34,18 @@ TMPDIR = /tmp
 
 -include $(VDRDIR)/Make.config
 
+ifneq (exists, $(shell pkg-config libcdio_cdda && echo exists))
+  $(warning ******************************************************************)
+  $(warning 'libcdio_cdda' not detected! ')
+  $(warning ******************************************************************)
+endif
+
+ifneq (exists, $(shell pkg-config libcddb && echo exists))
+  $(warning ******************************************************************)
+  $(warning 'libcddb' not detected! ')
+  $(warning ******************************************************************)
+endif
+
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 
 APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
@@ -53,7 +65,8 @@ DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 OBJS = $(PLUGIN).o cd_control.o pes_audio_converter.o bufferedcdio.o \
 				   cdioringbuf.o cdinfo.o
-LIBS = -lcdio -lcddb
+LIBS = $(shell pkg-config --libs libcddb)  
+LIBS += $(shell pkg-config --libs libcdio_cdda)
 
 ### The main target:
 

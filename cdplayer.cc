@@ -1,8 +1,12 @@
 /*
- * cdplayer.cc: A plugin for the Video Disk Recorder
+ * Plugin for VDR to act as CD-Player
  *
- * See the README file for copyright information and how to reach the author.
+ * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
+ * This code is distributed under the terms and conditions of the
+ * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
+ *
+ * This class implements the main plugin class
  *
  */
 
