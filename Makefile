@@ -26,6 +26,9 @@ VDRDIR = ../../..
 LIBDIR = ../../lib
 TMPDIR = /tmp
 
+### Uncomment if you use graphtft
+#DEFINES += -DUSE_GRAPHTFT
+
 ### Make sure that necessary options are included:
 
 -include $(VDRDIR)/Make.global

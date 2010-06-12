@@ -38,6 +38,11 @@ the vdr plugin configuration directory (can be overwritten with the -c
 option). For most distributions, this is /video/plugins. Copy the still picture 
 with name cd.mpg into this directory.
 
+Graphtft support:
+-----------------------
+For graphtft-support enable "DEFINES += -DUSE_GRAPHTFT" in the Makefile or
+add this line to the Make.config file of the VDR.
+
 Options for the plugin:
 -----------------------
   -d DEVICE, --device=DEVICE    use DEVICE as cdrom device 

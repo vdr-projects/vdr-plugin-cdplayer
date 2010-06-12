@@ -45,12 +45,25 @@ public:
     void GetCDDATime(int *min, int *sec);
 };
 
+// Track information for each track for cddb query (includes also data tracks)
+class cCddbInfo {
+private:
+    friend class cCdInfo;
+    lba_t mLba;
+public:
+    cCddbInfo(void) : mLba(0) {}
+    cCddbInfo(lba_t lba) { mLba = lba; }
+    lba_t GetCDDALba(void) { return mLba; }
+};
 // Vector (array) containing all track information
 typedef std::vector<cTrackInfo> TrackInfoVector;
+// Vector containing all track information required for CDDB query
+typedef std::vector<cCddbInfo> CddbInfoVector;
 
 class cCdInfo: public cThread {
 private:
     TrackInfoVector mTrackInfo;
+    CddbInfoVector mCddbInfo;
     lba_t mLeadOut;
     cMutex mInfoMutex;
     CD_TEXT_T mCdText;
@@ -62,7 +75,9 @@ public:
     void Clear(void) {
         mTrackInfo.clear();
     }
+
     void Add(lsn_t StartLsn, lsn_t EndLsn, lba_t lba, CD_TEXT_T &CdTextFields);
+    void AddData(lba_t lba);
 
     void SetLeadOut (lba_t leadout) { mLeadOut = leadout; }
 

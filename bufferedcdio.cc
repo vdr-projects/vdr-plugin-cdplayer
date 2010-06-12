@@ -185,6 +185,9 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
             mCdInfo.Add(startlsn, endlsn, lba, cdtextfields);
             hasaudiotrack = true;
         }
+        else {
+            mCdInfo.AddData(lba);
+        }
     }
     if (!hasaudiotrack) {
         mState = BCDIO_FAILED;

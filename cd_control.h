@@ -18,7 +18,7 @@
 
 // The maximum size of a single frame (up to HDTV 1920x1080):
 #define TS_SIZE 188
-#define MAXFRAMESIZE  (KILOBYTE(1024) / TS_SIZE * TS_SIZE) // multiple of TS_SIZE to avoid breaking up TS packets
+#define CDMAXFRAMESIZE  (KILOBYTE(1024) / TS_SIZE * TS_SIZE) // multiple of TS_SIZE to avoid breaking up TS packets
 #define MAX_SPEED 2
 
 class cCdPlayer: public cPlayer, public cThread {

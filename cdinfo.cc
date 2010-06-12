@@ -48,6 +48,14 @@ void cCdInfo::Add(lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
 {
     cTrackInfo ti(StartLsn, EndLsn, lba, CdTextFields);
     mTrackInfo.push_back(ti);
+    AddData(lba);
+}
+
+/* Add Data required for CDDB query */
+void cCdInfo::AddData(lba_t lba)
+{
+    cCddbInfo ci(lba);
+    mCddbInfo.push_back(ci);
 }
 
 void cCdInfo::SetCdInfo(const CD_TEXT_T CdTextFields) {
@@ -135,7 +143,7 @@ void cCdInfo::Action(void) {
        return;
      }
 
-     for(i = 0; i < GetNumTracks(); i++) {
+     for(i = 0; i < mCddbInfo.size(); i++) {
        cddb_track_t *t = cddb_track_new();
        if (t == NULL) {
            esyslog("%s %d cddb_track_new failed %s",
@@ -143,7 +151,7 @@ void cCdInfo::Action(void) {
            cddb_destroy(cddb_conn);
            return;
        }
-       cddb_track_set_frame_offset(t,mTrackInfo[i].GetCDDALba());
+       cddb_track_set_frame_offset(t,mCddbInfo[i].GetCDDALba());
        cddb_disc_add_track(cddb_disc, t);
      }
 

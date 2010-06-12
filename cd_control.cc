@@ -37,7 +37,9 @@ void cCdControl::Hide(void)
         mMenuPlaylist->Clear();
         delete mMenuPlaylist;
         cStatus::MsgOsdClear();
+#ifdef USE_GRAPHTFT
         cStatus::MsgOsdMenuDestroy();
+#endif
     }
     mMenuPlaylist = NULL;
 }
@@ -103,7 +105,7 @@ void cCdControl::ShowPlaylist()
 {
     cMutexLock MutexLock(&mControlMutex);
 
-    // If any other OSD is open then dont show Playlist menu
+    // If any other OSD is open then don't show Playlist menu
     if (cOsd::IsOpen() && mMenuPlaylist == NULL) {
         return;
     }
@@ -111,7 +113,9 @@ void cCdControl::ShowPlaylist()
     // Display Playlist menu
     if (mMenuPlaylist == NULL) {
         mMenuPlaylist = Skins.Current()->DisplayMenu();
+#ifdef USE_GRAPHTFT
         cStatus::MsgOsdMenuDisplay(menukind);
+#endif
     }
 
     // Build title information
@@ -249,7 +253,7 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
 {
     int fd;
     int len;
-    int size = MAXFRAMESIZE;
+    int size = CDMAXFRAMESIZE;
     cMutexLock MutexLock(&mPlayerMutex);
 
     if (pStillBuf != NULL) {
@@ -267,14 +271,14 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
         return;
     }
 
-    pStillBuf = (uchar *)malloc (MAXFRAMESIZE);
+    pStillBuf = (uchar *)malloc (CDMAXFRAMESIZE);
     if (pStillBuf == NULL) {
         esyslog("%s %d Out of memory", __FILE__, __LINE__);
         close(fd);
         return;
     }
     do {
-        len = read(fd, &pStillBuf[mStillBufLen], MAXFRAMESIZE);
+        len = read(fd, &pStillBuf[mStillBufLen], CDMAXFRAMESIZE);
         if (len < 0) {
             esyslog ("%s %d read error %d", __FILE__, __LINE__, errno);
             close(fd);
@@ -286,7 +290,7 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
         if (len > 0) {
             mStillBufLen += len;
             if (mStillBufLen >= size) {
-                size += MAXFRAMESIZE;
+                size += CDMAXFRAMESIZE;
                 pStillBuf = (uchar *) realloc(pStillBuf, size);
                 if (pStillBuf == NULL) {
                     close(fd);
