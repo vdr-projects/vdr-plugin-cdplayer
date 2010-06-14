@@ -11,6 +11,7 @@
  *
  */
 
+#include "cdplayer.h"
 #include "bufferedcdio.h"
 
 // Translated description of the cd text field
@@ -36,15 +37,18 @@ cBufferedCdio::cBufferedCdio(void) :
 {
     cMutexLock MutexLock(&mCdMutex);
     pCdio = NULL;
-    mCurrTrackIdx = 0;
-    mState = BCDIO_STOP;
-    SetDescription ("BufferedCdio");
+    mCurrTrackIdx = INVALID_TRACK_IDX;
+    mState = BCDIO_STARTING;
+    SetDescription("BufferedCdio");
 };
 
 cBufferedCdio::~cBufferedCdio(void)
 {
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_STOP;
+    if (Active()) {
+        Cancel(3);
+    }
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
     }
@@ -70,7 +74,7 @@ void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
     }
     for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
         if (cdtext->field[i] != NULL) {
-            cd_text[i] = cdtext->field[i];;
+            cd_text[i] = cdtext->field[i];
             dsyslog ("CD-Text %d: %s", i, cdtext->field[i]);
         }
     }
@@ -101,7 +105,8 @@ bool cBufferedCdio::GetData (uint8_t *data)
     }
     while (!mRingBuffer.GetBlock(data))
     {
-        if (!Running()) {
+        if (!Running() || (pCdio == NULL) || (mState == BCDIO_FAILED) ||
+            (mState == BCDIO_STOP)) {
             return false;
         }
     }
@@ -197,8 +202,11 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
                 __FILE__, __LINE__, FileName.c_str());
         return false;
     }
-    mCdInfo.SetLeadOut (cdio_get_track_lba(pCdio, CDIO_CDROM_LEADOUT_TRACK));
-    mCdInfo.Start(); // Start CDDB query
+
+    if (cPluginCdplayer::GetCDDBEnabled()) {
+        mCdInfo.SetLeadOut (cdio_get_track_lba(pCdio, CDIO_CDROM_LEADOUT_TRACK));
+        mCdInfo.Start(); // Start CDDB query
+    }
     return true;
 }
 
@@ -279,7 +287,7 @@ void cBufferedCdio::Action(void)
 // Set new track
 void cBufferedCdio::SetTrack (TRACK_IDX_T newtrack)
 {
-  if (newtrack > GetNumTracks()) {
+  if (newtrack > GetNumTracks()-1) {
       return;
   }
   mCurrTrackIdx = newtrack;

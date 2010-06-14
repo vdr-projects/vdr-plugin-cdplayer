@@ -28,6 +28,7 @@ static const int CCDIO_MAX_BLOCKS=32;
 
 typedef enum _bufcdio_state {
     BCDIO_STOP = 0,
+    BCDIO_STARTING,
     BCDIO_OPEN_DEVICE,
     BCDIO_PAUSE,
     BCDIO_PLAY,
@@ -86,14 +87,12 @@ public:
     void Action(void);
     void SetTrack (TRACK_IDX_T newtrack);
     void NextTrack(void) {
-        mCdMutex.Lock();
-        if (mCurrTrackIdx < GetNumTracks()) SetTrack(mCurrTrackIdx+1);
-        mCdMutex.Unlock();
+        cMutexLock MutexLock(&mCdMutex);
+        SetTrack(mCurrTrackIdx+1);
     };
     void PrevTrack(void) {
-        mCdMutex.Lock();
+        cMutexLock MutexLock(&mCdMutex);
         if (mCurrTrackIdx > 0) SetTrack(mCurrTrackIdx-1);
-        mCdMutex.Unlock();
     };
     void Stop(void) {
         mState = BCDIO_STOP;
@@ -104,6 +103,10 @@ public:
     void Pause(void) {
         if (mState == BCDIO_PLAY) mState = BCDIO_PAUSE;
         else if (mState == BCDIO_PAUSE) mState = BCDIO_PLAY;
+    }
+
+    bool CDDBInfoAvailable(void) {
+        return mCdInfo.CDDBInfoAvailable();
     }
 };
 

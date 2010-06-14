@@ -26,8 +26,11 @@ cCdControl::cCdControl(void)
 
 cCdControl::~cCdControl()
 {
-    Hide();
-    delete mCdPlayer;
+    dsyslog("Destroy cCdControl");
+    delete mMenuPlaylist;
+    if (mCdPlayer != NULL) {
+        delete mCdPlayer;
+    }
 }
 
 void cCdControl::Hide(void)
@@ -91,6 +94,9 @@ eOSState cCdControl::ProcessKey(eKeys Key)
         Skins.QueueMessage(mtError, mCdPlayer->GetErrorText().c_str());
         state = osEnd;
     }
+    if (mCdPlayer->GetState() == BCDIO_STOP) {
+        state = osEnd;
+    }
     if (state != osEnd) {
         ShowPlaylist();
     }
@@ -104,92 +110,162 @@ eOSState cCdControl::ProcessKey(eKeys Key)
 void cCdControl::ShowPlaylist()
 {
     cMutexLock MutexLock(&mControlMutex);
+    bool render_all = false;
+    char *str;
+    static TRACK_IDX_T currtitle = INVALID_TRACK_IDX;
+    static BUFCDIO_STATE_T state = BCDIO_FAILED;
+    static int speed = -1;
+    static int numtrk = 0;
+    static bool cddbinfo = false;
 
     // If any other OSD is open then don't show Playlist menu
     if (cOsd::IsOpen() && mMenuPlaylist == NULL) {
         return;
     }
 
+    if (mMenuPlaylist != cSkinDisplay::Current()) {
+        if (mMenuPlaylist != NULL) {
+            delete mMenuPlaylist;
+            dsyslog("restart OSD");
+        }
+        mMenuPlaylist = NULL;
+    }
+
     // Display Playlist menu
     if (mMenuPlaylist == NULL) {
+        render_all = true;
         mMenuPlaylist = Skins.Current()->DisplayMenu();
+    }
+
+    if ((currtitle != mCdPlayer->GetCurrTrack()) ||
+         (numtrk != mCdPlayer->GetNumTracks()) ||
+         (state != mCdPlayer->GetState()) ||
+         (cddbinfo != mCdPlayer->CDDBInfoAvailable()) ||
+         (speed != mCdPlayer->GetSpeed())) {
+        render_all = true;
+    }
+
+    if (render_all) {
+        currtitle = mCdPlayer->GetCurrTrack();
+        state = mCdPlayer->GetState();
+        speed = mCdPlayer->GetSpeed();
+        numtrk = mCdPlayer->GetNumTracks();
+        cddbinfo = mCdPlayer->CDDBInfoAvailable();
+        // Build title information
+        CD_TEXT_T cd_info;
+        mCdPlayer->GetCdInfo(cd_info);
+        string title;
+        string cdtitle = cd_info[CDTEXT_TITLE];
+        string perform = cd_info[CDTEXT_PERFORMER];
+        if (!cdtitle.empty()) {
+            title = cdtitle;
+        } else if (!perform.empty()) {
+            title = perform;
+        } else {
+            title = tr("Playlist");
+        }
+
+        title += "  ";
+        switch (state) {
+        case BCDIO_FAILED:
+        case BCDIO_STARTING:
+            title += "--";
+            break;
+        case BCDIO_STOP:
+        case BCDIO_PAUSE:
+            title += "||";
+            break;
+        case BCDIO_PLAY:
+            title += ">>";
+            break;
+        default:
+            break;
+        }
+
+        switch (speed) {
+        case 1:
+            title += "  x1,1";
+            break;
+        case 2:
+            title += "  x2";
+            break;
+        default:
+            break;
+        }
+        mMenuPlaylist->SetTitle(title.c_str());
+
+        // Build Playlist
+        mMenuPlaylist->SetTabs(3, 6, 10);
+
+        cStatus::MsgOsdClear();
+        cStatus::MsgOsdTitle(title.c_str());
 #ifdef USE_GRAPHTFT
         cStatus::MsgOsdMenuDisplay(menukind);
 #endif
-    }
-
-    // Build title information
-    CD_TEXT_T cd_info;
-    mCdPlayer->GetCdInfo(cd_info);
-    string title;
-    string cdtitle = cd_info[CDTEXT_TITLE];
-    string perform = cd_info[CDTEXT_PERFORMER];
-    if (!cdtitle.empty()) {
-        title = cdtitle;
-    }
-    else if (!perform.empty()) {
-        title = perform;
-    } else {
-        title = tr("Playlist");
-    }
-
-    title += "  ";
-    switch (mCdPlayer->GetState()) {
-    case BCDIO_FAILED:
-        title += "--";
-        break;
-    case BCDIO_STOP:
-    case BCDIO_PAUSE:
-        title += "||";
-        break;
-    case BCDIO_PLAY:
-        title += ">>";
-        break;
-    default:
-        break;
-    }
-
-    switch (mCdPlayer->GetSpeed()) {
-    case 1:
-        title += "  x1,1";
-        break;
-    case 2:
-        title += "  x2";
-        break;
-    default:
-        break;
-    }
-    mMenuPlaylist->SetTitle(title.c_str());
-
-    // Build Playlist
-    mMenuPlaylist->SetTabs(3, 6, 10);
-    cStatus::MsgOsdClear();
-    cStatus::MsgOsdTitle(title.c_str());
-    string curr;
-    for (TRACK_IDX_T i = 0; i < mCdPlayer->GetNumTracks(); i++) {
-        CD_TEXT_T text;
-        mCdPlayer->GetCdTextFields(i, text);
-        string artist = text[CDTEXT_PERFORMER];
-        string title = text[CDTEXT_TITLE];
-        char *str;
-        int min, sec;
-        mCdPlayer->GetTrackTime(i, &min, &sec);
-        asprintf(&str, "%2d\t%2d:%02d\t%s\t %s",
-                  i + 1, min, sec, artist.c_str(), title.c_str());
-        mMenuPlaylist->SetItem(str, i, (i == mCdPlayer->GetCurrTrack()), true);
-        free(str);
-        asprintf(&str, "%2d %2d:%02d %s", i + 1, min, sec, title.c_str());
-        cStatus::MsgOsdItem(str, i + 1);
-        if (i == mCdPlayer->GetCurrTrack()) {
-            curr = str;
+        int offset = 0;
+        int maxitems = mMenuPlaylist->MaxItems();
+        if (numtrk > mMenuPlaylist->MaxItems()) {
+            int itemcnt = maxitems / 2;
+            if ((int)currtitle > itemcnt) {
+                offset = currtitle - itemcnt;
+                if (offset + maxitems > (int)mCdPlayer->GetNumTracks()) {
+                    offset = mCdPlayer->GetNumTracks() - maxitems;
+                }
+            }
+            mMenuPlaylist->SetScrollbar (mCdPlayer->GetNumTracks(), offset);
         }
-        free(str);
-    }
-    cStatus::MsgOsdCurrentItem (curr.c_str());
- //   mMenuPlaylist->SetButtons("Red", "Green", "Yellow", "Blue");
+        if (maxitems > numtrk) {
+            maxitems = numtrk;
+        }
+        for (int i = 0; i < maxitems; i++) {
+            TRACK_IDX_T trk = i+offset;
+            str = BuildMenuStr(trk);
+            mMenuPlaylist->SetItem(str, i, (trk == mCdPlayer->GetCurrTrack()),
+                                   true);
+            free(str);
+        }
 
+        for (TRACK_IDX_T i = 0; i < numtrk; i++) {
+            str = BuildOSDStr(i);
+            cStatus::MsgOsdItem(str, i + 1);
+            free(str);
+        }
+        if ((currtitle != INVALID_TRACK_IDX) && (numtrk > 0)) {
+            str = BuildOSDStr(currtitle);
+            cStatus::MsgOsdCurrentItem(str);
+            free(str);
+        }
+        mMenuPlaylist->Flush();
+    }
+    //   mMenuPlaylist->SetButtons("Red", "Green", "Yellow", "Blue");
 }
 
+char *cCdControl::BuildOSDStr(TRACK_IDX_T idx)
+{
+    CD_TEXT_T text;
+    char *str;
+    int min, sec;
+    mCdPlayer->GetCdTextFields(idx, text);
+    string title = text[CDTEXT_TITLE];
+    mCdPlayer->GetTrackTime(idx, &min, &sec);
+    asprintf(&str, "%2d %2d:%02d %s", idx + 1, min, sec, title.c_str());
+    return str;
+}
+
+char *cCdControl::BuildMenuStr(TRACK_IDX_T idx)
+{
+    CD_TEXT_T text;
+    char *str;
+    int min, sec;
+    mCdPlayer->GetCdTextFields(idx, text);
+    string artist = text[CDTEXT_PERFORMER];
+    string title = text[CDTEXT_TITLE];
+
+    mCdPlayer->GetTrackTime(idx, &min, &sec);
+    asprintf(&str, "%2d\t%2d:%02d\t%s\t %s", idx + 1, min, sec, artist.c_str(),
+              title.c_str());
+    return str;
+}
 
 // ------------- Player -----------------------
 
@@ -209,13 +285,13 @@ cCdPlayer::cCdPlayer(void)
 
 cCdPlayer::~cCdPlayer()
 {
-    cMutexLock MutexLock(&mPlayerMutex);
+    dsyslog("Destroy cCdPlayer");
     Stop();
     free(pStillBuf);
 }
 
 void cCdPlayer::Stop(void) {
-    DeviceClear();
+    dsyslog("cCdPlayer Stop");
     if (Active()) {
         Cancel(10);
     }

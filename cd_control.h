@@ -33,7 +33,6 @@ protected:
     virtual void Activate(bool On);
     void Action(void);
     void DisplayStillPicture (void);
-
 public:
     cCdPlayer(void);
     virtual ~cCdPlayer();
@@ -76,6 +75,9 @@ public:
     void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
         cdio.GetTrackTime (track, min, sec);
     }
+    bool CDDBInfoAvailable(void) {
+        return cdio.CDDBInfoAvailable();
+    }
 };
 
 class cCdControl: public cControl {
@@ -85,6 +87,8 @@ private:
     cMutex mControlMutex;
     static const char *menutitle;
     static const char *menukind;
+    char *BuildOSDStr(TRACK_IDX_T);
+    char *BuildMenuStr(TRACK_IDX_T);
 public:
     cCdControl(void);
     virtual ~cCdControl();

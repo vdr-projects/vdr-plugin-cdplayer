@@ -20,7 +20,7 @@
 #include <string>
 #include "cd_control.h"
 
-static const char *VERSION        = "0.0.3";
+static const char *VERSION        = "0.0.4";
 static const char *DESCRIPTION    = trNOOP("CD-Player");
 
 class cPluginCdplayer: public cPlugin {
@@ -28,9 +28,14 @@ private:
     static std::string mDevice;
     static std::string mStillPicture;
     static std::string mcfgDir;
+    static std::string mCDDBServer;
+    static std::string mCDDBCacheDir;
+    static bool mEnableCDDB;
+    static bool mEnableCDDBCache;
+    cCdControl *mCdControl;
 public:
     cPluginCdplayer(void);
-    virtual ~cPluginCdplayer() {};
+    virtual ~cPluginCdplayer() {if (mCdControl != NULL) delete mCdControl; }
     virtual const char *Version(void) { return VERSION; }
     virtual const char *Description(void) { return tr(DESCRIPTION); }
     virtual const char *CommandLineHelp(void);
@@ -50,6 +55,7 @@ public:
     virtual const char **SVDRPHelpPages(void);
     virtual cString SVDRPCommand(const char *Command, const char *Option,
             int &ReplyCode);
+    // Configuration options changable by command line
     static const std::string GetStillPicName(void) {
         const std::string cfdir = cPlugin::ConfigDirectory();
         return cfdir + "/" + mcfgDir + "/" + mStillPicture;
@@ -57,6 +63,19 @@ public:
     static const std::string GetDeviceName(void) {
         return mDevice;
     }
+    static const std::string GetCDDBServer(void) {
+        return mCDDBServer;
+    }
+    static const std::string GetCDDBCacheDir (void) {
+        return mCDDBCacheDir;
+    }
+    static const bool GetCDDBEnabled(void) {
+        return mEnableCDDB;
+    }
+    static const bool GetCDDBCacheEnabled(void) {
+            return mEnableCDDBCache;
+        }
+
 };
 
 static inline const char *NotNull (const char *s) { return s ? s : ""; }

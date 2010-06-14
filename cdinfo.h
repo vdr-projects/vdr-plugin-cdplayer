@@ -22,7 +22,9 @@
 #include <string>
 
 typedef std::string CD_TEXT_T[MAX_CDTEXT_FIELDS];
-typedef unsigned int TRACK_IDX_T;
+typedef int TRACK_IDX_T;
+
+#define INVALID_TRACK_IDX ((TRACK_IDX_T)-1)
 
 // Track information for each track
 class cTrackInfo {
@@ -37,6 +39,7 @@ public:
     cTrackInfo(void) : mTrackNo(0), mStartLsn(0), mEndLsn(0) {}
     cTrackInfo(lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
                 CD_TEXT_T CdTextFields);
+    ~cTrackInfo() {}
     void SetCdTextFields (const CD_TEXT_T CdTextFields);
     track_t GetCDDATrack(void) { return mTrackNo; }
     lsn_t GetCDDAStartLsn(void) { return mStartLsn; }
@@ -67,10 +70,11 @@ private:
     lba_t mLeadOut;
     cMutex mInfoMutex;
     CD_TEXT_T mCdText;
+    bool mCddbInfoAvail;
 
 public:
-    cCdInfo(void) {}
-    ~cCdInfo(void) {Cancel(3);}
+    cCdInfo(void) {mCddbInfoAvail = false;}
+    ~cCdInfo(void) {if (Active()) Cancel(3);}
 
     void Clear(void) {
         mTrackInfo.clear();
@@ -102,6 +106,9 @@ public:
     }
     void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
         mTrackInfo[track].GetCDDATime(min, sec);
+    }
+    bool CDDBInfoAvailable(void) {
+        return mCddbInfoAvail;
     }
     void Action(void); // Start cddb query
 };

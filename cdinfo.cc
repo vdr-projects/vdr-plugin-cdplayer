@@ -78,8 +78,10 @@ void cCdInfo::GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &CdTextFields)
 {
     cMutexLock MutexLock(&mInfoMutex);
     int i;
-    for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
-        CdTextFields[i] = mTrackInfo[track].mCdTextFields[i];
+    if (track < (TRACK_IDX_T)mTrackInfo.size()) {
+        for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
+            CdTextFields[i] = mTrackInfo[track].mCdTextFields[i];
+        }
     }
 }
 
@@ -109,31 +111,14 @@ void cCdInfo::Action(void) {
                 __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
         return;
     }
- /*   cddb_set_server_name(cddb_conn, "freedb.freedb.invalid");
-    cddb_cache_set_dir(cddb_conn, "/tmpdir");*/
-   /*
 
-     if (NULL == cddb_opts.server)
-       cddb_set_server_name(*pp_conn, "freedb.freedb.org");
-     else
-       cddb_set_server_name(*pp_conn, cddb_opts.server);
-
-     if (cddb_opts.timeout >= 0)
-       cddb_set_timeout(*pp_conn, cddb_opts.timeout);
-
-     cddb_set_server_port(*pp_conn, cddb_opts.port);
-
-     if (cddb_opts.http)
-       cddb_http_enable(*pp_conn);
-     else
-       cddb_http_disable(*pp_conn);
-
-     if (NULL != cddb_opts.cachedir)
-       cddb_cache_set_dir(*pp_conn, cddb_opts.cachedir);
-
-     if (cddb_opts.disable_cache)
-       cddb_cache_disable(*pp_conn);
-     */
+    cddb_set_server_name(cddb_conn, cPluginCdplayer::GetCDDBServer().c_str());
+    if (!cPluginCdplayer::GetCDDBCacheDir().empty()) {
+        cddb_cache_set_dir(cddb_conn, cPluginCdplayer::GetCDDBCacheDir().c_str());
+    }
+    if (!cPluginCdplayer::GetCDDBCacheEnabled()) {
+        cddb_cache_disable(cddb_conn);
+    }
 
     cddb_disc = cddb_disc_new();
     if (cddb_disc == NULL) {
@@ -143,7 +128,7 @@ void cCdInfo::Action(void) {
        return;
      }
 
-     for(i = 0; i < mCddbInfo.size(); i++) {
+     for (i = 0; i < (TRACK_IDX_T)mCddbInfo.size(); i++) {
        cddb_track_t *t = cddb_track_new();
        if (t == NULL) {
            esyslog("%s %d cddb_track_new failed %s",
@@ -202,5 +187,6 @@ void cCdInfo::Action(void) {
         }
      }
      cddb_destroy(cddb_conn);
+     mCddbInfoAvail = true;
 }
 
