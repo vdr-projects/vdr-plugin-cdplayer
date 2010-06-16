@@ -1,10 +1,10 @@
-This is a "plugin" for the Video Disk Recorder (VDR).
+This is a CD-Player plugin for the Video Disk Recorder (VDR).
 
 Written by:                  Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
 
-Project's homepage:          http://www.uli-eckhardt.de/vdr (TBD)
+Project's homepage:          http://www.uli-eckhardt.de/vdr/cdplayer.en.html
 
-Latest version available at: http://www.uli-eckhardt.de/vdr (TBD)
+Latest version available at: http://www.uli-eckhardt.de/vdr/cdplayer.en.html
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,8 +19,9 @@ A CD-Player plugin which supports CD-Text and (later) CDDB-Database.
 Requirements:
 ------------
 
-- vdr 1.6?, vdr 1.7.13
+- vdr > 1.6
 - libcdio >= 0.8.0
+- libcddb >= 1.3.0
 
 Install:
 ------------
@@ -45,15 +46,32 @@ add this line to the Make.config file of the VDR.
 
 Options for the plugin:
 -----------------------
-  -d DEVICE, --device=DEVICE    use DEVICE as cdrom device 
-                                    (default: /dev/cdrom)
+  -d DEVICE, --device=DEVICE        use DEVICE as cdrom device 
+                                        (default: /dev/cdrom)
   
-  -s FILE,   --stillpic=FILE   Still-Picture to display
-                                    (default: cd.mpg)
+  -s FILE,   --stillpic=FILE        Still-Picture to display
+                                        (default: cd.mpg)
   
-  -c DIR,    --configdir=DIR   Directory for config files  
-                                    (default cdplayer)
-
+  -c DIR,    --configdir=DIR        Directory for config files  
+                                        (default cdplayer)
+                                        
+  -S SERVER  --cddbserver=SERVER    Hostname for CDDB server
+                                        (default freedb.freedb.org)
+                                        
+  -C DIR     --cddbcache=DIR        CDDB cache directory
+  
+  -N         --disablecddbcache     Disable CDDB cache
+  
+  -n         --disablecddb          Disable CDDB query
+  
+SVDRP Commands
+-----------------------
+    PLAY:  Play a disk
+    PAUSE: Pause
+    STOP:  Stop
+    NEXT:  Next title
+    PREV:  Previous title
+  
 Navigation
 -----------------------
 

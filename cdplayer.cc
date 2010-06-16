@@ -13,6 +13,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "cdplayer.h"
+#include <vdr/remote.h>
 
 static const char *MAINMENUENTRY  = trNOOP("CD-Player");
 
@@ -91,20 +92,16 @@ bool cPluginCdplayer::ProcessArgs(int argc, char *argv[])
 
 bool cPluginCdplayer::Initialize(void)
 {
-    // Initialize any background activities the plugin shall perform.
     return true;
 }
 
 bool cPluginCdplayer::Start(void)
 {
-    // Start any background activities the plugin shall perform.
-    dsyslog("cPluginCdplayer Start");
     return true;
 }
 
 void cPluginCdplayer::Stop(void)
 {
-    dsyslog("cPluginCdplayer Stop");
   // Stop any background activities the plugin is performing.
     if (mCdControl != NULL) {
         mCdControl->ProcessKey(kStop);
@@ -166,14 +163,45 @@ bool cPluginCdplayer::Service(const char *Id, void *Data)
 
 const char **cPluginCdplayer::SVDRPHelpPages(void)
 {
-  // Return help text for SVDRP commands this plugin implements
-  return NULL;
+    static const char *HelpPages[] = {
+            "PLAY:  Play a disk\n",
+            "PAUSE: Pause\n",
+            "STOP:  Stop\n",
+            "NEXT:  Next title\n",
+            "PREV:  Previous title\n",
+            NULL
+    };
+    return HelpPages;
 }
 
 cString cPluginCdplayer::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode)
 {
-  // Process SVDRP commands this plugin implements
-  return NULL;
+    if ((strcasecmp(Command, "PLAY") == 0) && (mCdControl == NULL)) {
+        cRemote::CallPlugin(Name());
+        return "OK";
+    }
+    if (mCdControl != NULL) {
+        if (strcasecmp(Command, "PLAY") == 0) {
+            mCdControl->ProcessKey(kPlay);
+        }
+        else if (strcasecmp(Command, "STOP") == 0) {
+            mCdControl->ProcessKey(kStop);
+        }
+        else if (strcasecmp(Command, "PAUSE") == 0) {
+            mCdControl->ProcessKey(kPause);
+        }
+        else if (strcasecmp(Command, "NEXT") == 0) {
+            mCdControl->ProcessKey(kNext);
+        }
+        else if (strcasecmp(Command, "PREV") == 0) {
+            mCdControl->ProcessKey(kPrev);
+        }
+        else {
+            return NULL;
+        }
+        return "OK";
+    }
+    return NULL;
 }
 
 VDRPLUGINCREATOR(cPluginCdplayer); // Don't touch this!

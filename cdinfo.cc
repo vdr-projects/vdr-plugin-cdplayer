@@ -105,6 +105,7 @@ void cCdInfo::Action(void) {
     cddb_track_t *track;
     CD_TEXT_T txt;
 
+    dsyslog("CDDB Query started");
     cddb_conn = cddb_new();
     if (cddb_conn == NULL) {
         dsyslog("%s %d Cddb Connection failed %s",
@@ -150,13 +151,12 @@ void cCdInfo::Action(void) {
      }
 
      nrfound = cddb_query(cddb_conn, cddb_disc);
-
-     if (nrfound == -1) {
+     if (nrfound <= 0) {
         dsyslog("%s %d CDDB no result.", __FILE__, __LINE__);
         cddb_destroy(cddb_conn);
         return;
      }
-
+     dsyslog("CDDB %d matches found %d", nrfound);
      if (cddb_read(cddb_conn, cddb_disc) == 0) {
          dsyslog("%s %d CDDB read failed %s.",
                  __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
@@ -168,10 +168,12 @@ void cCdInfo::Action(void) {
      txt[CDTEXT_TITLE] = NotNull(cddb_disc_get_title(cddb_disc));
      txt[CDTEXT_SONGWRITER] = NotNull(cddb_disc_get_artist(cddb_disc));
      txt[CDTEXT_PERFORMER] = NotNull(cddb_disc_get_artist(cddb_disc));
+     txt[CDTEXT_GENRE] = NotNull( cddb_disc_get_category_str(cddb_disc));
      SetCdInfo (txt);
      dsyslog("category: %s (%d) %08x",
              cddb_disc_get_category_str(cddb_disc),
-             cddb_disc_get_category(cddb_disc), cddb_disc_get_discid(cddb_disc));
+             cddb_disc_get_category(cddb_disc),
+             cddb_disc_get_discid(cddb_disc));
      dsyslog("%s by %s",
              cddb_disc_get_title(cddb_disc),
              cddb_disc_get_artist(cddb_disc));
@@ -187,6 +189,7 @@ void cCdInfo::Action(void) {
         }
      }
      cddb_destroy(cddb_conn);
+     dsyslog("CDDB Query finished");
      mCddbInfoAvail = true;
 }
 

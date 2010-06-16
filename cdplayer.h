@@ -73,8 +73,8 @@ public:
         return mEnableCDDB;
     }
     static const bool GetCDDBCacheEnabled(void) {
-            return mEnableCDDBCache;
-        }
+        return mEnableCDDBCache;
+    }
 
 };
 
