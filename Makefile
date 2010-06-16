@@ -19,6 +19,7 @@ VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).h | awk '{ pri
 
 CXX      ?= g++
 CXXFLAGS ?= -g -O2 -Wall -Woverloaded-virtual -Wno-parentheses 
+CXXFLAGS += -Wextra -pedantic
 
 ### The directory environment:
 

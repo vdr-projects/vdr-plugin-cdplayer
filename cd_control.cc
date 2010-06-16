@@ -35,6 +35,7 @@ cCdControl::~cCdControl()
 
 void cCdControl::Hide(void)
 {
+    dsyslog("Hide cCdControl");
     cMutexLock MutexLock(&mControlMutex);
     if (mMenuPlaylist != NULL) {
         mMenuPlaylist->Clear();
@@ -118,32 +119,37 @@ void cCdControl::ShowPlaylist()
     static int numtrk = 0;
     static bool cddbinfo = false;
 
-    // If any other OSD is open then don't show Playlist menu
-    if (cOsd::IsOpen() && mMenuPlaylist == NULL) {
+    if ((currtitle != mCdPlayer->GetCurrTrack()) ||
+        (numtrk != mCdPlayer->GetNumTracks()) ||
+        (state != mCdPlayer->GetState()) ||
+        (cddbinfo != mCdPlayer->CDDBInfoAvailable()) ||
+        (speed != mCdPlayer->GetSpeed())) {
+        render_all = true;
+    }
+    // If no change in display and any other OSD is open then don't show Playlist menu
+    else if (cOsd::IsOpen() && mMenuPlaylist == NULL) {
         return;
     }
 
     if (mMenuPlaylist != cSkinDisplay::Current()) {
         if (mMenuPlaylist != NULL) {
             delete mMenuPlaylist;
-            dsyslog("restart OSD");
         }
         mMenuPlaylist = NULL;
     }
 
     // Display Playlist menu
     if (mMenuPlaylist == NULL) {
+        dsyslog("Show OSD");
         render_all = true;
         mMenuPlaylist = Skins.Current()->DisplayMenu();
+#ifdef USE_GRAPHTFT
+        cStatus::MsgOsdMenuDestroy();
+        cStatus::MsgOsdMenuDisplay(menukind);
+#endif
     }
 
-    if ((currtitle != mCdPlayer->GetCurrTrack()) ||
-         (numtrk != mCdPlayer->GetNumTracks()) ||
-         (state != mCdPlayer->GetState()) ||
-         (cddbinfo != mCdPlayer->CDDBInfoAvailable()) ||
-         (speed != mCdPlayer->GetSpeed())) {
-        render_all = true;
-    }
+
 
     if (render_all) {
         currtitle = mCdPlayer->GetCurrTrack();
@@ -199,9 +205,7 @@ void cCdControl::ShowPlaylist()
 
         cStatus::MsgOsdClear();
         cStatus::MsgOsdTitle(title.c_str());
-#ifdef USE_GRAPHTFT
-        cStatus::MsgOsdMenuDisplay(menukind);
-#endif
+
         int offset = 0;
         int maxitems = mMenuPlaylist->MaxItems();
         if (numtrk > mMenuPlaylist->MaxItems()) {
@@ -237,6 +241,8 @@ void cCdControl::ShowPlaylist()
         }
         mMenuPlaylist->Flush();
     }
+    cStatus::MsgOsdHelpKeys("","","","");
+
     //   mMenuPlaylist->SetButtons("Red", "Green", "Yellow", "Blue");
 }
 
