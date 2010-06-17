@@ -32,6 +32,7 @@ typedef enum _bufcdio_state {
     BCDIO_OPEN_DEVICE,
     BCDIO_PAUSE,
     BCDIO_PLAY,
+    BCDIO_NEWTIME,
     BCDIO_FAILED
 } BUFCDIO_STATE_T;
 
@@ -43,6 +44,8 @@ private:
     track_t         mFirstTrackNum;  // CDIO first track
     track_t         mNumOfTracks;    // CDIO number of tracks
 
+    lsn_t           mStartLsn;
+    lsn_t           mCurrLsn;
     TRACK_IDX_T     mCurrTrackIdx; // Audio Track index
     cCdInfo         mCdInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
@@ -108,6 +111,7 @@ public:
     bool CDDBInfoAvailable(void) {
         return mCdInfo.CDDBInfoAvailable();
     }
+    void SkipTime(int tm);
 };
 
 #endif

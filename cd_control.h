@@ -40,13 +40,14 @@ public:
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
-    void NextTrack(void) {cdio.NextTrack();};
-    void PrevTrack(void) {cdio.PrevTrack();};
+    void NextTrack(void) {cdio.NextTrack();}
+    void PrevTrack(void) {cdio.PrevTrack();}
     void Stop(void);
-    void Pause(void) {cdio.Pause();};
-    void SpeedNormal(void) {mSpeed = 0;};
-    void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;};
-    void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;};
+    void Pause(void) {cdio.Pause();}
+    void SpeedNormal(void) {mSpeed = 0;}
+    void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
+    void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
+    void ChangeTime(int tm) {cdio.SkipTime(tm);}
     const TRACK_IDX_T GetNumTracks (void) {
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetNumTracks();
@@ -87,6 +88,10 @@ private:
     cMutex mControlMutex;
     static const char *menutitle;
     static const char *menukind;
+    static const char *redtxt;
+    static const char *greentxt;
+    static const char *yellowtxt;
+    static const char *bluetxt;
     char *BuildOSDStr(TRACK_IDX_T);
     char *BuildMenuStr(TRACK_IDX_T);
 public:

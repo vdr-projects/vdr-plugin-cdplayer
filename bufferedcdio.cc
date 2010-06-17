@@ -215,11 +215,11 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 {
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
 
-    lsn_t currlsn = GetStartLsn(trackidx);
+    mCurrLsn = mStartLsn;
     lsn_t endlsn = GetEndLsn(trackidx);
     dsyslog("%s %d Read Track %d Start %d End %d",
-            __FILE__, __LINE__, trackidx, currlsn, endlsn);
-    while (currlsn < endlsn) {
+            __FILE__, __LINE__, trackidx, mCurrLsn, endlsn);
+    while (mCurrLsn < endlsn) {
         if (mState == BCDIO_PAUSE) {
             cCondWait::SleepMs(250);
         }
@@ -230,20 +230,29 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                 mState = BCDIO_FAILED;
                 return false;
             }
-            if (cdio_read_audio_sectors(pCdio, buf, currlsn, 1)
+            if (cdio_read_audio_sectors(pCdio, buf, mCurrLsn, 1)
                                                         != DRIVER_OP_SUCCESS) {
                 mErrtxt = tr("Read error");
                 mState = BCDIO_FAILED;
                 mCdMutex.Unlock();
                 return false;
             }
+            mCurrLsn++;
             mCdMutex.Unlock();
+            if (!Running()) {
+                return false;
+            }
+            if (mTrackChange) {
+                return true;
+            }
             while (!mRingBuffer.PutBlock(buf)) {
                 if (!Running()) {
                     return false;
                 }
+                if (mTrackChange) {
+                    return true;
+                }
             }
-            currlsn++;
         }
         if (!Running()) {
             return false;
@@ -265,6 +274,9 @@ void cBufferedCdio::Action(void)
     mCurrTrackIdx=0;
     mState = BCDIO_PLAY;
     while (mCurrTrackIdx < numTracks) {
+        if (!mTrackChange) {
+            mStartLsn = GetStartLsn(mCurrTrackIdx);
+        }
         mTrackChange = false;
         if (!ReadTrack (mCurrTrackIdx)) {
             mState = BCDIO_FAILED;
@@ -287,9 +299,36 @@ void cBufferedCdio::Action(void)
 // Set new track
 void cBufferedCdio::SetTrack (TRACK_IDX_T newtrack)
 {
+  cMutexLock MutexLock(&mCdMutex);
   if (newtrack > GetNumTracks()-1) {
       return;
   }
+  mStartLsn = GetStartLsn(newtrack);
   mCurrTrackIdx = newtrack;
   mTrackChange = true;
+}
+
+void cBufferedCdio::SkipTime(int tm) {
+    cMutexLock MutexLock(&mCdMutex);
+    lsn_t newlsn = mCurrLsn + (tm * CDIO_CD_FRAMES_PER_SEC);
+    lsn_t lastlsn = GetEndLsn(GetNumTracks()-1)-CDIO_CD_FRAMES_PER_SEC;
+    TRACK_IDX_T idx;
+    TRACK_IDX_T newtrack = 0;
+
+    if (newlsn < GetStartLsn(0)) {
+        newlsn = GetStartLsn(0);
+    }
+    if (newlsn >= lastlsn) {
+        newlsn = lastlsn;
+    }
+    // Find track which contains calculated lsn
+    for (idx = 0; idx < GetNumTracks(); idx++) {
+        if (newlsn < GetEndLsn(idx)) {
+            newtrack = idx;
+            break;
+        }
+    }
+    mStartLsn = newlsn;
+    mCurrTrackIdx = newtrack;
+    mTrackChange = true;
 }

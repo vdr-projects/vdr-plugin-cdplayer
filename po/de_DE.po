@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-06-10 11:29+0200\n"
+"POT-Creation-Date: 2010-06-17 10:58+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -79,6 +79,12 @@ msgid "Read error"
 msgstr "Lesefehler"
 
 msgid "CD Player"
+msgstr ""
+
+msgid "1 Min -"
+msgstr ""
+
+msgid "1 Min +"
 msgstr ""
 
 msgid "Playlist"

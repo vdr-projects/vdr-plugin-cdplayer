@@ -17,6 +17,10 @@
 
 const char *cCdControl::menutitle = tr("CD Player");
 const char *cCdControl::menukind = "CDPLAYER";
+const char *cCdControl::redtxt = "";
+const char *cCdControl::greentxt = tr("1 Min -");
+const char *cCdControl::yellowtxt = tr("1 Min +");
+const char *cCdControl::bluetxt = "";
 
 cCdControl::cCdControl(void)
     :cControl(mCdPlayer = new cCdPlayer), mMenuPlaylist(NULL)
@@ -61,6 +65,14 @@ eOSState cCdControl::ProcessKey(eKeys Key)
     }
     state = osContinue;
     switch (Key & ~k_Repeat) {
+    case kGreen: // 1min back
+        mCdPlayer->ChangeTime(-60);
+        break;
+    case kYellow: //1min forward
+        mCdPlayer->ChangeTime(60);
+        break;
+    case kBlue: // Switch info display
+        break;
     case kFastFwd:
         mCdPlayer->SpeedFaster();
         break;
@@ -148,8 +160,6 @@ void cCdControl::ShowPlaylist()
         cStatus::MsgOsdMenuDisplay(menukind);
 #endif
     }
-
-
 
     if (render_all) {
         currtitle = mCdPlayer->GetCurrTrack();
@@ -241,9 +251,8 @@ void cCdControl::ShowPlaylist()
         }
         mMenuPlaylist->Flush();
     }
-    cStatus::MsgOsdHelpKeys("","","","");
-
-    //   mMenuPlaylist->SetButtons("Red", "Green", "Yellow", "Blue");
+    cStatus::MsgOsdHelpKeys(redtxt,greentxt,yellowtxt,bluetxt);
+    mMenuPlaylist->SetButtons(redtxt,greentxt,yellowtxt,bluetxt);
 }
 
 char *cCdControl::BuildOSDStr(TRACK_IDX_T idx)

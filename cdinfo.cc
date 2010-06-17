@@ -156,7 +156,7 @@ void cCdInfo::Action(void) {
         cddb_destroy(cddb_conn);
         return;
      }
-     dsyslog("CDDB %d matches found %d", nrfound);
+     dsyslog("CDDB %d matches found", nrfound);
      if (cddb_read(cddb_conn, cddb_disc) == 0) {
          dsyslog("%s %d CDDB read failed %s.",
                  __FILE__, __LINE__, cddb_error_str(cddb_errno(cddb_conn)));
