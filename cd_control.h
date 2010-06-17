@@ -52,9 +52,11 @@ public:
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetNumTracks();
     };
-    const TRACK_IDX_T GetCurrTrack(void) {
+    // Return current track index and optional the total length in seconds and
+    // the current second
+    const TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr = NULL) {
         cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetCurrTrack();
+        return cdio.GetCurrTrack(total, curr);
     };
     void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &txt) {
         cMutexLock MutexLock(&mPlayerMutex);
@@ -76,6 +78,7 @@ public:
     void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
         cdio.GetTrackTime (track, min, sec);
     }
+
     bool CDDBInfoAvailable(void) {
         return cdio.CDDBInfoAvailable();
     }
@@ -86,21 +89,26 @@ private:
     cCdPlayer *mCdPlayer;
     cSkinDisplayMenu *mMenuPlaylist;
     cMutex mControlMutex;
+    bool mShowDetail;
     static const char *menutitle;
-    static const char *menukind;
+    static const char *menukindPlayList;
+    static const char *menukindDetail;
     static const char *redtxt;
     static const char *greentxt;
     static const char *yellowtxt;
-    static const char *bluetxt;
+    static const char *bluetxtplay;
+    static const char *bluetxtdet;
     char *BuildOSDStr(TRACK_IDX_T);
     char *BuildMenuStr(TRACK_IDX_T);
+    void ShowDetail(void);
+    void ShowList(void);
+    void ShowPlaylist(void);
 public:
     cCdControl(void);
     virtual ~cCdControl();
     virtual void Hide(void);
-    virtual cOsdObject *GetInfo(void);
+    virtual cOsdObject *GetInfo(void) { return NULL; }
     virtual eOSState ProcessKey(eKeys Key);
-    void ShowPlaylist(void);
 };
 
 #endif

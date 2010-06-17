@@ -16,19 +16,19 @@
 
 // Translated description of the cd text field
 const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
-        tr("ARRANGER"),     /**< name(s) of the arranger(s) */
-        tr("COMPOSER"),     /**< name(s) of the composer(s) */
-        tr("DISCID"),       /**< disc identification information */
-        tr("GENRE"),        /**< genre identification and genre information */
-        tr("MESSAGE"),      /**< ISRC code of each track */
-        tr("ISRC"),         /**< message(s) from the content provider or artist */
-        tr("PERFORMER"),    /**< name(s) of the performer(s) */
-        tr("SIZE_INFO"),    /**< size information of the block */
-        tr("SONGWRITER"),   /**< name(s) of the songwriter(s) */
-        tr("TITLE"),        /**< title of album name or track titles */
-        tr("TOC_INFO"),     /**< table of contents information */
-        tr("TOC_INFO2"),    /**< second table of contents information */
-        tr("UPC_EAN"),
+        tr("Arranger"),     /**< name(s) of the arranger(s) */
+        tr("Composer"),     /**< name(s) of the composer(s) */
+        tr("Disk ID"),      /**< disc identification information */
+        tr("Genre"),        /**< genre identification and genre information */
+        tr("Message"),      /**< ISRC code of each track */
+        tr("Isrc"),         /**< message(s) from the content provider or artist */
+        tr("Performer"),    /**< name(s) of the performer(s) */
+        tr("Size Info"),    /**< size information of the block */
+        tr("Songwriter"),   /**< name(s) of the songwriter(s) */
+        tr("Title"),        /**< title of album name or track titles */
+        tr("Info1"),        /**< table of contents information */
+        tr("Info2"),        /**< second table of contents information */
+        tr("Upc Ean"),
         tr("Invalid")
 };
 
@@ -54,6 +54,17 @@ cBufferedCdio::~cBufferedCdio(void)
     }
 }
 
+const TRACK_IDX_T cBufferedCdio::GetCurrTrack(int *total, int *curr)
+{
+    if (total != NULL) {
+        *total = (GetEndLsn(mCurrTrackIdx) - GetStartLsn(mCurrTrackIdx))
+                            / CDIO_CD_FRAMES_PER_SEC;
+    }
+    if (curr != NULL) {
+        *curr = (mCurrLsn - GetStartLsn(mCurrTrackIdx))  / CDIO_CD_FRAMES_PER_SEC;
+    }
+    return mCurrTrackIdx;
+}
 // Get name of a CD-Text field
 const char *cBufferedCdio::GetCdTextField(const cdtext_field_t type)
 {

@@ -63,8 +63,8 @@ public:
     void CloseDevice(void);
 
     const string &GetErrorText(void) { return mErrtxt; };
-    const TRACK_IDX_T GetCurrTrack(void) { return mCurrTrackIdx; };
-    const char *GetCdTextField(const cdtext_field_t type);
+    const TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr=NULL);
+    static const char *GetCdTextField(const cdtext_field_t type);
     void GetCdInfo (CD_TEXT_T &txt) {
        mCdInfo.GetCdInfo(txt);
     }

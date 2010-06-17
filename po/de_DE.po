@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-06-17 10:58+0200\n"
+"POT-Creation-Date: 2010-06-17 15:01+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -15,43 +15,43 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-15\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "ARRANGER"
-msgstr "Bearbeiter"
-
-msgid "COMPOSER"
-msgstr "Komponist"
-
-msgid "DISCID"
+msgid "Arranger"
 msgstr ""
 
-msgid "GENRE"
-msgstr "Genre"
-
-msgid "MESSAGE"
+msgid "Composer"
 msgstr ""
 
-msgid "ISRC"
+msgid "Disk ID"
 msgstr ""
 
-msgid "PERFORMER"
-msgstr "Künstler"
-
-msgid "SIZE_INFO"
+msgid "Genre"
 msgstr ""
 
-msgid "SONGWRITER"
-msgstr "Songschreiber"
-
-msgid "TITLE"
-msgstr "Titel"
-
-msgid "TOC_INFO"
+msgid "Message"
 msgstr ""
 
-msgid "TOC_INFO2"
+msgid "Isrc"
 msgstr ""
 
-msgid "UPC_EAN"
+msgid "Performer"
+msgstr ""
+
+msgid "Size Info"
+msgstr ""
+
+msgid "Songwriter"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Info1"
+msgstr ""
+
+msgid "Info2"
+msgstr ""
+
+msgid "Upc Ean"
 msgstr ""
 
 msgid "Invalid"
@@ -81,10 +81,22 @@ msgstr "Lesefehler"
 msgid "CD Player"
 msgstr ""
 
-msgid "1 Min -"
+msgid "1 min -"
 msgstr ""
 
-msgid "1 Min +"
+msgid "1 min +"
+msgstr ""
+
+msgid "playlist"
+msgstr ""
+
+msgid "detail"
+msgstr ""
+
+msgid "CD Information"
+msgstr ""
+
+msgid "Song Information"
 msgstr ""
 
 msgid "Playlist"
@@ -96,3 +108,21 @@ msgstr "Kann device nicht öffnen"
 
 msgid "CD-Player"
 msgstr ""
+
+#~ msgid "ARRANGER"
+#~ msgstr "Bearbeiter"
+
+#~ msgid "COMPOSER"
+#~ msgstr "Komponist"
+
+#~ msgid "GENRE"
+#~ msgstr "Genre"
+
+#~ msgid "PERFORMER"
+#~ msgstr "Künstler"
+
+#~ msgid "SONGWRITER"
+#~ msgstr "Songschreiber"
+
+#~ msgid "TITLE"
+#~ msgstr "Titel"
