@@ -1,6 +1,6 @@
 This is a CD-Player plugin for the Video Disk Recorder (VDR).
 
-Written by:                  Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+Written by:                  Ulrich Eckhardt <vdr@uli-eckhardt.de>
 
 Project's homepage:          http://www.uli-eckhardt.de/vdr/cdplayer.en.html
 
@@ -79,8 +79,9 @@ The following navigation keys are available
 
 Key             Function
 -------------------------------------------------------------
-Green           1 min. backward  (TBD)
-Yellow          1 min. forward   (TBD)
+Green           1 min. backward 
+Yellow          1 min. forward  
+Blue            Toggle between detailed information and playlist
 
 Back,Ok, Menu   Stop Play - Exit
 

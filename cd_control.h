@@ -103,6 +103,7 @@ private:
     void ShowDetail(void);
     void ShowList(void);
     void ShowPlaylist(void);
+    void DisplayLine(const char *buf, int line);
 public:
     cCdControl(void);
     virtual ~cCdControl();

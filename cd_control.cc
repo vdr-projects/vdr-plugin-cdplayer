@@ -122,44 +122,49 @@ eOSState cCdControl::ProcessKey(eKeys Key)
     return (state);
 }
 
+void cCdControl::DisplayLine(const char *buf, int line)
+{
+    mMenuPlaylist->SetItem(buf, line, false, true);
+    cStatus::MsgOsdItem(buf, line);
+}
 void cCdControl::ShowDetail()
 {
     CD_TEXT_T cd_info;
-    string txt;
     char buf[100];
     int i;
     int lncnt = 1;
     string str;
     TRACK_IDX_T currtitle = mCdPlayer->GetCurrTrack();
-    txt = tr("CD Information");
-    cStatus::MsgOsdItem(txt.c_str(), lncnt++);
-    txt += "\n";
+
+    mMenuPlaylist->SetTabs(18);
+    str = tr("CD Information");
+    str = "\t" + str;
+    DisplayLine(str.c_str(), lncnt++);
     mCdPlayer->GetCdInfo(cd_info);
+
     for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
         if (!cd_info[i].empty()) {
-            sprintf(buf, "%10.10s : %.50s",
+            sprintf(buf, "%.15s\t: %.50s",
                     cBufferedCdio::GetCdTextField((cdtext_field_t)i),
                     cd_info[i].c_str());
-            cStatus::MsgOsdItem(buf, lncnt++);
-            txt += buf;
-            txt += "\n";
+            DisplayLine(buf, lncnt++);
         }
     }
+    DisplayLine("", lncnt++);
     str = tr("Song Information");
-    cStatus::MsgOsdItem(str.c_str(), lncnt++);
-    txt += "\n" + str + "\n";
+    str = "\t" + str;
+    DisplayLine(str.c_str(), lncnt++);
+
     mCdPlayer->GetCdTextFields(currtitle, cd_info);
     for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
         if (!cd_info[i].empty()) {
-            sprintf(buf, "%10.10s : %.50s",
+            sprintf(buf, "%.15s\t: %.50s",
                      cBufferedCdio::GetCdTextField((cdtext_field_t) i),
                      cd_info[i].c_str());
-            cStatus::MsgOsdItem(buf, lncnt++);
-            txt += buf;
-            txt += "\n";
+            DisplayLine(buf, lncnt++);
         }
     }
-    mMenuPlaylist->SetText(txt.c_str(), true);
+    //mMenuPlaylist->SetText(txt.c_str(), true);
 
     cStatus::MsgOsdHelpKeys(redtxt,greentxt,yellowtxt,bluetxtplay);
     mMenuPlaylist->SetButtons(redtxt,greentxt,yellowtxt,bluetxtplay);
@@ -223,7 +228,12 @@ void cCdControl::ShowPlaylist()
     static int numtrk = 0;
     static bool cddbinfo = false;
     static bool detail = false;
+    static int firsttime = 0;
 
+    if (firsttime < 10) {
+        firsttime++;
+        render_all = true;
+    }
     if ((currtitle != mCdPlayer->GetCurrTrack()) ||
         (numtrk != mCdPlayer->GetNumTracks()) ||
         (state != mCdPlayer->GetState()) ||

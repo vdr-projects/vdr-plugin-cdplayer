@@ -16,20 +16,20 @@
 
 // Translated description of the cd text field
 const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
-        tr("Arranger"),     /**< name(s) of the arranger(s) */
-        tr("Composer"),     /**< name(s) of the composer(s) */
-        tr("Disk ID"),      /**< disc identification information */
-        tr("Genre"),        /**< genre identification and genre information */
-        tr("Message"),      /**< ISRC code of each track */
-        tr("Isrc"),         /**< message(s) from the content provider or artist */
-        tr("Performer"),    /**< name(s) of the performer(s) */
-        tr("Size Info"),    /**< size information of the block */
-        tr("Songwriter"),   /**< name(s) of the songwriter(s) */
-        tr("Title"),        /**< title of album name or track titles */
-        tr("Info1"),        /**< table of contents information */
-        tr("Info2"),        /**< second table of contents information */
-        tr("Upc Ean"),
-        tr("Invalid")
+        "Arranger",     /**< name(s) of the arranger(s) */
+        "Composer",     /**< name(s) of the composer(s) */
+        "Disk ID",      /**< disc identification information */
+        "Genre",        /**< genre identification and genre information */
+        "Message",      /**< ISRC code of each track */
+        "Isrc",         /**< message(s) from the content provider or artist */
+        "Performer",    /**< name(s) of the performer(s) */
+        "Size Info",    /**< size information of the block */
+        "Songwriter",   /**< name(s) of the songwriter(s) */
+        "Title",        /**< title of album name or track titles */
+        "Info1",        /**< table of contents information */
+        "Info2",        /**< second table of contents information */
+        "Upc Ean",
+        "Invalid"
 };
 
 cBufferedCdio::cBufferedCdio(void) :
@@ -40,6 +40,20 @@ cBufferedCdio::cBufferedCdio(void) :
     mCurrTrackIdx = INVALID_TRACK_IDX;
     mState = BCDIO_STARTING;
     SetDescription("BufferedCdio");
+    cd_text_field[CDTEXT_ARRANGER]  = tr("Arranger");
+    cd_text_field[CDTEXT_COMPOSER]  = tr("Composer");
+    cd_text_field[CDTEXT_DISCID]    = tr("Disk ID");
+    cd_text_field[CDTEXT_GENRE]     = tr("Genre");
+    cd_text_field[CDTEXT_MESSAGE]   = tr("Message");
+    cd_text_field[CDTEXT_ISRC]      = tr("Isrc");
+    cd_text_field[CDTEXT_PERFORMER] = tr("Performer");
+    cd_text_field[CDTEXT_SIZE_INFO] = tr("Size Info");
+    cd_text_field[CDTEXT_SONGWRITER] = tr("Songwriter");
+    cd_text_field[CDTEXT_TITLE]     = tr("Title");
+    cd_text_field[CDTEXT_TOC_INFO]  = tr("Info1");
+    cd_text_field[CDTEXT_TOC_INFO2] = tr("Info2");
+    cd_text_field[CDTEXT_UPC_EAN]   = tr("Upc Ean");
+    cd_text_field[CDTEXT_INVALID]   = tr("Invalid");
 };
 
 cBufferedCdio::~cBufferedCdio(void)
@@ -282,7 +296,7 @@ void cBufferedCdio::Action(void)
 {
     TRACK_IDX_T numTracks = GetNumTracks();
     mRingBuffer.Clear();
-    mCurrTrackIdx=0;
+    SetTrack(0);
     mState = BCDIO_PLAY;
     while (mCurrTrackIdx < numTracks) {
         if (!mTrackChange) {

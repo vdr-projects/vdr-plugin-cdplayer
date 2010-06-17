@@ -99,13 +99,13 @@ I18Nmsgs  = $(addprefix $(LOCALEDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo
 I18Npot   = $(PODIR)/$(PLUGIN).pot
 
 %.mo: %.po
-	msgfmt -c -o $@ $<
+	msgfmt -v -c -o $@ $<
 
 $(I18Npot): $(wildcard *.cc *.h)
-	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='<see README>' -o $@ $^
+	xgettext -C -cTRANSLATORS --no-wrap -n -i -F --package-name="cdplayer plugin" -k -ktr -ktrNOOP --msgid-bugs-address='vdr@uli-eckhardt.de' -o $@ $^
 
 %.po: $(I18Npot)
-	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
+	msgmerge -v -U --no-wrap --backup=none -q $@ $<
 	@touch $@
 
 $(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo

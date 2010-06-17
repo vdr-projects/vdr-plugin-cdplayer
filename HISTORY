@@ -23,4 +23,5 @@ VDR Plugin 'cdplayer' Revision History
 2010-06-xx: Version 0.0.5
 
 - Fix OSD problem, that OSD is now always open after startup.
-- SVDRP Support
+- SVDRP Support.
+- Detail View.
