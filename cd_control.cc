@@ -228,12 +228,7 @@ void cCdControl::ShowPlaylist()
     static int numtrk = 0;
     static bool cddbinfo = false;
     static bool detail = false;
-    static int firsttime = 0;
 
-    if (firsttime < 10) {
-        firsttime++;
-        render_all = true;
-    }
     if ((currtitle != mCdPlayer->GetCurrTrack()) ||
         (numtrk != mCdPlayer->GetNumTracks()) ||
         (state != mCdPlayer->GetState()) ||
@@ -243,7 +238,7 @@ void cCdControl::ShowPlaylist()
         render_all = true;
     }
     // If no change in display and any other OSD is open then don't show Playlist menu
-    else if (cOsd::IsOpen() && mMenuPlaylist == NULL) {
+    if ((!render_all) && (cOsd::IsOpen() && mMenuPlaylist == NULL)) {
         return;
     }
 
