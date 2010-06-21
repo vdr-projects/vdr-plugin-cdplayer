@@ -20,8 +20,12 @@ VDR Plugin 'cdplayer' Revision History
 - Fix possible crashes.
 - Enhanced OSD, allows scrolling now
 
-2010-06-xx: Version 0.0.5
+2010-06-17: Version 0.0.5
 
 - Fix OSD problem, that OSD is now always open after startup.
 - SVDRP Support.
 - Detail View.
+
+2010-xx-x: Veriosn 0.x.x
+
+- Italian translation.
