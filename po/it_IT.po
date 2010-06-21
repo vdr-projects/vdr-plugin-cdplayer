@@ -1,0 +1,145 @@
+# CD-Player plugin language source file.
+# Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+# This file is distributed under the same license as the VDR package.
+# Ulrich Eckhardt
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VDR 1.7.x\n"
+"Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
+"POT-Creation-Date: 2010-06-17 18:30+0200\n"
+"PO-Revision-Date: 2010-06-19 23:40+0100\n"
+"Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
+"Language-Team: Italian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: bufferedcdio.cc:43
+msgid "Arranger"
+msgstr "Regista"
+
+#: bufferedcdio.cc:44
+msgid "Composer"
+msgstr "Compositore"
+
+#: bufferedcdio.cc:45
+msgid "Disk ID"
+msgstr "ID disco"
+
+#: bufferedcdio.cc:46
+msgid "Genre"
+msgstr "Genere"
+
+#: bufferedcdio.cc:47
+msgid "Message"
+msgstr "Messaggio"
+
+#: bufferedcdio.cc:48
+msgid "Isrc"
+msgstr "ISRC"
+
+#: bufferedcdio.cc:49
+msgid "Performer"
+msgstr "Interprete"
+
+#: bufferedcdio.cc:50
+msgid "Size Info"
+msgstr "Info dimensione"
+
+#: bufferedcdio.cc:51
+msgid "Songwriter"
+msgstr "Autore"
+
+#: bufferedcdio.cc:52
+msgid "Title"
+msgstr "Titolo"
+
+#: bufferedcdio.cc:53
+msgid "Info1"
+msgstr "Info 1"
+
+#: bufferedcdio.cc:54
+msgid "Info2"
+msgstr "Info 2"
+
+#: bufferedcdio.cc:55
+msgid "Upc Ean"
+msgstr "Upc Ean"
+
+#: bufferedcdio.cc:56
+msgid "Invalid"
+msgstr "Non valido"
+
+#: bufferedcdio.cc:156
+msgid "Can not open"
+msgstr "Impossibile aprire"
+
+#: bufferedcdio.cc:167
+msgid "No disc in drive"
+msgstr "Non c'è alcun disco nell'unità"
+
+#: bufferedcdio.cc:177
+msgid "Problem on read"
+msgstr "Errore di lettura"
+
+#: bufferedcdio.cc:195
+msgid "Problem on read lsn"
+msgstr "Errore di lettura LSN"
+
+#: bufferedcdio.cc:203
+msgid "Problem on read lba"
+msgstr "Errore di lettura LBA"
+
+#: bufferedcdio.cc:224
+msgid "Not an audio disk"
+msgstr "Disco audio non trovato"
+
+#: bufferedcdio.cc:260
+msgid "Read error"
+msgstr "Errore di lettura"
+
+#: cd_control.cc:18
+msgid "CD Player"
+msgstr "Lettore CD audio"
+
+#: cd_control.cc:22
+msgid "1 min -"
+msgstr "1 min -"
+
+#: cd_control.cc:23
+msgid "1 min +"
+msgstr "1 min +"
+
+#: cd_control.cc:24
+msgid "playlist"
+msgstr "lista esecuzione"
+
+#: cd_control.cc:25
+msgid "detail"
+msgstr "dettagli"
+
+#: cd_control.cc:140
+msgid "CD Information"
+msgstr "Informazioni CD"
+
+#: cd_control.cc:154
+msgid "Song Information"
+msgstr "Informazioni brano"
+
+#: cd_control.cc:285
+msgid "Playlist"
+msgstr "Lista esecuzione"
+
+#: cd_control.cc:428
+msgid "Can not open still picture: "
+msgstr "Impossibile aprire fermo immagine:"
+
+#: cdplayer.cc:18
+#: cdplayer.h:24
+msgid "CD-Player"
+msgstr "Lettore CD audio"
+
