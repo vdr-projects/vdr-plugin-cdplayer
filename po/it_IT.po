@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2010-06-17 18:30+0200\n"
+"POT-Creation-Date: 2010-07-11 18:24+0200\n"
 "PO-Revision-Date: 2010-06-19 23:40+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -134,12 +134,10 @@ msgstr "Informazioni brano"
 msgid "Playlist"
 msgstr "Lista esecuzione"
 
-#: cd_control.cc:428
+#: cd_control.cc:429
 msgid "Can not open still picture: "
 msgstr "Impossibile aprire fermo immagine:"
 
-#: cdplayer.cc:18
-#: cdplayer.h:24
+#: cdplayer.cc:18 cdplayer.h:24
 msgid "CD-Player"
 msgstr "Lettore CD audio"
-

@@ -33,6 +33,7 @@ private:
     static bool mEnableCDDB;
     static bool mEnableCDDBCache;
     cCdControl *mCdControl;
+    cMutex mCdMutex;
 public:
     cPluginCdplayer(void);
     virtual ~cPluginCdplayer() {if (mCdControl != NULL) delete mCdControl; }

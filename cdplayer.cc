@@ -45,6 +45,7 @@ const char *cPluginCdplayer::CommandLineHelp(void)
 
 bool cPluginCdplayer::ProcessArgs(int argc, char *argv[])
 {
+    cMutexLock MutexLock(&mCdMutex);
     static struct option long_options[] =
     {
         { "device",         required_argument, NULL, 'd' },
@@ -103,6 +104,7 @@ bool cPluginCdplayer::Start(void)
 void cPluginCdplayer::Stop(void)
 {
   // Stop any background activities the plugin is performing.
+    cMutexLock MutexLock(&mCdMutex);
     if (mCdControl != NULL) {
         mCdControl->ProcessKey(kStop);
     }
@@ -138,6 +140,7 @@ const char *cPluginCdplayer::MainMenuEntry(void)
 
 cOsdObject *cPluginCdplayer::MainMenuAction(void)
 {
+    cMutexLock MutexLock(&mCdMutex);
     mCdControl = new cCdControl();
     cControl::Launch(mCdControl);
     return NULL;
@@ -176,6 +179,7 @@ const char **cPluginCdplayer::SVDRPHelpPages(void)
 
 cString cPluginCdplayer::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode)
 {
+    cMutexLock MutexLock(&mCdMutex);
     if ((strcasecmp(Command, "PLAY") == 0) && (mCdControl == NULL)) {
         cRemote::CallPlugin(Name());
         return "OK";

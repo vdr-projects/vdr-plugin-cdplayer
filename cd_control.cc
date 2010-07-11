@@ -238,7 +238,7 @@ void cCdControl::ShowPlaylist()
         render_all = true;
     }
     // If no change in display and any other OSD is open then don't show Playlist menu
-    if ((!render_all) && (cOsd::IsOpen() && mMenuPlaylist == NULL)) {
+    if ((!render_all) && cOsd::IsOpen() && (mMenuPlaylist == NULL)) {
         return;
     }
 
@@ -312,6 +312,7 @@ void cCdControl::ShowPlaylist()
         default:
             break;
         }
+        Skins.Message(mtStatus, NULL);
         mMenuPlaylist->SetTitle(title.c_str());
         cStatus::MsgOsdClear();
         cStatus::MsgOsdTitle(title.c_str());
