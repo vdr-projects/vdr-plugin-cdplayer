@@ -84,9 +84,27 @@ bool cPluginCdplayer::ProcessArgs(int argc, char *argv[])
             mEnableCDDBCache = false;
             break;
         default:
-            dsyslog("CD Player unknown option %c", c);
+            esyslog("CD Player unknown option %c", c);
             return false;
         }
+    }
+
+    // Disable CDDB when no home and no CDDB cache dir is given.
+    if ((getenv("HOME") == NULL) && (mEnableCDDB)) {
+        if (mCDDBCacheDir.empty()) {
+            esyslog("No HOME set and no cache dir for CDDB, disable CDDB");
+            mEnableCDDB = false;
+        }
+        else {
+            esyslog("Define HOME to %s", mCDDBCacheDir.c_str());
+            if (setenv("HOME", mCDDBCacheDir.c_str(), 0) != 0) {
+                esyslog ("setenv failed %d", errno);
+                mEnableCDDB = false;
+            }
+        }
+    }
+    if (!mEnableCDDB) {
+        dsyslog ("CDDB disabled");
     }
     return true;
 }

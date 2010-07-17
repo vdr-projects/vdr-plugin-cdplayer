@@ -26,6 +26,8 @@ VDR Plugin 'cdplayer' Revision History
 - SVDRP Support.
 - Detail View.
 
-2010-xx-x: Veriosn 0.x.x
+2010-xx-x: Version 0.x.x
 
 - Italian translation.
+- Fix crash with skin elchi.
+- Workaround for crashing cddb library when no $HOME is set.
