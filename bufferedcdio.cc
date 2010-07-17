@@ -37,6 +37,8 @@ cBufferedCdio::cBufferedCdio(void) :
 {
     cMutexLock MutexLock(&mCdMutex);
     pCdio = NULL;
+    pParanoiaDrive = NULL;
+    pParanoiaCd = NULL;
     mCurrTrackIdx = INVALID_TRACK_IDX;
     mState = BCDIO_STARTING;
     SetDescription("BufferedCdio");
@@ -63,6 +65,12 @@ cBufferedCdio::~cBufferedCdio(void)
     if (Active()) {
         Cancel(3);
     }
+#ifdef USE_PARANOIA
+    pParanoiaDrive = NULL;
+    if (pParanoiaCd != NULL) {
+        cdio_paranoia_free(pParanoiaCd);
+    }
+#endif
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
     }
@@ -110,6 +118,13 @@ void cBufferedCdio::CloseDevice(void)
 {
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_STOP;
+#ifdef USE_PARANOIA
+    pParanoiaDrive = NULL;
+    if (pParanoiaCd != NULL) {
+        cdio_paranoia_free(pParanoiaCd);
+        pParanoiaCd = NULL;
+    }
+#endif
     if (pCdio != NULL) {
         cdio_destroy(pCdio);
         pCdio = NULL;
@@ -138,9 +153,28 @@ bool cBufferedCdio::GetData (uint8_t *data)
     return true;
 }
 
+
+bool cBufferedCdio::ParanoiaLogMsg (void)
+{
+    bool iserr = false;
+    if (pParanoiaDrive != NULL) {
+        char *err = cdio_cddap_errors(pParanoiaDrive);
+        char *mes = cdio_cddap_messages(pParanoiaDrive);
+        if (mes != NULL) {
+            dsyslog (mes);
+            free(mes);
+        }
+        if (err != NULL) {
+            esyslog (err);
+            free(err);
+            iserr = true;
+        }
+    }
+    return iserr;
+}
+
 // Open access to the audio cd and retrieve all available CD-Text
 // information
-
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
     bool hasaudiotrack = false;
@@ -158,6 +192,28 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
         esyslog("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
         return false;
     }
+
+#ifdef USE_PARANOIA
+    pParanoiaDrive=cdio_cddap_identify_cdio(pCdio, 1, NULL);
+    if (pParanoiaDrive == NULL) {
+        esyslog ("Drive Init failed");
+        CloseDevice();
+        return false;
+    }
+    cdio_cddap_open (pParanoiaDrive);
+
+    pParanoiaCd = cdio_paranoia_init(pParanoiaDrive);
+    if (pParanoiaCd == NULL) {
+        esyslog ("Paranoia Init failed");
+        CloseDevice();
+        return false;
+    }
+     /* Set reading mode for full paranoia, but allow skipping sectors. */
+    cdio_paranoia_modeset(pParanoiaCd,
+                             PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP);
+
+
+#endif
     dsyslog("The driver selected is %s", cdio_get_driver_name(pCdio));
     dsyslog("The default device for this driver is %s",
             cdio_get_default_device(pCdio));
@@ -238,12 +294,19 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
 // Read an audio track from CD and buffer the output into ringbuffer
 bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 {
+#ifdef USE_PARANOIA
+    uint8_t *buf;
+#else
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
+#endif
 
     mCurrLsn = mStartLsn;
     lsn_t endlsn = GetEndLsn(trackidx);
     dsyslog("%s %d Read Track %d Start %d End %d",
             __FILE__, __LINE__, trackidx, mCurrLsn, endlsn);
+#ifdef USE_PARANOIA
+    cdio_paranoia_seek(pParanoiaCd, mCurrLsn, SEEK_SET);
+#endif
     while (mCurrLsn < endlsn) {
         if (mState == BCDIO_PAUSE) {
             cCondWait::SleepMs(250);
@@ -255,6 +318,15 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                 mState = BCDIO_FAILED;
                 return false;
             }
+#ifdef USE_PARANOIA
+            buf=(uint8_t *)cdio_paranoia_read(pParanoiaCd, NULL);
+            if (ParanoiaLogMsg()) {
+                mErrtxt = tr("Read error");
+                mState = BCDIO_FAILED;
+                mCdMutex.Unlock();
+                return false;
+            }
+#else
             if (cdio_read_audio_sectors(pCdio, buf, mCurrLsn, 1)
                                                         != DRIVER_OP_SUCCESS) {
                 mErrtxt = tr("Read error");
@@ -262,6 +334,7 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                 mCdMutex.Unlock();
                 return false;
             }
+#endif
             mCurrLsn++;
             mCdMutex.Unlock();
             if (!Running()) {
@@ -270,6 +343,7 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
             if (mTrackChange) {
                 return true;
             }
+
             while (!mRingBuffer.PutBlock(buf)) {
                 if (!Running()) {
                     return false;

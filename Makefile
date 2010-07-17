@@ -50,6 +50,11 @@ ifneq (exists, $(shell pkg-config libcddb && echo exists))
   $(warning ******************************************************************)
 endif
 
+ifneq (exists, $(shell pkg-config libcdio_paranoia && echo exists))
+  $(warning ******************************************************************)
+  $(warning 'libcdio_paranoia' not detected! ')
+  $(warning ******************************************************************)
+endif
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 
 APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
@@ -71,6 +76,7 @@ OBJS = $(PLUGIN).o cd_control.o pes_audio_converter.o bufferedcdio.o \
 				   cdioringbuf.o cdinfo.o
 LIBS = $(shell pkg-config --libs libcddb)  
 LIBS += $(shell pkg-config --libs libcdio_cdda)
+LIBS += $(shell pkg-config --libs libcdio_paranoia)
 
 ### The main target:
 

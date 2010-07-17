@@ -14,12 +14,20 @@
 #ifndef __BUFFEREDCDIO_H__
 #define __BUFFEREDCDIO_H__
 
+#define DO_NOT_WANT_PARANOIA_COMPATIBILITY 1
+
 #include <string>
 #include <stdio.h>
 #include <stdint.h>
 #include <vdr/plugin.h>
+#include <cdio/cdda.h>
+#include <cdio/cd_types.h>
+#include <cdio/paranoia.h>
 #include "cdioringbuf.h"
 #include "cdinfo.h"
+
+#define USE_PARANOIA 1
+
 
 using namespace std;
 
@@ -40,7 +48,12 @@ typedef enum _bufcdio_state {
 class cBufferedCdio: public cThread {
 private:
     static const char *cd_text_field[MAX_CDTEXT_FIELDS+1];
+#ifdef USE_PARANOIA
+    cdrom_drive_t   *pParanoiaDrive;
+    cdrom_paranoia_t *pParanoiaCd;
+#endif
     CdIo_t          *pCdio;
+
     track_t         mFirstTrackNum;  // CDIO first track
     track_t         mNumOfTracks;    // CDIO number of tracks
 
@@ -52,9 +65,13 @@ private:
     bool           mTrackChange;  // Indication for external track change
     BUFCDIO_STATE_T mState;
     cMutex          mCdMutex;
+    string mErrtxt;
+
     void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
-    string mErrtxt;
+#ifdef USE_PARANOIA
+    bool ParanoiaLogMsg(void);
+#endif
 
 public:
     cBufferedCdio(void);

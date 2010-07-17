@@ -31,3 +31,4 @@ VDR Plugin 'cdplayer' Revision History
 - Italian translation.
 - Fix crash with skin elchi.
 - Workaround for crashing cddb library when no $HOME is set.
+- Add support for cdparanoia.
