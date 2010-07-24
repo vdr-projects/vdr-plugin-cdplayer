@@ -66,6 +66,9 @@ private:
     BUFCDIO_STATE_T mState;
     cMutex          mCdMutex;
     string mErrtxt;
+// Buffer statistics
+    int mBufferStat;
+    int mBufferCnt;
 
     void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);

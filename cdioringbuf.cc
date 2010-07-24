@@ -20,6 +20,7 @@ cCdIoRingBuffer::cCdIoRingBuffer()
     mBlocks = 0;
     mPutIdx = 0;
     mGetIdx = 0;
+    mNumBlocks = 0;
 };
 
 cCdIoRingBuffer::cCdIoRingBuffer(int blocks)
@@ -31,6 +32,7 @@ cCdIoRingBuffer::cCdIoRingBuffer(int blocks)
     }
     mPutIdx = 0;
     mGetIdx = 0;
+    mNumBlocks = 0;
     mBlocks = blocks;
     mGetAllowed.Deny();  // No data available, so lock GetBlock
     mPutAllowed.Allow(); // Allow PutBlock
@@ -64,6 +66,7 @@ bool cCdIoRingBuffer::GetBlock(uint8_t *block)
     }
     mPutAllowed.Allow();
     mBufferMutex.Unlock();
+    mNumBlocks--;
     return true;
 }
 
@@ -90,6 +93,7 @@ bool cCdIoRingBuffer::PutBlock(const uint8_t *block)
     }
     mGetAllowed.Allow();
     mBufferMutex.Unlock();
+    mNumBlocks++;
     return true;
 }
 
@@ -100,6 +104,7 @@ bool cCdIoRingBuffer::PutBlock(const uint8_t *block)
 void cCdIoRingBuffer::Clear(void)
 {
     mBufferMutex.Lock();
+    mNumBlocks = 0;
     mPutIdx = 0;
     mGetIdx = 0;
     mGetAllowed.Deny(); // No data available, so lock get call

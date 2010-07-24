@@ -194,6 +194,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     }
 
 #ifdef USE_PARANOIA
+    dsyslog("Use Paranoia");
     pParanoiaDrive=cdio_cddap_identify_cdio(pCdio, 1, NULL);
     if (pParanoiaDrive == NULL) {
         esyslog ("Drive Init failed");
@@ -211,8 +212,6 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
      /* Set reading mode for full paranoia, but allow skipping sectors. */
     cdio_paranoia_modeset(pParanoiaCd,
                              PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP);
-
-
 #endif
     dsyslog("The driver selected is %s", cdio_get_driver_name(pCdio));
     dsyslog("The default device for this driver is %s",
@@ -352,6 +351,8 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                     return true;
                 }
             }
+            mBufferStat += mRingBuffer.GetFreePercent();
+            mBufferCnt ++;
         }
         if (!Running()) {
             return false;
@@ -377,10 +378,13 @@ void cBufferedCdio::Action(void)
             mStartLsn = GetStartLsn(mCurrTrackIdx);
         }
         mTrackChange = false;
+        mBufferStat = 0;
+        mBufferCnt = 0;
         if (!ReadTrack (mCurrTrackIdx)) {
             mState = BCDIO_FAILED;
             return;
         }
+        dsyslog ("Av. buffer usage %d", (mBufferStat / mBufferCnt));
         if (!Running()) {
             mState = BCDIO_STOP;
             return;

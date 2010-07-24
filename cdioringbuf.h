@@ -66,6 +66,7 @@ private:
     int mPutIdx;
     int mGetIdx;
     int mBlocks;
+    int mNumBlocks;
     cMutex mBufferMutex;
     cAllowed mGetAllowed;
     cAllowed mPutAllowed;
@@ -76,6 +77,9 @@ public:
     bool GetBlock(uint8_t *block);
     bool PutBlock(const uint8_t *block);
     void Clear(void);
+    int GetFreePercent(void) {
+        return ((100*mNumBlocks)/mBlocks);
+    }
 };
 
 #endif
