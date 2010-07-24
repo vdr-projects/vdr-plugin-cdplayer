@@ -32,7 +32,7 @@
 using namespace std;
 
 // Maximum number of raw blocks to buffer
-static const int CCDIO_MAX_BLOCKS=32;
+static const int CCDIO_MAX_BLOCKS=128;
 
 typedef enum _bufcdio_state {
     BCDIO_STOP = 0,
