@@ -29,6 +29,11 @@ const int PES_DYNAMIC_RANGE_OFF = 0x80;
 const int STREAM_ID_PRIVATE1=0xBD;
 const int SUBSTREAM_LPCM=0xA0;
 
+// Bits for ext1;
+const int PES_EXT1=0x80;
+const int PES_ORIGINAL=0x01;
+const int PES_DATA_ALIGNMENT_INDICATOR=0x04;
+
 typedef enum _pcm_freq {
     PCM_FREQ_48000 = 0x00,
     PCM_FREQ_96000 = 0x10,
