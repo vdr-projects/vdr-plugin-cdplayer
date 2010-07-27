@@ -32,6 +32,7 @@ const int SUBSTREAM_LPCM=0xA0;
 // Bits for ext1;
 const int PES_EXT1=0x80;
 const int PES_ORIGINAL=0x01;
+const int PES_COPYRIGHT=0x02;
 const int PES_DATA_ALIGNMENT_INDICATOR=0x04;
 
 typedef enum _pcm_freq {
@@ -60,6 +61,7 @@ typedef struct _pes_pcm_stream {
     uint8_t ext1;
     uint8_t ext2;
     uint8_t pes_header_data_len; // PES_HEADER_LEN
+
     // PCM Stream header starts here
 
     // Byte 7

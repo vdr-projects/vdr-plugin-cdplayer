@@ -40,14 +40,14 @@ public:
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
-    void NextTrack(void) {cdio.NextTrack();}
-    void PrevTrack(void) {cdio.PrevTrack();}
+    void NextTrack(void) {DeviceClear(); cdio.NextTrack();}
+    void PrevTrack(void) {DeviceClear(); cdio.PrevTrack();}
     void Stop(void);
     void Pause(void) {cdio.Pause();}
     void SpeedNormal(void) {mSpeed = 0;}
-    void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
-    void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
-    void ChangeTime(int tm) {cdio.SkipTime(tm);}
+    void SpeedFaster(void) {DeviceClear(); if (mSpeed < MAX_SPEED) mSpeed++;}
+    void SpeedSlower(void) {DeviceClear(); if (mSpeed > 0) mSpeed--;}
+    void ChangeTime(int tm) {DeviceClear(); cdio.SkipTime(tm);}
     const TRACK_IDX_T GetNumTracks (void) {
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetNumTracks();

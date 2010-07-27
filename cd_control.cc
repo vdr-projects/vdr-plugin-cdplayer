@@ -484,8 +484,6 @@ void cCdPlayer::Activate(bool On)
     }
 }
 
-#define FRAME_DIV 4
-
 void cCdPlayer::Action(void)
 {
     bool play = true;
@@ -495,33 +493,31 @@ void cCdPlayer::Action(void)
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
     const uchar *pesdata;
     int peslen;
-    int chunksize = CDIO_CD_FRAMESIZE_RAW / FRAME_DIV;
 
     if (!cdio.OpenDevice (cPluginCdplayer::GetDeviceName())) {
         return;
     }
     cdio.Start();
+
     cDevice::PrimaryDevice()->SetCurrentAudioTrack(ttAudio);
     while (play) {
         if (!cdio.GetData(buf)) {
             play = false;
         }
-        int i = 0;
-        while ((i < FRAME_DIV) && (play)) {
-            if (DevicePoll(oPoller, 100)) {
-                converter.SetFreq(mSpeedTypes[mSpeed]);
-                converter.SetData(&buf[i * chunksize], chunksize);
-                pesdata = converter.GetPesData();
-                peslen = converter.GetPesLength();
 
-                if (PlayPes(pesdata, peslen, false) < 0) {
-                    play = false;
-                }
-                i++;
-            }
-            if (!Running()) {
+        if (DevicePoll(oPoller, 100)) {
+            converter.SetFreq(mSpeedTypes[mSpeed]);
+            converter.SetData(buf, CDIO_CD_FRAMESIZE_RAW);
+            pesdata = converter.GetPesData();
+            peslen = converter.GetPesLength();
+
+            if (PlayPes(pesdata, peslen, false) < 0) {
+                esyslog("%s %d PlayPes failed", __FILE__, __LINE__);
                 play = false;
             }
+        }
+        if (!Running()) {
+            play = false;
         }
     }
     cdio.Stop();
