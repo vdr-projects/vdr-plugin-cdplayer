@@ -384,7 +384,12 @@ void cBufferedCdio::Action(void)
             mState = BCDIO_FAILED;
             return;
         }
-        dsyslog ("Av. buffer usage %d", (mBufferStat / mBufferCnt));
+        if (mBufferCnt == 0) {
+            dsyslog ("Buffer empty");
+        }
+        else {
+            dsyslog ("Av. buffer usage %d", (mBufferStat / mBufferCnt));
+        }
         if (!Running()) {
             mState = BCDIO_STOP;
             return;
