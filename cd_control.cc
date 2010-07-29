@@ -14,6 +14,7 @@
 #include "pes_audio_converter.h"
 #include "bufferedcdio.h"
 #include <time.h>
+#include <assert.h>
 
 const char *cCdControl::menutitle = tr("CD Player");
 const char *cCdControl::menukindPlayList = "MenuCDPlayList";
@@ -484,37 +485,62 @@ void cCdPlayer::Activate(bool On)
     }
 }
 
+#define PACKET_SIZE 2000
+
+bool cCdPlayer::PlayPacket (const uint8_t *buf, int size) {
+    const uchar *pesdata;
+    static uint8_t pesbuf[3000];
+    int peslen;
+    int last = mBufEnd + size;
+    cPesAudioConverter converter;
+    cPoller oPoller;
+    assert(size > PACKET_SIZE);
+    memcpy (&mCDBuf[mBufEnd], buf, size);
+    while (last > PACKET_SIZE) {
+        if (DevicePoll(oPoller, 100)) {
+            converter.SetFreq(mSpeedTypes[mSpeed]);
+            converter.SetData(mCDBuf, PACKET_SIZE);
+            pesdata = converter.GetPesData();
+            peslen = converter.GetPesLength();
+#if 0
+FILE *fp=fopen("/tmp/out.pes","a");
+fwrite(pesdata,peslen,1,fp);
+fclose(fp);
+#endif
+            memcpy (pesbuf, pesdata, peslen);
+            if (PlayPes(pesbuf, peslen, false) < 0) {
+                esyslog("%s %d PlayPes failed", __FILE__, __LINE__);
+                return false;
+            }
+            mBufEnd = PACKET_SIZE;
+            memmove (mCDBuf, &mCDBuf[mBufEnd], last-mBufEnd);
+            mBufEnd = last-mBufEnd;
+            last -= PACKET_SIZE;
+        }
+        if (!Running()) {
+            return (false);
+        }
+    }
+    return (true);
+}
+
 void cCdPlayer::Action(void)
 {
     bool play = true;
-    cPesAudioConverter converter;
-    cPoller oPoller;
-
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
-    const uchar *pesdata;
-    int peslen;
 
     if (!cdio.OpenDevice (cPluginCdplayer::GetDeviceName())) {
         return;
     }
     cdio.Start();
-
+    mBufEnd = 0;
     cDevice::PrimaryDevice()->SetCurrentAudioTrack(ttAudio);
     while (play) {
         if (!cdio.GetData(buf)) {
             play = false;
         }
-
-        if (DevicePoll(oPoller, 100)) {
-            converter.SetFreq(mSpeedTypes[mSpeed]);
-            converter.SetData(buf, CDIO_CD_FRAMESIZE_RAW);
-            pesdata = converter.GetPesData();
-            peslen = converter.GetPesLength();
-
-            if (PlayPes(pesdata, peslen, false) < 0) {
-                esyslog("%s %d PlayPes failed", __FILE__, __LINE__);
-                play = false;
-            }
+        if (play) {
+            play = PlayPacket (buf, CDIO_CD_FRAMESIZE_RAW);
         }
         if (!Running()) {
             play = false;

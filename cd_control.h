@@ -28,11 +28,16 @@ protected:
     uchar *pStillBuf;
     int mStillBufLen;
     int mSpeed;
+    uint8_t mCDBuf[2 * CDIO_CD_FRAMESIZE_RAW];
+    int mBufEnd;
     static const PCM_FREQ_T mSpeedTypes[MAX_SPEED+1];
     cMutex mPlayerMutex;
+
     virtual void Activate(bool On);
     void Action(void);
     void DisplayStillPicture (void);
+    bool PlayPacket (const uint8_t *buf, int size);
+
 public:
     cCdPlayer(void);
     virtual ~cCdPlayer();
