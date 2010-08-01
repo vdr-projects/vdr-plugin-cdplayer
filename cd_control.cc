@@ -485,21 +485,19 @@ void cCdPlayer::Activate(bool On)
     }
 }
 
-#define PACKET_SIZE 2000
 
-bool cCdPlayer::PlayPacket (const uint8_t *buf, int size) {
+bool cCdPlayer::PlayPacket (const uint8_t *buf) {
     const uchar *pesdata;
-    static uint8_t pesbuf[3000];
+    static uint8_t pesbuf[CDIO_CD_FRAMESIZE_RAW];
     int peslen;
-    int last = mBufEnd + size;
+    int idx = 0;
     cPesAudioConverter converter;
     cPoller oPoller;
-    assert(size > PACKET_SIZE);
-    memcpy (&mCDBuf[mBufEnd], buf, size);
-    while (last > PACKET_SIZE) {
+
+    while (idx < CDIO_CD_FRAMESIZE_RAW) {
         if (DevicePoll(oPoller, 100)) {
             converter.SetFreq(mSpeedTypes[mSpeed]);
-            converter.SetData(mCDBuf, PACKET_SIZE);
+            converter.SetData(&buf[idx], CDIO_CD_FRAMESIZE_RAW/2);
             pesdata = converter.GetPesData();
             peslen = converter.GetPesLength();
 #if 0
@@ -512,10 +510,7 @@ fclose(fp);
                 esyslog("%s %d PlayPes failed", __FILE__, __LINE__);
                 return false;
             }
-            mBufEnd = PACKET_SIZE;
-            memmove (mCDBuf, &mCDBuf[mBufEnd], last-mBufEnd);
-            mBufEnd = last-mBufEnd;
-            last -= PACKET_SIZE;
+            idx += CDIO_CD_FRAMESIZE_RAW/2;
         }
         if (!Running()) {
             return (false);
@@ -533,14 +528,13 @@ void cCdPlayer::Action(void)
         return;
     }
     cdio.Start();
-    mBufEnd = 0;
     cDevice::PrimaryDevice()->SetCurrentAudioTrack(ttAudio);
     while (play) {
         if (!cdio.GetData(buf)) {
             play = false;
         }
         if (play) {
-            play = PlayPacket (buf, CDIO_CD_FRAMESIZE_RAW);
+            play = PlayPacket (buf);
         }
         if (!Running()) {
             play = false;

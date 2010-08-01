@@ -173,6 +173,18 @@ bool cBufferedCdio::ParanoiaLogMsg (void)
     return iserr;
 }
 
+void cBufferedCdio::SetSpeed (int speed)
+{
+    if (pCdio != NULL) {
+        if (cdio_set_speed (pCdio, speed) != 0) {
+            esyslog("%s %d mmc_set_drive_speed failed", __FILE__, __LINE__);
+        }
+        else {
+            dsyslog ("Change cd speed to %dx",speed);
+        }
+     }
+}
+
 // Open access to the audio cd and retrieve all available CD-Text
 // information
 bool cBufferedCdio::OpenDevice (const string &FileName)
@@ -181,6 +193,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     string txt;
     CD_TEXT_T cdtxt;
 
+    mSpeed = 8;
     CloseDevice();
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
@@ -192,7 +205,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
         esyslog("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
         return false;
     }
-
+    SetSpeed (mSpeed);
 #ifdef USE_PARANOIA
     dsyslog("Use Paranoia");
     pParanoiaDrive=cdio_cddap_identify_cdio(pCdio, 1, NULL);
@@ -298,9 +311,10 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 #else
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
 #endif
+    int percent;
+    lsn_t endlsn = GetEndLsn(trackidx);
 
     mCurrLsn = mStartLsn;
-    lsn_t endlsn = GetEndLsn(trackidx);
     dsyslog("%s %d Read Track %d Start %d End %d",
             __FILE__, __LINE__, trackidx, mCurrLsn, endlsn);
 #ifdef USE_PARANOIA
@@ -351,7 +365,23 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                     return true;
                 }
             }
-            mBufferStat += mRingBuffer.GetFreePercent();
+
+            // Slow down CD-Rom drive when buffer is full
+            percent = mRingBuffer.GetFreePercent();
+            int sp = 1;
+            if (percent < 25) {
+                sp = 8;
+            } else if (percent < 50) {
+                sp = 4;
+            } else if (percent < 70) {
+                sp = 2;
+            }
+
+            if (mSpeed != sp) {
+                SetSpeed(sp);
+                mSpeed = sp;
+            }
+            mBufferStat += percent;
             mBufferCnt ++;
         }
         if (!Running()) {

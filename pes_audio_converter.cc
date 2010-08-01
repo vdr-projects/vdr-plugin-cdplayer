@@ -31,7 +31,7 @@ void cPesAudioConverter::SetData(const uint8_t *payload, int length)
     mPesPcmStream.pes_packet_len_low = len & 0xFF;
     mPesPcmStream.pes_packet_len_high = (len >> 8) & 0xFF;
     mPesPcmStream.ext1 = PES_EXT1 | PES_DATA_ALIGNMENT_INDICATOR |
-                         PES_ORIGINAL | PES_COPYRIGHT;
+                         PES_ORIGINAL;
     mPesPcmStream.ext2 = 0;
     mPesPcmStream.pes_header_data_len = 0;
     // Setup PCM Header

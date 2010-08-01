@@ -26,8 +26,11 @@ const int PES_MAX_PACKSIZE = 4096;
 const int PES_MAX_PAYLOAD = (PES_MAX_PACKSIZE - PES_HEADER_LEN - LPCM_HEADER_LEN);
 
 const int PES_DYNAMIC_RANGE_OFF = 0x80;
-const int STREAM_ID_PRIVATE1=0xBD;
 const int SUBSTREAM_LPCM=0xA0;
+
+
+const int STREAM_ID_PRIVATE1=0xBD;
+const int STREAM_ID_AUDIO1 = 0xC0;
 
 // Bits for ext1;
 const int PES_EXT1=0x80;

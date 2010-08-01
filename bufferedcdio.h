@@ -23,6 +23,7 @@
 #include <cdio/cdda.h>
 #include <cdio/cd_types.h>
 #include <cdio/paranoia.h>
+#include <cdio/mmc.h>
 #include "cdioringbuf.h"
 #include "cdinfo.h"
 
@@ -65,6 +66,7 @@ private:
     bool           mTrackChange;  // Indication for external track change
     BUFCDIO_STATE_T mState;
     cMutex          mCdMutex;
+    int             mSpeed;
     string mErrtxt;
 // Buffer statistics
     int mBufferStat;
@@ -72,6 +74,7 @@ private:
 
     void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
+    void SetSpeed (int speed);
 #ifdef USE_PARANOIA
     bool ParanoiaLogMsg(void);
 #endif
