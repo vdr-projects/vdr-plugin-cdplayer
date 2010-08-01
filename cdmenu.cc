@@ -33,6 +33,8 @@ cMenuCDPlayer::cMenuCDPlayer(void) : cMenuSetupPage()
     Add(new cMenuEditBoolItem(tr("Show in main menu"), &mShowMainMenu));
 #ifdef USE_PARANOIA
     Add(new cMenuEditBoolItem(tr("Enable Paranoia"), &mUseParanoia));
+#else
+    mUseParanoia = false;
 #endif
 }
 

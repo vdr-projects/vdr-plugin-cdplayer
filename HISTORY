@@ -32,3 +32,5 @@ VDR Plugin 'cdplayer' Revision History
 - Fix crash with skin elchi.
 - Workaround for crashing cddb library when no $HOME is set.
 - Add support for cdparanoia.
+- Fixes for FF-DVB Card support.
+- Limit CD-Speed.

@@ -37,9 +37,11 @@ cBufferedCdio::cBufferedCdio(void) :
         mRingBuffer(CCDIO_MAX_BLOCKS)
 {
     cMutexLock MutexLock(&mCdMutex);
-    pCdio = NULL;
+#ifdef USE_PARANOIA
     pParanoiaDrive = NULL;
     pParanoiaCd = NULL;
+#endif
+    pCdio = NULL;
     mCurrTrackIdx = INVALID_TRACK_IDX;
     mState = BCDIO_STARTING;
     SetDescription("BufferedCdio");

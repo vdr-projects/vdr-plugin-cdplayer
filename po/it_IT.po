@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2010-08-01 18:45+0200\n"
+"POT-Creation-Date: 2010-08-01 18:57+0200\n"
 "PO-Revision-Date: 2010-06-19 23:40+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -18,87 +18,87 @@ msgstr ""
 "X-Poedit-Country: ITALY\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: bufferedcdio.cc:46
+#: bufferedcdio.cc:48
 msgid "Arranger"
 msgstr "Regista"
 
-#: bufferedcdio.cc:47
+#: bufferedcdio.cc:49
 msgid "Composer"
 msgstr "Compositore"
 
-#: bufferedcdio.cc:48
+#: bufferedcdio.cc:50
 msgid "Disk ID"
 msgstr "ID disco"
 
-#: bufferedcdio.cc:49
+#: bufferedcdio.cc:51
 msgid "Genre"
 msgstr "Genere"
 
-#: bufferedcdio.cc:50
+#: bufferedcdio.cc:52
 msgid "Message"
 msgstr "Messaggio"
 
-#: bufferedcdio.cc:51
+#: bufferedcdio.cc:53
 msgid "Isrc"
 msgstr "ISRC"
 
-#: bufferedcdio.cc:52
+#: bufferedcdio.cc:54
 msgid "Performer"
 msgstr "Interprete"
 
-#: bufferedcdio.cc:53
+#: bufferedcdio.cc:55
 msgid "Size Info"
 msgstr "Info dimensione"
 
-#: bufferedcdio.cc:54
+#: bufferedcdio.cc:56
 msgid "Songwriter"
 msgstr "Autore"
 
-#: bufferedcdio.cc:55
+#: bufferedcdio.cc:57
 msgid "Title"
 msgstr "Titolo"
 
-#: bufferedcdio.cc:56
+#: bufferedcdio.cc:58
 msgid "Info1"
 msgstr "Info 1"
 
-#: bufferedcdio.cc:57
+#: bufferedcdio.cc:59
 msgid "Info2"
 msgstr "Info 2"
 
-#: bufferedcdio.cc:58
+#: bufferedcdio.cc:60
 msgid "Upc Ean"
 msgstr "Upc Ean"
 
-#: bufferedcdio.cc:59
+#: bufferedcdio.cc:61
 msgid "Invalid"
 msgstr "Non valido"
 
-#: bufferedcdio.cc:205
+#: bufferedcdio.cc:207
 msgid "Can not open"
 msgstr "Impossibile aprire"
 
-#: bufferedcdio.cc:242
+#: bufferedcdio.cc:244
 msgid "No disc in drive"
 msgstr "Non c'è alcun disco nell'unità"
 
-#: bufferedcdio.cc:252
+#: bufferedcdio.cc:254
 msgid "Problem on read"
 msgstr "Errore di lettura"
 
-#: bufferedcdio.cc:270
+#: bufferedcdio.cc:272
 msgid "Problem on read lsn"
 msgstr "Errore di lettura LSN"
 
-#: bufferedcdio.cc:278
+#: bufferedcdio.cc:280
 msgid "Problem on read lba"
 msgstr "Errore di lettura LBA"
 
-#: bufferedcdio.cc:299
+#: bufferedcdio.cc:301
 msgid "Not an audio disk"
 msgstr "Disco audio non trovato"
 
-#: bufferedcdio.cc:343 bufferedcdio.cc:354
+#: bufferedcdio.cc:345 bufferedcdio.cc:356
 msgid "Read error"
 msgstr "Errore di lettura"
 

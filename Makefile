@@ -53,7 +53,11 @@ endif
 ifneq (exists, $(shell pkg-config libcdio_paranoia && echo exists))
   $(warning ******************************************************************)
   $(warning 'libcdio_paranoia' not detected! ')
+  $(warning 'compiling without paranoia support ')
   $(warning ******************************************************************)
+else 
+### Comment out if you don't like libparanoia support
+  DEFINES += -DUSE_PARANOIA=1
 endif
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 

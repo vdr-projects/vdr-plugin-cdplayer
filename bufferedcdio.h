@@ -27,9 +27,6 @@
 #include "cdioringbuf.h"
 #include "cdinfo.h"
 
-#define USE_PARANOIA 1
-
-
 using namespace std;
 
 // Maximum number of raw blocks to buffer
