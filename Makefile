@@ -73,7 +73,7 @@ DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 ### The object files (add further files here):
 
 OBJS = $(PLUGIN).o cd_control.o pes_audio_converter.o bufferedcdio.o \
-				   cdioringbuf.o cdinfo.o
+				   cdioringbuf.o cdinfo.o cdmenu.o
 LIBS = $(shell pkg-config --libs libcddb)  
 LIBS += $(shell pkg-config --libs libcdio_cdda)
 LIBS += $(shell pkg-config --libs libcdio_paranoia)

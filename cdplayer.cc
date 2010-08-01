@@ -13,6 +13,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "cdplayer.h"
+#include "cdmenu.h"
 #include <vdr/remote.h>
 
 static const char *MAINMENUENTRY  = trNOOP("CD-Player");
@@ -153,7 +154,10 @@ time_t cPluginCdplayer::WakeupTime(void)
 
 const char *cPluginCdplayer::MainMenuEntry(void)
 {
-    return tr(MAINMENUENTRY);
+    if (cMenuCDPlayer::GetShowMainMenu()) {
+        return tr(MAINMENUENTRY);
+    }
+    return NULL;
 }
 
 cOsdObject *cPluginCdplayer::MainMenuAction(void)
@@ -167,13 +171,13 @@ cOsdObject *cPluginCdplayer::MainMenuAction(void)
 cMenuSetupPage *cPluginCdplayer::SetupMenu(void)
 {
   // Return a setup menu in case the plugin supports one.
-  return NULL;
+    return new cMenuCDPlayer();
 }
 
 bool cPluginCdplayer::SetupParse(const char *Name, const char *Value)
 {
   // Parse your own setup parameters and store their values.
-  return false;
+  return cMenuCDPlayer::SetupParse(Name, Value);
 }
 
 bool cPluginCdplayer::Service(const char *Id, void *Data)

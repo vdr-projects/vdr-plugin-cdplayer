@@ -121,10 +121,10 @@ public:
         if (mCurrTrackIdx > 0) SetTrack(mCurrTrackIdx-1);
     };
     void Stop(void) {
+        cMutexLock MutexLock(&mCdMutex);
         mState = BCDIO_STOP;
         Cancel(5);
         CloseDevice();
-
     }
     void Pause(void) {
         if (mState == BCDIO_PLAY) mState = BCDIO_PAUSE;

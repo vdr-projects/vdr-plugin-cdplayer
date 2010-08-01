@@ -13,6 +13,7 @@
 
 #include "cdplayer.h"
 #include "bufferedcdio.h"
+#include "cdmenu.h"
 
 // Translated description of the cd text field
 const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
@@ -153,7 +154,7 @@ bool cBufferedCdio::GetData (uint8_t *data)
     return true;
 }
 
-
+#ifdef USE_PARANOIA
 bool cBufferedCdio::ParanoiaLogMsg (void)
 {
     bool iserr = false;
@@ -172,6 +173,7 @@ bool cBufferedCdio::ParanoiaLogMsg (void)
     }
     return iserr;
 }
+#endif
 
 void cBufferedCdio::SetSpeed (int speed)
 {
@@ -193,7 +195,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     string txt;
     CD_TEXT_T cdtxt;
 
-    mSpeed = 8;
+    mSpeed = cMenuCDPlayer::GetMaxSpeed();
     CloseDevice();
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
@@ -207,7 +209,12 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     }
     SetSpeed (mSpeed);
 #ifdef USE_PARANOIA
-    dsyslog("Use Paranoia");
+    if (cMenuCDPlayer::GetUseParanoia()) {
+        dsyslog("Use Paranoia");
+    }
+    else {
+        dsyslog("Paranoia disabled");
+    }
     pParanoiaDrive=cdio_cddap_identify_cdio(pCdio, 1, NULL);
     if (pParanoiaDrive == NULL) {
         esyslog ("Drive Init failed");
@@ -306,11 +313,9 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
 // Read an audio track from CD and buffer the output into ringbuffer
 bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 {
-#ifdef USE_PARANOIA
-    uint8_t *buf;
-#else
+    uint8_t *bufptr;
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
-#endif
+
     int percent;
     lsn_t endlsn = GetEndLsn(trackidx);
 
@@ -332,20 +337,26 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                 return false;
             }
 #ifdef USE_PARANOIA
-            buf=(uint8_t *)cdio_paranoia_read(pParanoiaCd, NULL);
-            if (ParanoiaLogMsg()) {
-                mErrtxt = tr("Read error");
-                mState = BCDIO_FAILED;
-                mCdMutex.Unlock();
-                return false;
+            if (cMenuCDPlayer::GetUseParanoia()) {
+                bufptr = (uint8_t *)cdio_paranoia_read(pParanoiaCd, NULL);
+                if (ParanoiaLogMsg()) {
+                    mErrtxt = tr("Read error");
+                    mState = BCDIO_FAILED;
+                    mCdMutex.Unlock();
+                    return false;
+                }
             }
-#else
-            if (cdio_read_audio_sectors(pCdio, buf, mCurrLsn, 1)
+            else {
+#endif
+            bufptr = buf;
+            if (cdio_read_audio_sectors(pCdio, bufptr, mCurrLsn, 1)
                                                         != DRIVER_OP_SUCCESS) {
                 mErrtxt = tr("Read error");
                 mState = BCDIO_FAILED;
                 mCdMutex.Unlock();
                 return false;
+            }
+#ifdef USE_PARANOIA
             }
 #endif
             mCurrLsn++;
@@ -357,7 +368,7 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                 return true;
             }
 
-            while (!mRingBuffer.PutBlock(buf)) {
+            while (!mRingBuffer.PutBlock(bufptr)) {
                 if (!Running()) {
                     return false;
                 }
@@ -376,7 +387,10 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
             } else if (percent < 70) {
                 sp = 2;
             }
-
+            // Limit maximum speed to menu setting
+            if (sp > cMenuCDPlayer::GetMaxSpeed()) {
+                sp = cMenuCDPlayer::GetMaxSpeed();
+            }
             if (mSpeed != sp) {
                 SetSpeed(sp);
                 mSpeed = sp;
@@ -414,6 +428,7 @@ void cBufferedCdio::Action(void)
             mState = BCDIO_FAILED;
             return;
         }
+        // Output Buffer statistics
         if (mBufferCnt == 0) {
             dsyslog ("Buffer empty");
         }

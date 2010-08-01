@@ -20,7 +20,7 @@
 #include <string>
 #include "cd_control.h"
 
-static const char *VERSION        = "0.0.5";
+static const char *VERSION        = "0.0.6";
 static const char *DESCRIPTION    = trNOOP("CD-Player");
 
 class cPluginCdplayer: public cPlugin {
@@ -32,11 +32,13 @@ private:
     static std::string mCDDBCacheDir;
     static bool mEnableCDDB;
     static bool mEnableCDDBCache;
+
+    bool mShowMainMenu;
     cCdControl *mCdControl;
     cMutex mCdMutex;
 public:
     cPluginCdplayer(void);
-    virtual ~cPluginCdplayer() {if (mCdControl != NULL) delete mCdControl; }
+    virtual ~cPluginCdplayer() {if (mCdControl != NULL) delete mCdControl;}
     virtual const char *Version(void) { return VERSION; }
     virtual const char *Description(void) { return tr(DESCRIPTION); }
     virtual const char *CommandLineHelp(void);
@@ -56,7 +58,14 @@ public:
     virtual const char **SVDRPHelpPages(void);
     virtual cString SVDRPCommand(const char *Command, const char *Option,
             int &ReplyCode);
-    // Configuration options changable by command line
+
+    void ShowMainMenuEntry (bool show) { mShowMainMenu = show; };
+    // Configuration options changeable by command line
+
+    static const std::string GetConfigDir(void) {
+        const std::string cfdir = cPlugin::ConfigDirectory();
+        return cfdir + "/" + mcfgDir + "/";
+    }
     static const std::string GetStillPicName(void) {
         const std::string cfdir = cPlugin::ConfigDirectory();
         return cfdir + "/" + mcfgDir + "/" + mStillPicture;
