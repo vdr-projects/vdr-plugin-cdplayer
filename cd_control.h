@@ -23,34 +23,36 @@
 
 class cCdPlayer: public cPlayer, public cThread {
 protected:
-
     cBufferedCdio cdio;
     uchar *pStillBuf;
     int mStillBufLen;
     int mSpeed;
+    bool mPurge;
     static const PCM_FREQ_T mSpeedTypes[MAX_SPEED+1];
     cMutex mPlayerMutex;
 
     virtual void Activate(bool On);
     void Action(void);
+    void DeviceClear() {mPurge = true; cPlayer::DeviceClear();}
     void DisplayStillPicture (void);
     bool PlayPacket (const uint8_t *buf);
 
 public:
     cCdPlayer(void);
     virtual ~cCdPlayer();
+
     virtual bool GetIndex(int &Current, int &Total, bool SnapToIFrame = false);
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
-    void NextTrack(void) {DeviceClear(); cdio.NextTrack();}
-    void PrevTrack(void) {DeviceClear(); cdio.PrevTrack();}
+    void NextTrack(void) {cdio.NextTrack(); DeviceClear();}
+    void PrevTrack(void) {cdio.PrevTrack(); DeviceClear();}
     void Stop(void);
     void Pause(void) {cdio.Pause();}
     void SpeedNormal(void) {mSpeed = 0;}
-    void SpeedFaster(void) {DeviceClear(); if (mSpeed < MAX_SPEED) mSpeed++;}
-    void SpeedSlower(void) {DeviceClear(); if (mSpeed > 0) mSpeed--;}
-    void ChangeTime(int tm) {DeviceClear(); cdio.SkipTime(tm);}
+    void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
+    void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
+    void ChangeTime(int tm) {cdio.SkipTime(tm); DeviceClear(); }
     const TRACK_IDX_T GetNumTracks (void) {
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetNumTracks();

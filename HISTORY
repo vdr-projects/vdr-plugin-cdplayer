@@ -26,7 +26,7 @@ VDR Plugin 'cdplayer' Revision History
 - SVDRP Support.
 - Detail View.
 
-2010-xx-x: Version 0.x.x
+2010-07-04: Version 0.0.6
 
 - Italian translation.
 - Fix crash with skin elchi.
@@ -34,3 +34,7 @@ VDR Plugin 'cdplayer' Revision History
 - Add support for cdparanoia.
 - Fixes for FF-DVB Card support.
 - Limit CD-Speed.
+
+2010-07-x: Version 1.0.0
+
+- Update buffer handling

@@ -443,6 +443,7 @@ void cBufferedCdio::Action(void)
         }
         if (mTrackChange) {
             mRingBuffer.Clear();
+            cCondWait::SleepMs(500);
         }
         else {
             mCurrTrackIdx++;

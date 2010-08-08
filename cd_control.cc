@@ -368,6 +368,7 @@ cCdPlayer::cCdPlayer(void)
     pStillBuf = NULL;
     mStillBufLen = 0;
     mSpeed = 0;
+    mPurge = false;
     SetDescription ("cdplayer");
 }
 
@@ -506,6 +507,9 @@ fwrite(pesdata,peslen,1,fp);
 fclose(fp);
 #endif
             memcpy (pesbuf, pesdata, peslen);
+            if (mPurge) {
+                return true;
+            }
             if (PlayPes(pesbuf, peslen, false) < 0) {
                 esyslog("%s %d PlayPes failed", __FILE__, __LINE__);
                 return false;
@@ -513,10 +517,13 @@ fclose(fp);
             idx += CDIO_CD_FRAMESIZE_RAW/2;
         }
         if (!Running()) {
-            return (false);
+            return false;
+        }
+        if (mPurge) {
+            return true;
         }
     }
-    return (true);
+    return true;
 }
 
 void cCdPlayer::Action(void)
@@ -539,6 +546,7 @@ void cCdPlayer::Action(void)
         if (!Running()) {
             play = false;
         }
+        mPurge = false;
     }
     cdio.Stop();
 }
