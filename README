@@ -39,6 +39,10 @@ the vdr plugin configuration directory (can be overwritten with the -c
 option). For most distributions, this is /video/plugins. Copy the still picture 
 with name cd.mpg into this directory.
 
+Support for cdparanoia can be completely disabled adding "NOPARANOIA=0" to 
+Make.global or Make.config
+
+
 Graphtft support:
 -----------------------
 For graphtft-support enable "DEFINES += -DUSE_GRAPHTFT" in the Makefile or

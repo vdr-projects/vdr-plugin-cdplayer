@@ -57,7 +57,12 @@ ifneq (exists, $(shell pkg-config libcdio_paranoia && echo exists))
   $(warning ******************************************************************)
 else 
 ### Comment out if you don't like libparanoia support
+ifdef NOPARANOIA
+  $(warning 'paranoia support disabled')
+else
+  USE_PARANOIA=1
   DEFINES += -DUSE_PARANOIA=1
+endif
 endif
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 
@@ -80,8 +85,9 @@ OBJS = $(PLUGIN).o cd_control.o pes_audio_converter.o bufferedcdio.o \
 				   cdioringbuf.o cdinfo.o cdmenu.o
 LIBS = $(shell pkg-config --libs libcddb)  
 LIBS += $(shell pkg-config --libs libcdio_cdda)
+ifdef USE_PARANOIA
 LIBS += $(shell pkg-config --libs libcdio_paranoia)
-
+endif
 ### The main target:
 
 all: libvdr-$(PLUGIN).so i18n

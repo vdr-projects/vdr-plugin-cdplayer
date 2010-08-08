@@ -38,3 +38,5 @@ VDR Plugin 'cdplayer' Revision History
 2010-07-x: Version 1.0.0
 
 - Update buffer handling
+- Support for cdparanoia can be disabled with an entry of "NOPARANOIA=0"
+  to Make.config.
