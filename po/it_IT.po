@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2010-08-01 18:57+0200\n"
-"PO-Revision-Date: 2010-06-19 23:40+0100\n"
+"POT-Creation-Date: 2010-08-08 13:56+0200\n"
+"PO-Revision-Date: 2010-08-08 20:06+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -98,7 +98,8 @@ msgstr "Errore di lettura LBA"
 msgid "Not an audio disk"
 msgstr "Disco audio non trovato"
 
-#: bufferedcdio.cc:345 bufferedcdio.cc:356
+#: bufferedcdio.cc:345
+#: bufferedcdio.cc:356
 msgid "Read error"
 msgstr "Errore di lettura"
 
@@ -134,22 +135,25 @@ msgstr "Informazioni brano"
 msgid "Playlist"
 msgstr "Lista esecuzione"
 
-#: cd_control.cc:430
+#: cd_control.cc:431
 msgid "Can not open still picture: "
 msgstr "Impossibile aprire fermo immagine:"
 
-#: cdmenu.cc:30 cdplayer.cc:19 cdplayer.h:24
+#: cdmenu.cc:30
+#: cdplayer.cc:19
+#: cdplayer.h:24
 msgid "CD-Player"
 msgstr "Lettore CD audio"
 
 #: cdmenu.cc:32
 msgid "Max CD Speed"
-msgstr ""
+msgstr "Velocità massima CD"
 
 #: cdmenu.cc:33
 msgid "Show in main menu"
-msgstr ""
+msgstr "Mostra nel menu principale"
 
 #: cdmenu.cc:35
 msgid "Enable Paranoia"
-msgstr ""
+msgstr "Abilita paranoia"
+
