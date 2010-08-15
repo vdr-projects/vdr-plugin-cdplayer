@@ -478,7 +478,6 @@ void cCdPlayer::Activate(bool On)
             std::string file = cPluginCdplayer::GetStillPicName();
             LoadStillPicture(file);
             Start();
-            DevicePlay();
         }
     }
     else {
@@ -529,18 +528,24 @@ fclose(fp);
 void cCdPlayer::Action(void)
 {
     bool play = true;
+    bool startup = false;
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
 
     if (!cdio.OpenDevice (cPluginCdplayer::GetDeviceName())) {
         return;
     }
     cdio.Start();
-    cDevice::PrimaryDevice()->SetCurrentAudioTrack(ttAudio);
+
     while (play) {
         if (!cdio.GetData(buf)) {
             play = false;
         }
         if (play) {
+            if ((!startup) || (mPurge)) {
+                DevicePlay();
+                cDevice::PrimaryDevice()->SetCurrentAudioTrack(ttAudio);
+            }
+            startup = true;
             play = PlayPacket (buf);
         }
         if (!Running()) {
