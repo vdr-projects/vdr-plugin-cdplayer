@@ -41,3 +41,8 @@ VDR Plugin 'cdplayer' Revision History
 - Support for cdparanoia can be disabled with an entry of "NOPARANOIA=0"
   to Make.config.
 - Update of Italian translation.
+
+2010-07-22: Version 1.0.1
+
+- Fix a possible crash by send DevicePlay after the time the data for first 
+  track is really available.
