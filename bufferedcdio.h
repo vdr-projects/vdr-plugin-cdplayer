@@ -123,6 +123,10 @@ public:
         Cancel(5);
         CloseDevice();
     }
+
+    void Play(void) {
+         if (mState == BCDIO_PAUSE) mState = BCDIO_PLAY;
+    }
     void Pause(void) {
         if (mState == BCDIO_PLAY) mState = BCDIO_PAUSE;
         else if (mState == BCDIO_PAUSE) mState = BCDIO_PLAY;

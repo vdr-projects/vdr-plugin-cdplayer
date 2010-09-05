@@ -83,7 +83,7 @@ eOSState cCdControl::ProcessKey(eKeys Key)
         mCdPlayer->SpeedSlower();
         break;
     case kPlay:
-        mCdPlayer->SpeedNormal();
+        mCdPlayer->Play();
         break;
     case kDown:
     case kNext:
@@ -485,6 +485,23 @@ void cCdPlayer::Activate(bool On)
     }
 }
 
+void cCdPlayer::Pause (void)
+{
+    cdio.Pause();
+    if (cdio.GetState() == BCDIO_PLAY) {
+        DevicePlay();
+    }
+    else {
+        DeviceFreeze();
+    }
+}
+
+void cCdPlayer::Play (void)
+{
+    cdio.Play();
+    SpeedNormal();
+    DevicePlay();
+}
 
 bool cCdPlayer::PlayPacket (const uint8_t *buf) {
     const uchar *pesdata;
@@ -543,7 +560,7 @@ void cCdPlayer::Action(void)
         if (play) {
             if ((!startup) || (mPurge)) {
                 DevicePlay();
-                cDevice::PrimaryDevice()->SetCurrentAudioTrack(ttAudio);
+                DeviceSetCurrentAudioTrack(ttAudio);
             }
             startup = true;
             play = PlayPacket (buf);

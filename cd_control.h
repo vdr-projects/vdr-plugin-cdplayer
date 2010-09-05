@@ -48,7 +48,8 @@ public:
     void NextTrack(void) {cdio.NextTrack(); DeviceClear();}
     void PrevTrack(void) {cdio.PrevTrack(); DeviceClear();}
     void Stop(void);
-    void Pause(void) {cdio.Pause();}
+    void Pause(void);
+    void Play(void);
     void SpeedNormal(void) {mSpeed = 0;}
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
