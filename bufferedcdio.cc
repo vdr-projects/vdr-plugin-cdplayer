@@ -331,6 +331,11 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
         if (mState == BCDIO_PAUSE) {
             cCondWait::SleepMs(250);
         }
+        // Stop from external
+        else if ((mState == BCDIO_STOP) || (mState == BCDIO_FAILED)) {
+            return false;
+        }
+        // Play
         else {
             mCdMutex.Lock();
             if (pCdio == NULL) {
