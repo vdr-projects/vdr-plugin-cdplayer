@@ -379,14 +379,6 @@ cCdPlayer::~cCdPlayer()
     free(pStillBuf);
 }
 
-void cCdPlayer::Stop(void) {
-    dsyslog("cCdPlayer Stop");
-    if (Active()) {
-        Cancel(10);
-    }
-    Detach();
-}
-
 bool cCdPlayer::GetReplayMode(bool &Play, bool &Forward, int &Speed)
 {
     cMutexLock MutexLock(&mPlayerMutex);
@@ -477,7 +469,7 @@ void cCdPlayer::Activate(bool On)
         if (GetState() != BCDIO_PLAY) {
             std::string file = cPluginCdplayer::GetStillPicName();
             LoadStillPicture(file);
-            Start();
+            Play();
         }
     }
     else {
@@ -487,6 +479,7 @@ void cCdPlayer::Activate(bool On)
 
 void cCdPlayer::Pause (void)
 {
+    dsyslog("cCdPlayer Pause");
     cdio.Pause();
     if (cdio.GetState() == BCDIO_PLAY) {
         DevicePlay();
@@ -498,9 +491,33 @@ void cCdPlayer::Pause (void)
 
 void cCdPlayer::Play (void)
 {
+    dsyslog("cCdPlayer Start");
+
+    // If CDIO Input thread is not running, start it
+    if (!cdio.Active()) {
+        if (!cdio.OpenDevice(cPluginCdplayer::GetDeviceName())) {
+            return;
+        }
+        cdio.Start();
+    }
     cdio.Play();
     SpeedNormal();
     DevicePlay();
+    DeviceSetCurrentAudioTrack(ttAudio);
+    // If CD-Player ouput thread is not running, start it
+    if (!Active()) {
+        Start();
+    }
+}
+
+void cCdPlayer::Stop(void)
+{
+    dsyslog("cCdPlayer Stop");
+    DeviceClear();
+    if (Active()) {
+        Cancel(10);
+    }
+    Detach();
 }
 
 bool cCdPlayer::PlayPacket (const uint8_t *buf) {
@@ -545,24 +562,17 @@ fclose(fp);
 void cCdPlayer::Action(void)
 {
     bool play = true;
-    bool startup = false;
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
-
-    if (!cdio.OpenDevice (cPluginCdplayer::GetDeviceName())) {
-        return;
-    }
-    cdio.Start();
 
     while (play) {
         if (!cdio.GetData(buf)) {
             play = false;
         }
         if (play) {
-            if ((!startup) || (mPurge)) {
+            if (mPurge) {
                 DevicePlay();
                 DeviceSetCurrentAudioTrack(ttAudio);
             }
-            startup = true;
             play = PlayPacket (buf);
         }
         if (!Running()) {
