@@ -466,7 +466,9 @@ void cCdPlayer::Activate(bool On)
 {
     cMutexLock MutexLock(&mPlayerMutex);
     if (On) {
+        dsyslog("cCdPlayer Activate On");
         if (GetState() != BCDIO_PLAY) {
+            DeviceClear();
             std::string file = cPluginCdplayer::GetStillPicName();
             LoadStillPicture(file);
             Play();
@@ -502,9 +504,8 @@ void cCdPlayer::Play (void)
     }
     cdio.Play();
     SpeedNormal();
-    DevicePlay();
-    DeviceSetCurrentAudioTrack(ttAudio);
-    // If CD-Player ouput thread is not running, start it
+
+    // If CD-Player output thread is not running, start it
     if (!Active()) {
         Start();
     }
@@ -520,14 +521,39 @@ void cCdPlayer::Stop(void)
     Detach();
 }
 
-bool cCdPlayer::PlayPacket (const uint8_t *buf) {
+void cCdPlayer::NextTrack(void)
+{
+    dsyslog("cCdPlayer Next");
+    cdio.NextTrack();
+    DeviceClear();
+}
+
+void cCdPlayer::PrevTrack(void)
+{
+    dsyslog("cCdPlayer Prev");
+    cdio.PrevTrack();
+    DeviceClear();
+}
+
+void cCdPlayer::ChangeTime(int tm)
+{
+    dsyslog("cCdPlayer ChangeTime");
+    cdio.SkipTime(tm);
+    DeviceClear();
+}
+
+bool cCdPlayer::PlayData (const uint8_t *buf) {
     const uchar *pesdata;
     static uint8_t pesbuf[CDIO_CD_FRAMESIZE_RAW];
     int peslen;
     int idx = 0;
     cPesAudioConverter converter;
     cPoller oPoller;
-
+#if 0
+FILE *fp=fopen("/tmp/out.raw","a");
+fwrite(buf,CDIO_CD_FRAMESIZE_RAW,1,fp);
+fclose(fp);
+#endif
     while (idx < CDIO_CD_FRAMESIZE_RAW) {
         if (DevicePoll(oPoller, 100)) {
             converter.SetFreq(mSpeedTypes[mSpeed]);
@@ -564,21 +590,33 @@ void cCdPlayer::Action(void)
     bool play = true;
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
 
+    // Clear and flush output device
+    DeviceClear();
+    DeviceFlush(100);
+    DeviceSetCurrentAudioTrack(ttAudio);
+    DevicePlay();
+
+    // Wait until some Data is in the ring buffer
+    cdio.WaitBuffer();
+    mPurge = false;
+
     while (play) {
         if (!cdio.GetData(buf)) {
+            dsyslog ("cCdPlayer GetData stop");
             play = false;
         }
         if (play) {
             if (mPurge) {
                 DevicePlay();
                 DeviceSetCurrentAudioTrack(ttAudio);
+                mPurge = false;
+            } else {
+                play = PlayData(buf);
             }
-            play = PlayPacket (buf);
         }
         if (!Running()) {
             play = false;
         }
-        mPurge = false;
     }
     cdio.Stop();
 }

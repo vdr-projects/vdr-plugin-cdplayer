@@ -17,10 +17,7 @@
 cCdIoRingBuffer::cCdIoRingBuffer()
 {
     mData = NULL;
-    mBlocks = 0;
-    mPutIdx = 0;
-    mGetIdx = 0;
-    mNumBlocks = 0;
+    Clear();
 };
 
 cCdIoRingBuffer::cCdIoRingBuffer(int blocks)
@@ -30,12 +27,8 @@ cCdIoRingBuffer::cCdIoRingBuffer(int blocks)
         esyslog ("%s %d Out of memory", __FILE__, __LINE__);
         exit(-1);
     }
-    mPutIdx = 0;
-    mGetIdx = 0;
-    mNumBlocks = 0;
     mBlocks = blocks;
-    mGetAllowed.Deny();  // No data available, so lock GetBlock
-    mPutAllowed.Allow(); // Allow PutBlock
+    Clear();
 }
 
 cCdIoRingBuffer::~cCdIoRingBuffer()
@@ -44,8 +37,17 @@ cCdIoRingBuffer::~cCdIoRingBuffer()
 }
 
 /*
- * Get a block from the ringbuffer, wait if
- * currently no data is avalable
+ * Wait until at least numblocks blocks are available in the ringbuffer
+ */
+void cCdIoRingBuffer::WaitBlocksAvail (int numblocks)
+{
+    while (mNumBlocks < numblocks) {
+        cCondWait::SleepMs(250);
+    }
+}
+/*
+ * Get a block from the ring buffer, wait if
+ * currently no data is available
  */
 
 bool cCdIoRingBuffer::GetBlock(uint8_t *block)
@@ -65,13 +67,13 @@ bool cCdIoRingBuffer::GetBlock(uint8_t *block)
         mGetAllowed.Deny();
     }
     mPutAllowed.Allow();
-    mBufferMutex.Unlock();
     mNumBlocks--;
+    mBufferMutex.Unlock();
     return true;
 }
 
 /*
- * Put a block to the ringbuffer, wait if
+ * Put a block to the ring buffer, wait if
  * no space is left on the buffer
  */
 
@@ -92,8 +94,8 @@ bool cCdIoRingBuffer::PutBlock(const uint8_t *block)
         mPutAllowed.Deny();
     }
     mGetAllowed.Allow();
-    mBufferMutex.Unlock();
     mNumBlocks++;
+    mBufferMutex.Unlock();
     return true;
 }
 

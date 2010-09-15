@@ -26,8 +26,9 @@ protected:
     cBufferedCdio cdio;
     uchar *pStillBuf;
     int mStillBufLen;
-    int mSpeed;
-    bool mPurge;
+    volatile int mSpeed;
+    volatile bool mTrackChange;  // Indication for external track change
+    volatile bool mPurge;
     static const PCM_FREQ_T mSpeedTypes[MAX_SPEED+1];
     cMutex mPlayerMutex;
 
@@ -35,7 +36,7 @@ protected:
     void Action(void);
     void DeviceClear() {mPurge = true; cPlayer::DeviceClear();}
     void DisplayStillPicture (void);
-    bool PlayPacket (const uint8_t *buf);
+    bool PlayData (const uint8_t *buf);
 
 public:
     cCdPlayer(void);
@@ -45,15 +46,15 @@ public:
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
-    void NextTrack(void) {cdio.NextTrack(); DeviceClear();}
-    void PrevTrack(void) {cdio.PrevTrack(); DeviceClear();}
+    void NextTrack(void);
+    void PrevTrack(void);
     void Stop(void);
     void Pause(void);
     void Play(void);
     void SpeedNormal(void) {mSpeed = 0;}
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
-    void ChangeTime(int tm) {cdio.SkipTime(tm); DeviceClear(); }
+    void ChangeTime(int tm);
     const TRACK_IDX_T GetNumTracks (void) {
         cMutexLock MutexLock(&mPlayerMutex);
         return cdio.GetNumTracks();

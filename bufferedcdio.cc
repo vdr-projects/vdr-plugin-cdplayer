@@ -320,12 +320,14 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 
     int percent;
     lsn_t endlsn = GetEndLsn(trackidx);
-
+    mTrackChange = false;
     mCurrLsn = mStartLsn;
     dsyslog("%s %d Read Track %d Start %d End %d",
             __FILE__, __LINE__, trackidx, mCurrLsn, endlsn);
 #ifdef USE_PARANOIA
-    cdio_paranoia_seek(pParanoiaCd, mCurrLsn, SEEK_SET);
+    if (cMenuCDPlayer::GetUseParanoia()) {
+        cdio_paranoia_seek(pParanoiaCd, mCurrLsn, SEEK_SET);
+    }
 #endif
     while (mCurrLsn < endlsn) {
         if (mState == BCDIO_PAUSE) {
@@ -425,10 +427,6 @@ void cBufferedCdio::Action(void)
     SetTrack(0);
     mState = BCDIO_PLAY;
     while (mCurrTrackIdx < numTracks) {
-        if (!mTrackChange) {
-            mStartLsn = GetStartLsn(mCurrTrackIdx);
-        }
-        mTrackChange = false;
         mBufferStat = 0;
         mBufferCnt = 0;
         if (!ReadTrack (mCurrTrackIdx)) {
@@ -452,6 +450,7 @@ void cBufferedCdio::Action(void)
         }
         else {
             mCurrTrackIdx++;
+            mStartLsn = GetStartLsn(mCurrTrackIdx);
         }
     }
     mState = BCDIO_STOP;

@@ -52,18 +52,19 @@ private:
 #endif
     CdIo_t          *pCdio;
 
-    track_t         mFirstTrackNum;  // CDIO first track
-    track_t         mNumOfTracks;    // CDIO number of tracks
+    track_t mFirstTrackNum;  // CDIO first track
+    track_t mNumOfTracks;    // CDIO number of tracks
 
-    lsn_t           mStartLsn;
-    lsn_t           mCurrLsn;
-    TRACK_IDX_T     mCurrTrackIdx; // Audio Track index
+    volatile lsn_t          mStartLsn;
+    volatile lsn_t          mCurrLsn;
+    volatile TRACK_IDX_T    mCurrTrackIdx; // Audio Track index
+    volatile bool mTrackChange;  // Indication for external track change
+
     cCdInfo         mCdInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
-    bool           mTrackChange;  // Indication for external track change
     BUFCDIO_STATE_T mState;
     cMutex          mCdMutex;
-    int             mSpeed;
+    volatile int  mSpeed;
     string mErrtxt;
 // Buffer statistics
     int mBufferStat;
@@ -136,6 +137,9 @@ public:
         return mCdInfo.CDDBInfoAvailable();
     }
     void SkipTime(int tm);
+
+    // Wait until some buffers are available on first play.
+    void WaitBuffer (void) { mRingBuffer.WaitBlocksAvail (CCDIO_MAX_BLOCKS/4); }
 };
 
 #endif

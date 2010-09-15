@@ -21,7 +21,7 @@
 class cAllowed : public cCondWait
 {
 private:
-    bool mAllowed;  // Access allowed ?
+    volatile bool mAllowed;  // Access allowed ?
     cMutex mMutex;   // Mutex for waiting
 public:
 
@@ -63,10 +63,10 @@ public:
 class cCdIoRingBuffer {
 private:
     uint8_t *mData;
-    int mPutIdx;
-    int mGetIdx;
+    volatile int mPutIdx;
+    volatile int mGetIdx;
     int mBlocks;
-    int mNumBlocks;
+    volatile int mNumBlocks;
     cMutex mBufferMutex;
     cAllowed mGetAllowed;
     cAllowed mPutAllowed;
@@ -77,6 +77,9 @@ public:
     bool GetBlock(uint8_t *block);
     bool PutBlock(const uint8_t *block);
     void Clear(void);
+    // Wait until number of blocks are available in the ring buffer.
+    void WaitBlocksAvail (int numblocks);
+    // Return average usage for debugging purposes
     int GetFreePercent(void) {
         return ((100*mNumBlocks)/mBlocks);
     }
