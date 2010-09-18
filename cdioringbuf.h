@@ -79,6 +79,8 @@ public:
     void Clear(void);
     // Wait until number of blocks are available in the ring buffer.
     void WaitBlocksAvail (int numblocks);
+    // Wait until all blocks are removed from ring buffer.
+    void WaitEmpty (void);
     // Return average usage for debugging purposes
     int GetFreePercent(void) {
         return ((100*mNumBlocks)/mBlocks);

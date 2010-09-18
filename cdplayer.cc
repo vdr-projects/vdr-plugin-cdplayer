@@ -162,6 +162,7 @@ const char *cPluginCdplayer::MainMenuEntry(void)
 
 cOsdObject *cPluginCdplayer::MainMenuAction(void)
 {
+    dsyslog("MainMenuAction");
     cMutexLock MutexLock(&mCdMutex);
     mCdControl = new cCdControl();
     cControl::Launch(mCdControl);

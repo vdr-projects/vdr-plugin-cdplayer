@@ -46,3 +46,9 @@ VDR Plugin 'cdplayer' Revision History
 
 - Fix a possible crash by send DevicePlay after the time the data for first 
   track is really available.
+  
+2010-09-18: Version 1.0.2
+
+- Enhanced device initialization so that the first blocks of the CD are
+  really replayed on first start.
+- Fix some problems with vdr-sxfe/libxineoutput.

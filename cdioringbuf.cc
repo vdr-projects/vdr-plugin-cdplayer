@@ -45,6 +45,16 @@ void cCdIoRingBuffer::WaitBlocksAvail (int numblocks)
         cCondWait::SleepMs(250);
     }
 }
+
+/*
+ * Wait until the ringbuffer is empty.
+ */
+void cCdIoRingBuffer::WaitEmpty (void)
+{
+    while (mNumBlocks > 0) {
+        cCondWait::SleepMs(250);
+    }
+}
 /*
  * Get a block from the ring buffer, wait if
  * currently no data is available

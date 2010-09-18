@@ -29,12 +29,13 @@ cCdControl::cCdControl(void)
     : cControl(mCdPlayer = new cCdPlayer), mMenuPlaylist(NULL),
       mShowDetail(false)
 {
-
+    cStatus::MsgReplaying(this,menutitle, NULL,true);
 }
 
 cCdControl::~cCdControl()
 {
     dsyslog("Destroy cCdControl");
+    cStatus::MsgReplaying(this,NULL,NULL,false);
     if (mMenuPlaylist != NULL) {
         delete mMenuPlaylist;
     }
@@ -128,6 +129,7 @@ void cCdControl::DisplayLine(const char *buf, int line)
     mMenuPlaylist->SetItem(buf, line, false, true);
     cStatus::MsgOsdItem(buf, line);
 }
+
 void cCdControl::ShowDetail()
 {
     CD_TEXT_T cd_info;
@@ -166,11 +168,9 @@ void cCdControl::ShowDetail()
         }
     }
     //mMenuPlaylist->SetText(txt.c_str(), true);
-
     cStatus::MsgOsdHelpKeys(redtxt,greentxt,yellowtxt,bluetxtplay);
     mMenuPlaylist->SetButtons(redtxt,greentxt,yellowtxt,bluetxtplay);
 }
-
 
 void cCdControl::ShowList()
 {
@@ -213,7 +213,6 @@ void cCdControl::ShowList()
         free(str);
     }
 
-
     cStatus::MsgOsdHelpKeys(redtxt, greentxt, yellowtxt, bluetxtdet);
     mMenuPlaylist->SetButtons(redtxt, greentxt, yellowtxt, bluetxtdet);
 }
@@ -226,7 +225,7 @@ void cCdControl::ShowPlaylist()
     static TRACK_IDX_T currtitle = INVALID_TRACK_IDX;
     static BUFCDIO_STATE_T state = BCDIO_FAILED;
     static int speed = -1;
-    static int numtrk = 0;
+    static int numtrk = -1;
     static bool cddbinfo = false;
     static bool detail = false;
 
@@ -364,6 +363,7 @@ const PCM_FREQ_T cCdPlayer::mSpeedTypes[] = {
 };
 
 cCdPlayer::cCdPlayer(void)
+    :cPlayer (pmAudioVideo)
 {
     pStillBuf = NULL;
     mStillBufLen = 0;
@@ -475,6 +475,7 @@ void cCdPlayer::Activate(bool On)
         }
     }
     else {
+        dsyslog("cCdPlayer Activate Off");
         Stop();
     }
 }
@@ -514,6 +515,7 @@ void cCdPlayer::Play (void)
 void cCdPlayer::Stop(void)
 {
     dsyslog("cCdPlayer Stop");
+
     DeviceClear();
     if (Active()) {
         Cancel(10);

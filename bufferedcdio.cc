@@ -453,6 +453,8 @@ void cBufferedCdio::Action(void)
             mStartLsn = GetStartLsn(mCurrTrackIdx);
         }
     }
+    mRingBuffer.WaitEmpty();
+    cCondWait::SleepMs(1000);
     mState = BCDIO_STOP;
 }
 
