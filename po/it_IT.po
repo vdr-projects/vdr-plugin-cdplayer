@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2010-08-08 13:56+0200\n"
+"POT-Creation-Date: 2011-04-24 18:16+0200\n"
 "PO-Revision-Date: 2010-08-08 20:06+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -98,8 +99,7 @@ msgstr "Errore di lettura LBA"
 msgid "Not an audio disk"
 msgstr "Disco audio non trovato"
 
-#: bufferedcdio.cc:345
-#: bufferedcdio.cc:356
+#: bufferedcdio.cc:352 bufferedcdio.cc:363
 msgid "Read error"
 msgstr "Errore di lettura"
 
@@ -123,25 +123,23 @@ msgstr "lista esecuzione"
 msgid "detail"
 msgstr "dettagli"
 
-#: cd_control.cc:141
+#: cd_control.cc:143
 msgid "CD Information"
 msgstr "Informazioni CD"
 
-#: cd_control.cc:155
+#: cd_control.cc:157
 msgid "Song Information"
 msgstr "Informazioni brano"
 
-#: cd_control.cc:286
+#: cd_control.cc:285
 msgid "Playlist"
 msgstr "Lista esecuzione"
 
-#: cd_control.cc:431
+#: cd_control.cc:423
 msgid "Can not open still picture: "
 msgstr "Impossibile aprire fermo immagine:"
 
-#: cdmenu.cc:30
-#: cdplayer.cc:19
-#: cdplayer.h:24
+#: cdmenu.cc:30 cdplayer.cc:19 cdplayer.h:24
 msgid "CD-Player"
 msgstr "Lettore CD audio"
 
@@ -156,4 +154,3 @@ msgstr "Mostra nel menu principale"
 #: cdmenu.cc:35
 msgid "Enable Paranoia"
 msgstr "Abilita paranoia"
-

@@ -134,7 +134,7 @@ i18n: $(I18Nmsgs) $(I18Npot)
 ### Targets:
 
 libvdr-$(PLUGIN).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) -shared $(LIBS) $(OBJS) -o $@
+	$(CXX) $(CXXFLAGS) -shared $(OBJS) $(LIBS) -o $@
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
 dist: clean
