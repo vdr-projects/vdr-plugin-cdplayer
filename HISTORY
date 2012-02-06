@@ -52,3 +52,7 @@ VDR Plugin 'cdplayer' Revision History
 - Enhanced device initialization so that the first blocks of the CD are
   really replayed on first start.
 - Fix some problems with vdr-sxfe/libxineoutput.
+
+2012-02-06: Version 1.0.3
+
+- Fix a linker problem.
