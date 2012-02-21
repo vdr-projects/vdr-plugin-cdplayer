@@ -15,6 +15,7 @@
 #include <vdr/player.h>
 #include "bufferedcdio.h"
 #include "pes_audio_converter.h"
+#include "service.h"
 
 // The maximum size of a single frame (up to HDTV 1920x1080):
 #define TS_SIZE 188
@@ -36,12 +37,13 @@ protected:
     void Action(void);
     void DeviceClear() {mPurge = true; cPlayer::DeviceClear();}
     void DisplayStillPicture (void);
-    bool PlayData (const uint8_t *buf);
+    bool PlayData (const uint8_t *buf, int frame);
+    cPlugin *mSpanPlugin;
 
 public:
     cCdPlayer(void);
     virtual ~cCdPlayer();
-
+    virtual double FramesPerSecond(void) { return (double)CDIO_CD_FRAMES_PER_SEC; };
     virtual bool GetIndex(int &Current, int &Total, bool SnapToIFrame = false);
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);

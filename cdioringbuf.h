@@ -62,7 +62,13 @@ public:
 
 class cCdIoRingBuffer {
 private:
-    uint8_t *mData;
+    typedef struct _buffer_data {
+        lsn_t mLsn;     // LSN for attached data
+        int mFrame;      // Framenumber
+        uint8_t mData[CDIO_CD_FRAMESIZE_RAW];
+    } BUFFER_DATA;
+
+    BUFFER_DATA *mData;
     volatile int mPutIdx;
     volatile int mGetIdx;
     int mBlocks;
@@ -74,8 +80,8 @@ private:
 public:
     cCdIoRingBuffer(int blocks);
     ~cCdIoRingBuffer();
-    bool GetBlock(uint8_t *block);
-    bool PutBlock(const uint8_t *block);
+    bool GetBlock(uint8_t *block, lsn_t *lsn, int *frame);
+    bool PutBlock(const uint8_t *block, const lsn_t lsn, const int frame);
     void Clear(void);
     // Wait until number of blocks are available in the ring buffer.
     void WaitBlocksAvail (int numblocks);

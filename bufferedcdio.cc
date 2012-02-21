@@ -59,6 +59,7 @@ cBufferedCdio::cBufferedCdio(void) :
     cd_text_field[CDTEXT_TOC_INFO2] = tr("Info2");
     cd_text_field[CDTEXT_UPC_EAN]   = tr("Upc Ean");
     cd_text_field[CDTEXT_INVALID]   = tr("Invalid");
+    mSpanPlugin = cPluginManager::CallFirstService(SPAN_SET_PCM_DATA_ID, NULL);
 };
 
 cBufferedCdio::~cBufferedCdio(void)
@@ -138,7 +139,7 @@ void cBufferedCdio::CloseDevice(void)
 }
 
 // Get a block of raw audio data from buffer
-bool cBufferedCdio::GetData (uint8_t *data)
+bool cBufferedCdio::GetData (uint8_t *data, lsn_t *lsn, int *frame)
 {
     if (pCdio == NULL) {
         return false;
@@ -146,7 +147,7 @@ bool cBufferedCdio::GetData (uint8_t *data)
     if ((mState == BCDIO_FAILED) || (mState == BCDIO_STOP)) {
         return false;
     }
-    while (!mRingBuffer.GetBlock(data))
+    while (!mRingBuffer.GetBlock(data, lsn, frame))
     {
         if (!Running() || (pCdio == NULL) || (mState == BCDIO_FAILED) ||
             (mState == BCDIO_STOP)) {
@@ -312,12 +313,28 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     return true;
 }
 
+// Hand over the PCM16-data to span plugin
+
+void cBufferedCdio::SendToSpanPlugin (const uchar *data, int len, int frame) {
+    Span_SetPcmData_1_0 setpcmdata;
+    if (mSpanPlugin) {
+        setpcmdata.length = len;
+        // the timestamp (ms) of the frame(s) to be visualized:
+        setpcmdata.index = (frame * 1000) / CDIO_CD_FRAMES_PER_SEC;
+        // tell span the ringbuffer's size for it's internal bookkeeping of the data to be visualized:
+        setpcmdata.bufferSize = CCDIO_MAX_BLOCKS * PES_MAX_PACKSIZE;
+        setpcmdata.data = data;
+        setpcmdata.bigEndian = true;
+        cPluginManager::CallFirstService(SPAN_SET_PCM_DATA_ID, &setpcmdata);
+    }
+}
+
 // Read an audio track from CD and buffer the output into ringbuffer
 bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 {
     uint8_t *bufptr;
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
-
+    int frame = 0;
     int percent;
     lsn_t endlsn = GetEndLsn(trackidx);
     mTrackChange = false;
@@ -376,8 +393,8 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
             if (mTrackChange) {
                 return true;
             }
-
-            while (!mRingBuffer.PutBlock(bufptr)) {
+            SendToSpanPlugin (bufptr, CDIO_CD_FRAMESIZE_RAW, frame);
+            while (!mRingBuffer.PutBlock(bufptr, mCurrLsn-1, frame)) {
                 if (!Running()) {
                     return false;
                 }
@@ -385,7 +402,7 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
                     return true;
                 }
             }
-
+            frame++;
             // Slow down CD-Rom drive when buffer is full
             percent = mRingBuffer.GetFreePercent();
             int sp = 1;

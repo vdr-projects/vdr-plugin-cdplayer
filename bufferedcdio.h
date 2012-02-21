@@ -77,6 +77,10 @@ private:
     bool ParanoiaLogMsg(void);
 #endif
 
+    // Span Plugin
+    void SendToSpanPlugin(const uchar *data, int len, int frame);
+    cPlugin *mSpanPlugin;
+
 public:
     cBufferedCdio(void);
     ~cBufferedCdio(void);
@@ -104,7 +108,7 @@ public:
     const TRACK_IDX_T GetNumTracks (void) {
         return mCdInfo.GetNumTracks();
     }
-    bool GetData (uint8_t *data); // Get a raw audio block
+    bool GetData (uint8_t *data, lsn_t *lsn, int *frame); // Get a raw audio block
     BUFCDIO_STATE_T GetState(void)  {
         return mState;
     };

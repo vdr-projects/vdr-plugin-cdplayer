@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2011-04-24 18:16+0200\n"
+"POT-Creation-Date: 2012-02-21 16:04+0100\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -72,31 +72,31 @@ msgstr ""
 msgid "Invalid"
 msgstr "Ungültig"
 
-#: bufferedcdio.cc:207
+#: bufferedcdio.cc:208
 msgid "Can not open"
 msgstr "Kann device nicht öffnen"
 
-#: bufferedcdio.cc:244
+#: bufferedcdio.cc:245
 msgid "No disc in drive"
 msgstr "Keine CD im Laufwerk"
 
-#: bufferedcdio.cc:254
+#: bufferedcdio.cc:255
 msgid "Problem on read"
 msgstr "Problem beim lesen"
 
-#: bufferedcdio.cc:272
+#: bufferedcdio.cc:273
 msgid "Problem on read lsn"
 msgstr ""
 
-#: bufferedcdio.cc:280
+#: bufferedcdio.cc:281
 msgid "Problem on read lba"
 msgstr ""
 
-#: bufferedcdio.cc:301
+#: bufferedcdio.cc:302
 msgid "Not an audio disk"
 msgstr "Keine Audio disk"
 
-#: bufferedcdio.cc:352 bufferedcdio.cc:363
+#: bufferedcdio.cc:369 bufferedcdio.cc:380
 msgid "Read error"
 msgstr "Lesefehler"
 
@@ -132,7 +132,7 @@ msgstr ""
 msgid "Playlist"
 msgstr "Titel"
 
-#: cd_control.cc:423
+#: cd_control.cc:424
 #, fuzzy
 msgid "Can not open still picture: "
 msgstr "Kann device nicht öffnen"

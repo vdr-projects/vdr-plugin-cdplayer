@@ -369,6 +369,7 @@ cCdPlayer::cCdPlayer(void)
     mStillBufLen = 0;
     mSpeed = 0;
     mPurge = false;
+    mSpanPlugin = cPluginManager::CallFirstService(SPAN_SET_PCM_DATA_ID, NULL);
     SetDescription ("cdplayer");
 }
 
@@ -544,20 +545,28 @@ void cCdPlayer::ChangeTime(int tm)
     DeviceClear();
 }
 
-bool cCdPlayer::PlayData (const uint8_t *buf) {
+bool cCdPlayer::PlayData (const uint8_t *buf, int frame) {
     const uchar *pesdata;
     static uint8_t pesbuf[CDIO_CD_FRAMESIZE_RAW];
     int peslen;
     int idx = 0;
     cPesAudioConverter converter;
     cPoller oPoller;
+
 #if 0
 FILE *fp=fopen("/tmp/out.raw","a");
 fwrite(buf,CDIO_CD_FRAMESIZE_RAW,1,fp);
 fclose(fp);
 #endif
+
+    if (mSpanPlugin != NULL) {
+        Span_SetPlayindex_1_0 SetPlayindexData;
+        SetPlayindexData.index = (frame * 1000) / CDIO_CD_FRAMES_PER_SEC;
+        cPluginManager::CallFirstService(SPAN_SET_PLAYINDEX_ID, &SetPlayindexData);
+    }
     while (idx < CDIO_CD_FRAMESIZE_RAW) {
         if (DevicePoll(oPoller, 100)) {
+
             converter.SetFreq(mSpeedTypes[mSpeed]);
             converter.SetData(&buf[idx], CDIO_CD_FRAMESIZE_RAW/2);
             pesdata = converter.GetPesData();
@@ -571,6 +580,7 @@ fclose(fp);
             if (mPurge) {
                 return true;
             }
+
             if (PlayPes(pesbuf, peslen, false) < 0) {
                 esyslog("%s %d PlayPes failed", __FILE__, __LINE__);
                 return false;
@@ -591,7 +601,8 @@ void cCdPlayer::Action(void)
 {
     bool play = true;
     uint8_t buf[CDIO_CD_FRAMESIZE_RAW];
-
+    lsn_t lsn = 0;
+    int frame = 0;
     // Clear and flush output device
     DeviceClear();
     DeviceFlush(100);
@@ -601,9 +612,8 @@ void cCdPlayer::Action(void)
     // Wait until some Data is in the ring buffer
     cdio.WaitBuffer();
     mPurge = false;
-
     while (play) {
-        if (!cdio.GetData(buf)) {
+        if (!cdio.GetData(buf, &lsn, &frame)) {
             dsyslog ("cCdPlayer GetData stop");
             play = false;
         }
@@ -613,7 +623,7 @@ void cCdPlayer::Action(void)
                 DeviceSetCurrentAudioTrack(ttAudio);
                 mPurge = false;
             } else {
-                play = PlayData(buf);
+                play = PlayData(buf, frame);
             }
         }
         if (!Running()) {

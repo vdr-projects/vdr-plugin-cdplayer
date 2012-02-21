@@ -183,8 +183,15 @@ bool cPluginCdplayer::SetupParse(const char *Name, const char *Value)
 
 bool cPluginCdplayer::Service(const char *Id, void *Data)
 {
-  // Handle custom service requests from other plugins
-  return false;
+    // If span plugin is active, register as active.
+    if (strcmp(Id, SPAN_PROVIDER_CHECK_ID) == 0) {
+        if (Data != NULL) {
+            Span_Provider_Check_1_0 *pc = (Span_Provider_Check_1_0 *)Data;
+            *pc->isActive = true;
+        }
+        return true;
+    }
+    return false;
 }
 
 const char **cPluginCdplayer::SVDRPHelpPages(void)

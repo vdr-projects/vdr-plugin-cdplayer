@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2011-04-24 18:16+0200\n"
+"POT-Creation-Date: 2012-02-21 16:04+0100\n"
 "PO-Revision-Date: 2010-08-08 20:06+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -75,31 +75,31 @@ msgstr "Upc Ean"
 msgid "Invalid"
 msgstr "Non valido"
 
-#: bufferedcdio.cc:207
+#: bufferedcdio.cc:208
 msgid "Can not open"
 msgstr "Impossibile aprire"
 
-#: bufferedcdio.cc:244
+#: bufferedcdio.cc:245
 msgid "No disc in drive"
 msgstr "Non c'è alcun disco nell'unità"
 
-#: bufferedcdio.cc:254
+#: bufferedcdio.cc:255
 msgid "Problem on read"
 msgstr "Errore di lettura"
 
-#: bufferedcdio.cc:272
+#: bufferedcdio.cc:273
 msgid "Problem on read lsn"
 msgstr "Errore di lettura LSN"
 
-#: bufferedcdio.cc:280
+#: bufferedcdio.cc:281
 msgid "Problem on read lba"
 msgstr "Errore di lettura LBA"
 
-#: bufferedcdio.cc:301
+#: bufferedcdio.cc:302
 msgid "Not an audio disk"
 msgstr "Disco audio non trovato"
 
-#: bufferedcdio.cc:352 bufferedcdio.cc:363
+#: bufferedcdio.cc:369 bufferedcdio.cc:380
 msgid "Read error"
 msgstr "Errore di lettura"
 
@@ -135,7 +135,7 @@ msgstr "Informazioni brano"
 msgid "Playlist"
 msgstr "Lista esecuzione"
 
-#: cd_control.cc:423
+#: cd_control.cc:424
 msgid "Can not open still picture: "
 msgstr "Impossibile aprire fermo immagine:"
 
