@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -14,9 +14,14 @@
 #ifndef CDINFO_H_
 #define CDINFO_H_
 
-#include <vdr/plugin.h>
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
+
+#ifdef VERSION
+#undef VERSION
+#endif
+
+#include <vdr/plugin.h>
 #include <cddb/cddb.h>
 #include <vector>
 #include <string>
