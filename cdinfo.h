@@ -37,8 +37,8 @@ private:
     CD_TEXT_T mCdTextFields;
 public:
     cTrackInfo(void) : mTrackNo(0), mStartLsn(0), mEndLsn(0) {}
-    cTrackInfo(lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
-                CD_TEXT_T CdTextFields);
+    cTrackInfo(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
+               CD_TEXT_T CdTextFields);
     ~cTrackInfo() {}
     void SetCdTextFields (const CD_TEXT_T CdTextFields);
     track_t GetCDDATrack(void) { return mTrackNo; }
@@ -46,6 +46,7 @@ public:
     lsn_t GetCDDAEndLsn(void) { return mEndLsn; }
     lba_t GetCDDALba(void) { return mLba; }
     void GetCDDATime(int *min, int *sec);
+    int GetTimeSecs(void) {return (mEndLsn - mStartLsn) / CDIO_CD_FRAMES_PER_SEC;}
 };
 
 // Track information for each track for cddb query (includes also data tracks)
@@ -58,10 +59,12 @@ public:
     cCddbInfo(lba_t lba) { mLba = lba; }
     lba_t GetCDDALba(void) { return mLba; }
 };
+
 // Vector (array) containing all track information
 typedef std::vector<cTrackInfo> TrackInfoVector;
 // Vector containing all track information required for CDDB query
 typedef std::vector<cCddbInfo> CddbInfoVector;
+// List containing the PlayList
 
 class cCdInfo: public cThread {
 private:
@@ -72,6 +75,10 @@ private:
     CD_TEXT_T mCdText;
     bool mCddbInfoAvail;
 
+    void SetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T CdTextFields) {
+          cMutexLock MutexLock (&mInfoMutex);
+          mTrackInfo[track].SetCdTextFields(CdTextFields);
+     }
 public:
     cCdInfo(void) {mCddbInfoAvail = false;}
     ~cCdInfo(void) {if (Active()) Cancel(3);}
@@ -80,21 +87,16 @@ public:
         mTrackInfo.clear();
     }
 
-    void Add(lsn_t StartLsn, lsn_t EndLsn, lba_t lba, CD_TEXT_T &CdTextFields);
+    void Add(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba, CD_TEXT_T &CdTextFields);
     void AddData(lba_t lba);
 
     void SetLeadOut (lba_t leadout) { mLeadOut = leadout; }
 
     void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &CdTextFields);
-    void SetCdTextFields(const TRACK_IDX_T track, const CD_TEXT_T CdTextFields);
 
     void SetCdInfo(const CD_TEXT_T CdTextFields);
     void GetCdInfo(CD_TEXT_T &txt);
 
-    void SetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T CdTextFields) {
-        cMutexLock MutexLock (&mInfoMutex);
-        mTrackInfo[track].SetCdTextFields(CdTextFields);
-    }
     const TRACK_IDX_T GetNumTracks(void) {
         return mTrackInfo.size();
     }

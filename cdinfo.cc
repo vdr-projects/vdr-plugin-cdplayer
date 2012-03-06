@@ -17,9 +17,9 @@
 /*
  * Trackinfo class holds information about a single track.
  */
-cTrackInfo::cTrackInfo(lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
+cTrackInfo::cTrackInfo(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
                           CD_TEXT_T CdTextFields)
-                          : mTrackNo(0), mStartLsn(StartLsn), mEndLsn(EndLsn),
+                          : mTrackNo(TrackNo), mStartLsn(StartLsn), mEndLsn(EndLsn),
                             mLba(lba)
 {
     SetCdTextFields (CdTextFields);
@@ -35,7 +35,7 @@ void cTrackInfo::SetCdTextFields (const CD_TEXT_T CdTextFields)
 
 void cTrackInfo::GetCDDATime(int *min, int *sec)
 {
-    int s = (mEndLsn - mStartLsn) / CDIO_CD_FRAMES_PER_SEC;
+    int s = GetTimeSecs();
     *min = (s / 60);
     *sec = s - (*min * 60);
 }
@@ -43,10 +43,10 @@ void cTrackInfo::GetCDDATime(int *min, int *sec)
 /*
  * cCdInfo class holds information about the entire CD.
  */
-void cCdInfo::Add(lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
-                    CD_TEXT_T &CdTextFields)
+void cCdInfo::Add(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
+                  CD_TEXT_T &CdTextFields)
 {
-    cTrackInfo ti(StartLsn, EndLsn, lba, CdTextFields);
+    cTrackInfo ti(TrackNo, StartLsn, EndLsn, lba, CdTextFields);
     mTrackInfo.push_back(ti);
     AddData(lba);
 }
@@ -81,18 +81,6 @@ void cCdInfo::GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &CdTextFields)
     if (track < (TRACK_IDX_T)mTrackInfo.size()) {
         for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
             CdTextFields[i] = mTrackInfo[track].mCdTextFields[i];
-        }
-    }
-}
-
-void cCdInfo::SetCdTextFields(const TRACK_IDX_T track,
-                                  const CD_TEXT_T CdTextFields)
-{
-    cMutexLock MutexLock(&mInfoMutex);
-    int i;
-    for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
-        if (!CdTextFields[i].empty()) {
-            mTrackInfo[track].mCdTextFields[i] = CdTextFields[i];
         }
     }
 }

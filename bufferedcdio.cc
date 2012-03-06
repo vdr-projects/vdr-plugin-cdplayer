@@ -290,7 +290,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
             dsyslog ("get_track_info for track %d S %d E %d L %d",
                      track_no, startlsn, endlsn, lba);
             GetCDText (track_no, cdtextfields);
-            mCdInfo.Add(startlsn, endlsn, lba, cdtextfields);
+            mCdInfo.Add(track_no, startlsn, endlsn, lba, cdtextfields);
             hasaudiotrack = true;
         }
         else {
