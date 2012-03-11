@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-02-22 13:38+0100\n"
+"POT-Creation-Date: 2012-03-11 19:13+0100\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -104,6 +104,10 @@ msgstr "Lesefehler"
 msgid "CD Player"
 msgstr ""
 
+#: cd_control.cc:22
+msgid "random"
+msgstr "zufällig"
+
 #: cd_control.cc:23
 msgid "1 min -"
 msgstr ""
@@ -120,24 +124,23 @@ msgstr ""
 msgid "detail"
 msgstr ""
 
-#: cd_control.cc:143
+#: cd_control.cc:147
 msgid "CD Information"
 msgstr ""
 
-#: cd_control.cc:157
+#: cd_control.cc:161
 msgid "Song Information"
 msgstr ""
 
-#: cd_control.cc:285
+#: cd_control.cc:288
 msgid "Playlist"
 msgstr "Titel"
 
-#: cd_control.cc:424
-#, fuzzy
+#: cd_control.cc:427
 msgid "Can not open still picture: "
 msgstr "Kann device nicht öffnen"
 
-#: cdmenu.cc:30 cdplayer.cc:19 cdplayer.h:24
+#: cdmenu.cc:30 cdplayer.cc:19 cdplayer.h:30
 msgid "CD-Player"
 msgstr ""
 

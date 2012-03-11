@@ -70,11 +70,14 @@ typedef std::vector<cTrackInfo> TrackInfoVector;
 // Vector containing all track information required for CDDB query
 typedef std::vector<cCddbInfo> CddbInfoVector;
 // List containing the PlayList
+typedef std::vector<track_t> PlayList;
 
 class cCdInfo: public cThread {
 private:
     TrackInfoVector mTrackInfo;
     CddbInfoVector mCddbInfo;
+    PlayList mPlayList;
+
     lba_t mLeadOut;
     cMutex mInfoMutex;
     CD_TEXT_T mCdText;
@@ -102,7 +105,7 @@ public:
     void SetCdInfo(const CD_TEXT_T CdTextFields);
     void GetCdInfo(CD_TEXT_T &txt);
 
-    const TRACK_IDX_T GetNumTracks(void) {
+    TRACK_IDX_T GetNumTracks(void) {
         return mTrackInfo.size();
     }
     lsn_t GetStartLsn(const TRACK_IDX_T track) {
@@ -116,6 +119,9 @@ public:
     }
     bool CDDBInfoAvailable(void) {
         return mCddbInfoAvail;
+    }
+    PlayList GetDefaultPlayList(void) {
+        return mPlayList;
     }
     void Action(void); // Start cddb query
 };

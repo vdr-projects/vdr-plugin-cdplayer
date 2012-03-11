@@ -18,7 +18,7 @@ cCdIoRingBuffer::cCdIoRingBuffer()
 {
     mData = NULL;
     Clear();
-};
+}
 
 cCdIoRingBuffer::cCdIoRingBuffer(int blocks)
 {

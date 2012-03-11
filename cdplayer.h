@@ -13,6 +13,12 @@
 #ifndef _CDPLAYER_H
 #define _CDPLAYER_H
 
+#ifdef __GNUC__
+#define UNUSED_ARG __attribute__ ((unused))
+#else
+#define UNUSED_ARG
+#endif
+
 #include <vdr/plugin.h>
 #include <vdr/status.h>
 #include <vdr/player.h>
@@ -20,7 +26,7 @@
 #include <string>
 #include "cd_control.h"
 
-static const char *VERSION        = "1.0.3";
+static const char *VERSION        = "1.1.0";
 static const char *DESCRIPTION    = trNOOP("CD-Player");
 
 class cPluginCdplayer: public cPlugin {
@@ -79,10 +85,10 @@ public:
     static const std::string GetCDDBCacheDir (void) {
         return mCDDBCacheDir;
     }
-    static const bool GetCDDBEnabled(void) {
+    static bool GetCDDBEnabled(void) {
         return mEnableCDDB;
     }
-    static const bool GetCDDBCacheEnabled(void) {
+    static bool GetCDDBCacheEnabled(void) {
         return mEnableCDDBCache;
     }
 

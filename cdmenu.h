@@ -24,8 +24,8 @@ protected:
 
 public:
     cMenuCDPlayer(void);
-    static const int GetMaxSpeed(void) { return mMaxSpeed; }
-    static const bool GetUseParanoia(void) { return mUseParanoia; }
-    static const bool GetShowMainMenu(void) { return mShowMainMenu; }
-    static const bool SetupParse(const char *Name, const char *Value);
+    static int GetMaxSpeed(void) { return mMaxSpeed; }
+    static bool GetUseParanoia(void) { return mUseParanoia; }
+    static bool GetShowMainMenu(void) { return mShowMainMenu; }
+    static bool SetupParse(const char *Name, const char *Value);
 };

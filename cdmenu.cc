@@ -38,7 +38,7 @@ cMenuCDPlayer::cMenuCDPlayer(void) : cMenuSetupPage()
 #endif
 }
 
-const bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
+bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
 {
   // Parse setup parameters and store their values.
   if (strcasecmp(Name, MAXCDSPEED) == 0) {

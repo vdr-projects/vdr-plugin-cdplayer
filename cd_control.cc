@@ -19,7 +19,7 @@
 const char *cCdControl::menutitle = tr("CD Player");
 const char *cCdControl::menukindPlayList = "MenuCDPlayList";
 const char *cCdControl::menukindDetail = "NormalDetail";
-const char *cCdControl::redtxt = "";
+const char *cCdControl::redtxt = tr("random");
 const char *cCdControl::greentxt = tr("1 min -");
 const char *cCdControl::yellowtxt = tr("1 min +");
 const char *cCdControl::bluetxtplay = tr("playlist");
@@ -27,7 +27,7 @@ const char *cCdControl::bluetxtdet = tr("detail");
 
 cCdControl::cCdControl(void)
     : cControl(mCdPlayer = new cCdPlayer), mMenuPlaylist(NULL),
-      mShowDetail(false)
+      mShowDetail(false), mCurrtitle(INVALID_TRACK_IDX)
 {
     cStatus::MsgReplaying(this,menutitle, NULL,true);
 }
@@ -68,6 +68,10 @@ eOSState cCdControl::ProcessKey(eKeys Key)
     }
     state = osContinue;
     switch (Key & ~k_Repeat) {
+    case kRed:
+        mCdPlayer->Random();
+        mCurrtitle = INVALID_TRACK_IDX;
+        break;
     case kGreen: // 1min back
         mCdPlayer->ChangeTime(-60);
         break;
@@ -222,14 +226,13 @@ void cCdControl::ShowPlaylist()
     cMutexLock MutexLock(&mControlMutex);
     CD_TEXT_T cd_info;
     bool render_all = false;
-    static TRACK_IDX_T currtitle = INVALID_TRACK_IDX;
     static BUFCDIO_STATE_T state = BCDIO_FAILED;
     static int speed = -1;
     static int numtrk = -1;
     static bool cddbinfo = false;
     static bool detail = false;
 
-    if ((currtitle != mCdPlayer->GetCurrTrack()) ||
+    if ((mCurrtitle != mCdPlayer->GetCurrTrack()) ||
         (numtrk != mCdPlayer->GetNumTracks()) ||
         (state != mCdPlayer->GetState()) ||
         (cddbinfo != mCdPlayer->CDDBInfoAvailable()) ||
@@ -265,7 +268,7 @@ void cCdControl::ShowPlaylist()
             mMenuPlaylist->Clear();
         }
         detail = mShowDetail;
-        currtitle = mCdPlayer->GetCurrTrack();
+        mCurrtitle = mCdPlayer->GetCurrTrack();
         state = mCdPlayer->GetState();
         speed = mCdPlayer->GetSpeed();
         numtrk = mCdPlayer->GetNumTracks();
@@ -392,7 +395,7 @@ bool cCdPlayer::GetReplayMode(bool &Play, bool &Forward, int &Speed)
     return (true);
 }
 
-bool cCdPlayer::GetIndex(int &Current, int &Total, bool SnapToIFrame)
+bool cCdPlayer::GetIndex(int &Current, int &Total, UNUSED_ARG bool SnapToIFrame)
 {
     cMutexLock MutexLock(&mPlayerMutex);
     Current = GetCurrTrack();
@@ -484,8 +487,8 @@ void cCdPlayer::Activate(bool On)
 void cCdPlayer::Pause (void)
 {
     dsyslog("cCdPlayer Pause");
-    cdio.Pause();
-    if (cdio.GetState() == BCDIO_PLAY) {
+    mBufCdio.Pause();
+    if (mBufCdio.GetState() == BCDIO_PLAY) {
         DevicePlay();
     }
     else {
@@ -498,13 +501,13 @@ void cCdPlayer::Play (void)
     dsyslog("cCdPlayer Start");
 
     // If CDIO Input thread is not running, start it
-    if (!cdio.Active()) {
-        if (!cdio.OpenDevice(cPluginCdplayer::GetDeviceName())) {
+    if (!mBufCdio.Active()) {
+        if (!mBufCdio.OpenDevice(cPluginCdplayer::GetDeviceName())) {
             return;
         }
-        cdio.Start();
+        mBufCdio.Start();
     }
-    cdio.Play();
+    mBufCdio.Play();
     SpeedNormal();
 
     // If CD-Player output thread is not running, start it
@@ -524,24 +527,38 @@ void cCdPlayer::Stop(void)
     Detach();
 }
 
+void cCdPlayer::Random(void)
+{
+    PlayList pl = mBufCdio.GetDefaultPlayList();
+    PlayList newlist;
+    int idx;
+    while (!pl.empty()) {
+        idx = rand() % pl.size();
+        newlist.push_back(pl[idx]);
+        pl.erase(pl.begin() + idx);
+    }
+    mBufCdio.SetPlayList(newlist);
+    mBufCdio.SetTrack(0);
+}
+
 void cCdPlayer::NextTrack(void)
 {
     dsyslog("cCdPlayer Next");
-    cdio.NextTrack();
+    mBufCdio.NextTrack();
     DeviceClear();
 }
 
 void cCdPlayer::PrevTrack(void)
 {
     dsyslog("cCdPlayer Prev");
-    cdio.PrevTrack();
+    mBufCdio.PrevTrack();
     DeviceClear();
 }
 
 void cCdPlayer::ChangeTime(int tm)
 {
     dsyslog("cCdPlayer ChangeTime");
-    cdio.SkipTime(tm);
+    mBufCdio.SkipTime(tm);
     DeviceClear();
 }
 
@@ -610,10 +627,10 @@ void cCdPlayer::Action(void)
     DevicePlay();
 
     // Wait until some Data is in the ring buffer
-    cdio.WaitBuffer();
+    mBufCdio.WaitBuffer();
     mPurge = false;
     while (play) {
-        if (!cdio.GetData(buf, &lsn, &frame)) {
+        if (!mBufCdio.GetData(buf, &lsn, &frame)) {
             dsyslog ("cCdPlayer GetData stop");
             play = false;
         }
@@ -630,5 +647,5 @@ void cCdPlayer::Action(void)
             play = false;
         }
     }
-    cdio.Stop();
+    mBufCdio.Stop();
 }

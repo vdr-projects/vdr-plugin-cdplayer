@@ -24,7 +24,7 @@
 
 class cCdPlayer: public cPlayer, public cThread {
 protected:
-    cBufferedCdio cdio;
+    cBufferedCdio mBufCdio;
     uchar *pStillBuf;
     int mStillBufLen;
     volatile int mSpeed;
@@ -48,6 +48,7 @@ public:
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
+    void Random(void);
     void NextTrack(void);
     void PrevTrack(void);
     void Stop(void);
@@ -57,39 +58,39 @@ public:
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
     void ChangeTime(int tm);
-    const TRACK_IDX_T GetNumTracks (void) {
+    TRACK_IDX_T GetNumTracks (void) {
         cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetNumTracks();
+        return mBufCdio.GetNumTracks();
     };
     // Return current track index and optional the total length in seconds and
     // the current second
-    const TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr = NULL) {
+    TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr = NULL) {
         cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetCurrTrack(total, curr);
+        return mBufCdio.GetCurrTrack(total, curr);
     };
     void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &txt) {
         cMutexLock MutexLock(&mPlayerMutex);
-        cdio.GetCdTextFields(track, txt);
+        mBufCdio.GetCdTextFields(track, txt);
     };
     void GetCdInfo (CD_TEXT_T &txt) {
         cMutexLock MutexLock(&mPlayerMutex);
-        cdio.GetCdInfo(txt);
+        mBufCdio.GetCdInfo(txt);
     }
     int GetSpeed(void) {
         return mSpeed;
     }
     BUFCDIO_STATE_T GetState(void) {
-        return cdio.GetState();
+        return mBufCdio.GetState();
     }
     const string &GetErrorText(void) {
-        return cdio.GetErrorText();
+        return mBufCdio.GetErrorText();
     }
     void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
-        cdio.GetTrackTime (track, min, sec);
+        mBufCdio.GetTrackTime (track, min, sec);
     }
 
     bool CDDBInfoAvailable(void) {
-        return cdio.CDDBInfoAvailable();
+        return mBufCdio.CDDBInfoAvailable();
     }
 };
 
@@ -99,6 +100,7 @@ private:
     cSkinDisplayMenu *mMenuPlaylist;
     cMutex mControlMutex;
     bool mShowDetail;
+    TRACK_IDX_T mCurrtitle;
     static const char *menutitle;
     static const char *menukindPlayList;
     static const char *menukindDetail;

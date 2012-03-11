@@ -60,7 +60,7 @@ cBufferedCdio::cBufferedCdio(void) :
     cd_text_field[CDTEXT_UPC_EAN]   = tr("Upc Ean");
     cd_text_field[CDTEXT_INVALID]   = tr("Invalid");
     mSpanPlugin = cPluginManager::CallFirstService(SPAN_SET_PCM_DATA_ID, NULL);
-};
+}
 
 cBufferedCdio::~cBufferedCdio(void)
 {
@@ -80,7 +80,7 @@ cBufferedCdio::~cBufferedCdio(void)
     }
 }
 
-const TRACK_IDX_T cBufferedCdio::GetCurrTrack(int *total, int *curr)
+LOGICAL_TRACK_IDX cBufferedCdio::GetCurrTrack(int *total, int *curr)
 {
     if (total != NULL) {
         *total = (GetEndLsn(mCurrTrackIdx) - GetStartLsn(mCurrTrackIdx))
@@ -305,7 +305,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
                 __FILE__, __LINE__, FileName.c_str());
         return false;
     }
-
+    mPlayList = mCdInfo.GetDefaultPlayList();
     if (cPluginCdplayer::GetCDDBEnabled()) {
         mCdInfo.SetLeadOut (cdio_get_track_lba(pCdio, CDIO_CDROM_LEADOUT_TRACK));
         mCdInfo.Start(); // Start CDDB query
@@ -476,7 +476,7 @@ void cBufferedCdio::Action(void)
 }
 
 // Set new track
-void cBufferedCdio::SetTrack (TRACK_IDX_T newtrack)
+void cBufferedCdio::SetTrack (LOGICAL_TRACK_IDX newtrack)
 {
   cMutexLock MutexLock(&mCdMutex);
   if (newtrack > GetNumTracks()-1) {
@@ -491,9 +491,9 @@ void cBufferedCdio::SkipTime(int tm) {
     cMutexLock MutexLock(&mCdMutex);
     lsn_t newlsn = mCurrLsn + (tm * CDIO_CD_FRAMES_PER_SEC);
     lsn_t lastlsn = GetEndLsn(GetNumTracks()-1)-CDIO_CD_FRAMES_PER_SEC;
-    TRACK_IDX_T idx;
-    TRACK_IDX_T newtrack = 0;
-
+    LOGICAL_TRACK_IDX idx;
+    LOGICAL_TRACK_IDX newtrack = 0;
+// @TODO
     if (newlsn < GetStartLsn(0)) {
         newlsn = GetStartLsn(0);
     }

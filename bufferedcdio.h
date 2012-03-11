@@ -32,6 +32,8 @@ using namespace std;
 // Maximum number of raw blocks to buffer
 static const int CCDIO_MAX_BLOCKS=128;
 
+typedef int LOGICAL_TRACK_IDX;
+
 typedef enum _bufcdio_state {
     BCDIO_STOP = 0,
     BCDIO_STARTING,
@@ -51,13 +53,13 @@ private:
     cdrom_paranoia_t *pParanoiaCd;
 #endif
     CdIo_t          *pCdio;
-
+    PlayList mPlayList;
     track_t mFirstTrackNum;  // CDIO first track
     track_t mNumOfTracks;    // CDIO number of tracks
 
-    volatile lsn_t          mStartLsn;
-    volatile lsn_t          mCurrLsn;
-    volatile TRACK_IDX_T    mCurrTrackIdx; // Audio Track index
+    volatile lsn_t             mStartLsn;
+    volatile lsn_t             mCurrLsn;
+    volatile LOGICAL_TRACK_IDX mCurrTrackIdx; // Audio Track index
     volatile bool mTrackChange;  // Indication for external track change
 
     cCdInfo         mCdInfo;    // CD Information per audio track
@@ -73,6 +75,9 @@ private:
     void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
     void SetSpeed (int speed);
+    TRACK_IDX_T GetTrackPlaylist (const LOGICAL_TRACK_IDX track) {
+        return mPlayList[track-1];
+    }
 #ifdef USE_PARANOIA
     bool ParanoiaLogMsg(void);
 #endif
@@ -87,33 +92,41 @@ public:
     bool OpenDevice(const string &FileName);
     void CloseDevice(void);
 
+    PlayList GetDefaultPlayList (void) {
+        return mCdInfo.GetDefaultPlayList();
+    }
+    void SetPlayList (const PlayList li) {
+        mPlayList = li;
+    }
+
     const string &GetErrorText(void) { return mErrtxt; };
-    const TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr=NULL);
+
+    LOGICAL_TRACK_IDX GetCurrTrack(int *total = NULL, int *curr=NULL);
     static const char *GetCdTextField(const cdtext_field_t type);
     void GetCdInfo (CD_TEXT_T &txt) {
        mCdInfo.GetCdInfo(txt);
     }
-    void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &txt) {
-        mCdInfo.GetCdTextFields(track, txt);
+    void GetCdTextFields(const LOGICAL_TRACK_IDX track, CD_TEXT_T &txt) {
+        mCdInfo.GetCdTextFields(GetTrackPlaylist(track), txt);
     };
-    lsn_t GetStartLsn (const TRACK_IDX_T track) {
-        return mCdInfo.GetStartLsn(track);
+    lsn_t GetStartLsn (const LOGICAL_TRACK_IDX track) {
+        return mCdInfo.GetStartLsn(GetTrackPlaylist(track));
     }
-    lsn_t GetEndLsn (const TRACK_IDX_T track) {
-        return mCdInfo.GetEndLsn(track);
+    lsn_t GetEndLsn (const LOGICAL_TRACK_IDX track) {
+        return mCdInfo.GetEndLsn(GetTrackPlaylist(track));
     }
-    void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
-        return mCdInfo.GetTrackTime (track, min, sec);
+    void GetTrackTime (const LOGICAL_TRACK_IDX track, int *min, int *sec) {
+        return mCdInfo.GetTrackTime (GetTrackPlaylist(track), min, sec);
     }
-    const TRACK_IDX_T GetNumTracks (void) {
+    TRACK_IDX_T GetNumTracks (void) {
         return mCdInfo.GetNumTracks();
     }
     bool GetData (uint8_t *data, lsn_t *lsn, int *frame); // Get a raw audio block
-    BUFCDIO_STATE_T GetState(void)  {
+    BUFCDIO_STATE_T GetState(void) {
         return mState;
     };
     void Action(void);
-    void SetTrack (TRACK_IDX_T newtrack);
+    void SetTrack (LOGICAL_TRACK_IDX newtrack);
     void NextTrack(void) {
         cMutexLock MutexLock(&mCdMutex);
         SetTrack(mCurrTrackIdx+1);

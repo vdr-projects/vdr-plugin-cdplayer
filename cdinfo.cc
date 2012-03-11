@@ -48,6 +48,7 @@ void cCdInfo::Add(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
 {
     cTrackInfo ti(TrackNo, StartLsn, EndLsn, lba, CdTextFields);
     mTrackInfo.push_back(ti);
+    mPlayList.push_back(TrackNo);
     AddData(lba);
 }
 

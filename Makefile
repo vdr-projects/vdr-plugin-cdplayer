@@ -19,7 +19,7 @@ VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).h | awk '{ pri
 
 CXX      ?= g++
 CXXFLAGS ?= -g -O2 -Wall -Woverloaded-virtual -Wno-parentheses 
-CXXFLAGS += -Wextra -pedantic
+CEXTRA    = -Wextra -pedantic
 
 ### The directory environment:
 
@@ -75,7 +75,7 @@ PACKAGE = vdr-$(ARCHIVE)
 
 ### Includes and Defines (add further entries here):
 
-INCLUDES += -I$(VDRDIR)/include
+INCLUDES += -isystem$(VDRDIR)/include
 
 DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
@@ -95,7 +95,7 @@ all: libvdr-$(PLUGIN).so i18n
 ### Implicit rules:
 
 %.o: %.cc
-	$(CXX) $(CXXFLAGS) -c $(DEFINES) $(INCLUDES) $<
+	$(CXX) $(CXXFLAGS) $(CEXTRA) -c $(DEFINES) $(INCLUDES) $<
 
 ### Dependencies:
 
