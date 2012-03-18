@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-03-18 14:57+0100\n"
+"POT-Creation-Date: 2012-03-18 16:53+0100\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -104,70 +104,79 @@ msgstr "Lesefehler"
 msgid "CD Player"
 msgstr ""
 
-#: cd_control.cc:153
+#: cd_control.cc:169
 msgid "CD Information"
 msgstr ""
 
-#: cd_control.cc:167
+#: cd_control.cc:183
 msgid "Song Information"
 msgstr ""
 
-#: cd_control.cc:185
+#: cd_control.cc:201 cdmenu.cc:38
 msgid "random"
 msgstr "Zufällig"
 
-#: cd_control.cc:186
+#: cd_control.cc:202
 msgid "sort"
 msgstr "Sortiert"
 
-#: cd_control.cc:187
+#: cd_control.cc:203
 msgid "1 min -"
 msgstr "1 Min -"
 
-#: cd_control.cc:188
+#: cd_control.cc:204
 msgid "1 min +"
 msgstr "1 Min +"
 
-#: cd_control.cc:189
+#: cd_control.cc:205
 msgid "playlist"
 msgstr "Liste"
 
-#: cd_control.cc:190
+#: cd_control.cc:206
 msgid "detail"
 msgstr "Detail"
 
-#: cd_control.cc:311
+#: cd_control.cc:329
 msgid "Playlist"
 msgstr "Titel"
 
-#: cd_control.cc:452
+#: cd_control.cc:482
 msgid "Can not open still picture: "
 msgstr "Kann device nicht öffnen"
 
-#: cdmenu.cc:33
-msgid "Sorted"
+#: cdmenu.cc:37
+#, fuzzy
+msgid "sorted"
 msgstr "Sortiert"
 
-#: cdmenu.cc:34
-msgid "Random"
-msgstr "Zufällig"
-
-#: cdmenu.cc:37 cdplayer.cc:19 cdplayer.h:30
+#: cdmenu.cc:41 cdplayer.cc:19 cdplayer.h:30
 msgid "CD-Player"
 msgstr ""
 
-#: cdmenu.cc:39
-msgid "Max CD Speed"
+#: cdmenu.cc:43
+msgid "Max CD speed"
 msgstr ""
 
-#: cdmenu.cc:40
+#: cdmenu.cc:44
 msgid "Show in main menu"
 msgstr "Im Hauptmenü anzeigen"
 
-#: cdmenu.cc:41
+#: cdmenu.cc:45
 msgid "Play mode"
 msgstr "Modus"
 
-#: cdmenu.cc:45
+#: cdmenu.cc:47
+#, fuzzy
+msgid "Show artist"
+msgstr "Künstler anzeigen"
+
+#: cdmenu.cc:48
+msgid "Restart playback"
+msgstr ""
+
+#: cdmenu.cc:50
 msgid "Enable Paranoia"
 msgstr "Paranoia Unterstützung aktivieren"
+
+#~ msgid "Random"
+#~ msgstr "Zufällig"

@@ -49,12 +49,18 @@ public:
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
-    void RandomPlay(void);
+    void SetRestartMode (bool restart) {mBufCdio.SetRestartMode(restart);}
+    void RandomPlay(void)
+    {
+        mBufCdio.RandomPlay();
+        mPlayRandom = true;
+    }
     void SortedPlay(void) {
-        mBufCdio.SetPlayList(mBufCdio.GetDefaultPlayList());
-        mBufCdio.SetTrack(0);
+        mBufCdio.SortedPlay();
         mPlayRandom = false;
     }
+
+    void SetTrack(TRACK_IDX_T track);
     void NextTrack(void);
     void PrevTrack(void);
     void Stop(void);
@@ -108,6 +114,7 @@ private:
     cMutex mControlMutex;
     bool mShowDetail;
     bool mPlayRandom;
+    bool mRestart;
     TRACK_IDX_T mCurrtitle;
     static const char *menukindPlayList;
     static const char *menukindDetail;

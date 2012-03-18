@@ -56,3 +56,11 @@ VDR Plugin 'cdplayer' Revision History
 2012-02-06: Version 1.0.3
 
 - Fix a linker problem.
+
+2012-03-18: Version 1.1.0
+
+- Shuffle-Mode.
+- Repeate Mode.
+- Tracks 1-9 directly selectable via Keys 1-9.
+- Support for libcdio version 0.83.
+- Support for span plugin.

@@ -443,35 +443,44 @@ void cBufferedCdio::Action(void)
     mRingBuffer.Clear();
     SetTrack(0);
     mState = BCDIO_PLAY;
-    while (mCurrTrackIdx < numTracks) {
-        mBufferStat = 0;
-        mBufferCnt = 0;
-        if (!ReadTrack (mCurrTrackIdx)) {
-            mState = BCDIO_FAILED;
-            return;
+    while (mRestart) {
+        while (mCurrTrackIdx < numTracks) {
+            mBufferStat = 0;
+            mBufferCnt = 0;
+            if (!ReadTrack (mCurrTrackIdx)) {
+                mState = BCDIO_FAILED;
+                return;
+            }
+            // Output Buffer statistics
+            if (mBufferCnt == 0) {
+                dsyslog ("Buffer empty");
+            }
+            else {
+                dsyslog ("Av. buffer usage %d", (mBufferStat / mBufferCnt));
+            }
+            if (!Running()) {
+                mState = BCDIO_STOP;
+                return;
+            }
+            if (mTrackChange) {
+                mRingBuffer.Clear();
+                cCondWait::SleepMs(500);
+            }
+            else {
+                mCurrTrackIdx++;
+                mStartLsn = GetStartLsn(mCurrTrackIdx);
+            }
         }
-        // Output Buffer statistics
-        if (mBufferCnt == 0) {
-            dsyslog ("Buffer empty");
+        mRingBuffer.WaitEmpty();
+        cCondWait::SleepMs(500);
+        if (mPlayRandom) {
+            RandomPlay();
         }
         else {
-            dsyslog ("Av. buffer usage %d", (mBufferStat / mBufferCnt));
-        }
-        if (!Running()) {
-            mState = BCDIO_STOP;
-            return;
-        }
-        if (mTrackChange) {
-            mRingBuffer.Clear();
-            cCondWait::SleepMs(500);
-        }
-        else {
-            mCurrTrackIdx++;
-            mStartLsn = GetStartLsn(mCurrTrackIdx);
+            SortedPlay();
         }
     }
-    mRingBuffer.WaitEmpty();
-    cCondWait::SleepMs(1000);
+    cCondWait::SleepMs(500);
     mState = BCDIO_STOP;
 }
 
@@ -539,4 +548,27 @@ void cBufferedCdio::SkipTime(int tm) {
     }
 
     mTrackChange = true;
+}
+
+void cBufferedCdio::SortedPlay(void) {
+    dsyslog("%s %d Sorted", __FILE__, __LINE__);
+    SetPlayList(GetDefaultPlayList());
+    SetTrack(0);
+    mPlayRandom = false;
+}
+
+void cBufferedCdio::RandomPlay(void)
+{
+    PlayList pl = GetDefaultPlayList();
+    PlayList newlist;
+    int idx;
+    dsyslog("%s %d Random", __FILE__, __LINE__);
+    while (!pl.empty()) {
+        idx = rand() % pl.size();
+        newlist.push_back(pl[idx]);
+        pl.erase(pl.begin() + idx);
+    }
+    SetPlayList(newlist);
+    SetTrack(0);
+    mPlayRandom = true;
 }

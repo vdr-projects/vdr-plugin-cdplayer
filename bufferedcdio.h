@@ -59,6 +59,8 @@ private:
     volatile lsn_t             mCurrLsn;
     volatile TRACK_IDX_T       mCurrTrackIdx; // Audio Track index
     volatile bool mTrackChange;  // Indication for external track change
+    volatile bool mRestart;
+    bool mPlayRandom;
 
     cCdInfo         mCdInfo;    // CD Information per audio track
     cCdIoRingBuffer mRingBuffer;
@@ -129,7 +131,10 @@ public:
     BUFCDIO_STATE_T GetState(void) {
         return mState;
     };
+
     void Action(void);
+
+    void SetRestartMode(bool restart) {mRestart = restart;}
     void SetTrack (TRACK_IDX_T newtrack);
     void NextTrack(void) {
         cMutexLock MutexLock(&mCdMutex);
@@ -145,6 +150,9 @@ public:
         Cancel(5);
         CloseDevice();
     }
+
+    void RandomPlay(void);
+    void SortedPlay(void);
 
     void Play(void) {
          if (mState == BCDIO_PAUSE) mState = BCDIO_PLAY;

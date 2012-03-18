@@ -16,10 +16,14 @@ static const char *MAXCDSPEED = "MaxCDSpeed";
 static const char *ENABLEPARANOIA = "EnableParanoia";
 static const char *ENABLEMAINMENU = "EnableMainMenu";
 static const char *PLAYMODE = "PlayMode";
+static const char *SHOWPERFORMER ="ShowArtist";
+static const char *RESTART="Restart";
 
 int cMenuCDPlayer::mMaxSpeed = 8;
 int cMenuCDPlayer::mShowMainMenu = true;
 int cMenuCDPlayer::mPlayMode = false;
+int cMenuCDPlayer::mShowArtist = true;
+int cMenuCDPlayer::mRestart = false;
 
 #ifdef USE_PARANOIA
 int cMenuCDPlayer::mUseParanoia = true;
@@ -30,17 +34,18 @@ int cMenuCDPlayer::mUseParanoia = false;
 cMenuCDPlayer::cMenuCDPlayer(void) : cMenuSetupPage()
 {
     static const char *playmode_entry[] = {
-            tr("Sorted"),
-            tr("Random"),
+            tr("sorted"),
+            tr("random"),
     };
 
     SetSection (tr("CD-Player"));
 
-    Add(new cMenuEditIntItem(tr("Max CD Speed"), &mMaxSpeed));
+    Add(new cMenuEditIntItem(tr("Max CD speed"), &mMaxSpeed));
     Add(new cMenuEditBoolItem(tr("Show in main menu"), &mShowMainMenu));
     Add(new cMenuEditStraItem(tr("Play mode"), &mPlayMode,
                                   2, playmode_entry));
-
+    Add(new cMenuEditBoolItem(tr("Show artist"), &mShowArtist));
+    Add(new cMenuEditBoolItem(tr("Restart playback"), &mRestart));
 #ifdef USE_PARANOIA
     Add(new cMenuEditBoolItem(tr("Enable Paranoia"), &mUseParanoia));
 #else
@@ -64,8 +69,14 @@ bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
       mShowMainMenu = atoi(Value);
   }
   else if (strcasecmp(Name, PLAYMODE) == 0) {
-        mPlayMode = atoi(Value);
-    }
+      mPlayMode = atoi(Value);
+  }
+  else if (strcasecmp(Name, SHOWPERFORMER) == 0) {
+      mShowArtist = atoi(Value);
+  }
+  else if (strcasecmp(Name, RESTART) == 0) {
+      mRestart = atoi(Value);
+  }
   else {
      return false;
   }
@@ -78,4 +89,6 @@ void cMenuCDPlayer::Store(void)
     SetupStore(ENABLEPARANOIA, (int)mUseParanoia);
     SetupStore(ENABLEMAINMENU, (int)mShowMainMenu);
     SetupStore(PLAYMODE, (int)mPlayMode);
+    SetupStore(SHOWPERFORMER, (int)mShowArtist);
+    SetupStore(RESTART, (int)mRestart);
 }

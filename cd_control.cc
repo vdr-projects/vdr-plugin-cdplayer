@@ -29,6 +29,10 @@ cCdControl::cCdControl(void)
     if (mPlayRandom) {
         mCdPlayer->RandomPlay();
     }
+    else {
+        mCdPlayer->SortedPlay();
+    }
+    mRestart = cMenuCDPlayer::GetRestart();
 }
 
 cCdControl::~cCdControl()
@@ -61,12 +65,9 @@ void cCdControl::Hide(void)
 
 eOSState cCdControl::ProcessKey(eKeys Key)
 {
-    eOSState state = cOsdObject::ProcessKey(Key);
-    if (state != osUnknown) {
-        return (state);
-    }
-    state = osContinue;
-    switch (Key & ~k_Repeat) {
+    eOSState state = osContinue;
+    //Key = Key & ~k_Repeat;
+    switch (Key) {
     case kRed:
         if (mPlayRandom) {
             mCdPlayer->SortedPlay();
@@ -111,8 +112,23 @@ eOSState cCdControl::ProcessKey(eKeys Key)
     case kPause:
         mCdPlayer->Pause();
         break;
+    case kLeft:
+        mRestart = !mRestart;
+        mCdPlayer->SetRestartMode(mRestart);
+        break;
     default:
-        state = osUnknown;
+        if ((Key >= k1) && (Key <= k9))
+        {
+            mCdPlayer->SetTrack(Key - k1);
+        }
+        else
+        {
+            state = cOsdObject::ProcessKey(Key);
+            if (state != osUnknown) {
+                return (state);
+            }
+            state = osUnknown;
+        }
         break;
     }
 
@@ -254,12 +270,13 @@ void cCdControl::ShowPlaylist()
     static int numtrk = -1;
     static bool cddbinfo = false;
     static bool detail = false;
-
+    static bool restart = false;
     if ((mCurrtitle != mCdPlayer->GetCurrTrack()) ||
         (numtrk != mCdPlayer->GetNumTracks()) ||
         (state != mCdPlayer->GetState()) ||
         (cddbinfo != mCdPlayer->CDDBInfoAvailable()) ||
         (detail != mShowDetail) ||
+        (restart != mRestart) ||
         (speed != mCdPlayer->GetSpeed())) {
         render_all = true;
     }
@@ -290,6 +307,7 @@ void cCdControl::ShowPlaylist()
         if (detail != mShowDetail) {
             mMenuPlaylist->Clear();
         }
+        restart = mRestart;
         detail = mShowDetail;
         mCurrtitle = mCdPlayer->GetCurrTrack();
         state = mCdPlayer->GetState();
@@ -326,6 +344,13 @@ void cCdControl::ShowPlaylist()
             break;
         default:
             break;
+        }
+
+        if (mRestart) {
+            title += " R";
+        }
+        else {
+            title += " S";
         }
 
         switch (mCdPlayer->GetSpeed()) {
@@ -376,8 +401,13 @@ char *cCdControl::BuildMenuStr(TRACK_IDX_T idx)
     string title = text[CDTEXT_TITLE];
 
     mCdPlayer->GetTrackTime(idx, &min, &sec);
-    asprintf(&str, "%2d\t%2d:%02d\t%s\t %s", idx+1, min, sec, artist.c_str(),
-              title.c_str());
+    if (cMenuCDPlayer::GetShowArtist()) {
+        asprintf(&str, "%2d\t%2d:%02d\t%s\t %s", idx+1, min, sec, artist.c_str(),
+                title.c_str());
+    }
+    else {
+        asprintf(&str, "%2d\t%2d:%02d\t%s", idx+1, min, sec, title.c_str());
+    }
     return str;
 }
 
@@ -553,20 +583,11 @@ void cCdPlayer::Stop(void)
     Detach();
 }
 
-void cCdPlayer::RandomPlay(void)
+void cCdPlayer::SetTrack(TRACK_IDX_T track)
 {
-    PlayList pl = mBufCdio.GetDefaultPlayList();
-    PlayList newlist;
-    int idx;
-
-    while (!pl.empty()) {
-        idx = rand() % pl.size();
-        newlist.push_back(pl[idx]);
-        pl.erase(pl.begin() + idx);
-    }
-    mBufCdio.SetPlayList(newlist);
-    mBufCdio.SetTrack(0);
-    mPlayRandom = true;
+    dsyslog("cCdPlayer SetTrack");
+    mBufCdio.SetTrack(track);
+    DeviceClear();
 }
 
 void cCdPlayer::NextTrack(void)
