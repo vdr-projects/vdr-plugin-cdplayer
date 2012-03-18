@@ -48,7 +48,8 @@ void cCdInfo::Add(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
 {
     cTrackInfo ti(TrackNo, StartLsn, EndLsn, lba, CdTextFields);
     mTrackInfo.push_back(ti);
-    mPlayList.push_back(TrackNo);
+    mPlayList.push_back(mLastTrackIdx);
+    mLastTrackIdx++;
     AddData(lba);
 }
 
@@ -79,6 +80,7 @@ void cCdInfo::GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &CdTextFields)
 {
     cMutexLock MutexLock(&mInfoMutex);
     int i;
+
     if (track < (TRACK_IDX_T)mTrackInfo.size()) {
         for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
             CdTextFields[i] = mTrackInfo[track].mCdTextFields[i];

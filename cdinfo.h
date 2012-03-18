@@ -74,6 +74,7 @@ typedef std::vector<track_t> PlayList;
 
 class cCdInfo: public cThread {
 private:
+    TRACK_IDX_T mLastTrackIdx;
     TrackInfoVector mTrackInfo;
     CddbInfoVector mCddbInfo;
     PlayList mPlayList;
@@ -88,11 +89,13 @@ private:
           mTrackInfo[track].SetCdTextFields(CdTextFields);
      }
 public:
-    cCdInfo(void) {mCddbInfoAvail = false;}
+    cCdInfo(void) {mCddbInfoAvail = false; mLastTrackIdx = 0;}
     ~cCdInfo(void) {if (Active()) Cancel(3);}
 
     void Clear(void) {
         mTrackInfo.clear();
+        mPlayList.clear();
+        mLastTrackIdx = 0;
     }
 
     void Add(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba, CD_TEXT_T &CdTextFields);

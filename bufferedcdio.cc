@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -80,7 +80,7 @@ cBufferedCdio::~cBufferedCdio(void)
     }
 }
 
-LOGICAL_TRACK_IDX cBufferedCdio::GetCurrTrack(int *total, int *curr)
+TRACK_IDX_T cBufferedCdio::GetCurrTrack(int *total, int *curr)
 {
     if (total != NULL) {
         *total = (GetEndLsn(mCurrTrackIdx) - GetStartLsn(mCurrTrackIdx))
@@ -476,7 +476,7 @@ void cBufferedCdio::Action(void)
 }
 
 // Set new track
-void cBufferedCdio::SetTrack (LOGICAL_TRACK_IDX newtrack)
+void cBufferedCdio::SetTrack (TRACK_IDX_T newtrack)
 {
   cMutexLock MutexLock(&mCdMutex);
   if (newtrack > GetNumTracks()-1) {
@@ -487,27 +487,56 @@ void cBufferedCdio::SetTrack (LOGICAL_TRACK_IDX newtrack)
   mTrackChange = true;
 }
 
+void cBufferedCdio::SkipTimeFwd(lsn_t lsncnt) {
+    lsn_t cur;
+    cur = mCurrLsn - GetStartLsn(mCurrTrackIdx);
+    lsncnt += cur;
+    while (lsncnt > GetLengthLsn(mCurrTrackIdx)) {
+        cur = GetLengthLsn(mCurrTrackIdx);
+        mCurrTrackIdx++;
+        if (mCurrTrackIdx > GetNumTracks()) {
+            mCurrTrackIdx--;
+            mCurrLsn = GetEndLsn(mCurrTrackIdx)-CDIO_CD_FRAMES_PER_SEC;
+            mStartLsn = mCurrLsn;
+            return;
+        }
+        lsncnt -= cur;
+    }
+    mCurrLsn = GetStartLsn(mCurrTrackIdx) + lsncnt;
+    mStartLsn = mCurrLsn;
+}
+
+void cBufferedCdio::SkipTimeBack(lsn_t lsncnt) {
+    lsn_t cur;
+    cur = mCurrLsn - GetStartLsn(mCurrTrackIdx);
+    lsncnt -= cur;
+    while (lsncnt > 0) {
+        cur = GetLengthLsn(mCurrTrackIdx);
+        mCurrTrackIdx--;
+        if (mCurrTrackIdx < 0) {
+            mCurrTrackIdx = 0;
+            mCurrLsn = GetStartLsn(mCurrTrackIdx);
+            mStartLsn = mCurrLsn;
+            return;
+        }
+        lsncnt -= cur;
+    }
+    // NOTE: lsncnt is negative here
+    mCurrLsn = GetEndLsn(mCurrTrackIdx) + lsncnt;
+    mStartLsn = mCurrLsn;
+}
+
 void cBufferedCdio::SkipTime(int tm) {
     cMutexLock MutexLock(&mCdMutex);
-    lsn_t newlsn = mCurrLsn + (tm * CDIO_CD_FRAMES_PER_SEC);
-    lsn_t lastlsn = GetEndLsn(GetNumTracks()-1)-CDIO_CD_FRAMES_PER_SEC;
-    LOGICAL_TRACK_IDX idx;
-    LOGICAL_TRACK_IDX newtrack = 0;
-// @TODO
-    if (newlsn < GetStartLsn(0)) {
-        newlsn = GetStartLsn(0);
-    }
-    if (newlsn >= lastlsn) {
-        newlsn = lastlsn;
-    }
+    lsn_t lsncnt = abs(tm * CDIO_CD_FRAMES_PER_SEC);
+
     // Find track which contains calculated lsn
-    for (idx = 0; idx < GetNumTracks(); idx++) {
-        if (newlsn < GetEndLsn(idx)) {
-            newtrack = idx;
-            break;
-        }
+    if (tm >= 0) {
+        SkipTimeFwd(lsncnt);
     }
-    mStartLsn = newlsn;
-    mCurrTrackIdx = newtrack;
+    else {
+        SkipTimeBack(lsncnt);
+    }
+
     mTrackChange = true;
 }

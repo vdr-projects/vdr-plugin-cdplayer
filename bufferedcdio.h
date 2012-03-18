@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -32,8 +32,6 @@ using namespace std;
 // Maximum number of raw blocks to buffer
 static const int CCDIO_MAX_BLOCKS=128;
 
-typedef int LOGICAL_TRACK_IDX;
-
 typedef enum _bufcdio_state {
     BCDIO_STOP = 0,
     BCDIO_STARTING,
@@ -59,7 +57,7 @@ private:
 
     volatile lsn_t             mStartLsn;
     volatile lsn_t             mCurrLsn;
-    volatile LOGICAL_TRACK_IDX mCurrTrackIdx; // Audio Track index
+    volatile TRACK_IDX_T       mCurrTrackIdx; // Audio Track index
     volatile bool mTrackChange;  // Indication for external track change
 
     cCdInfo         mCdInfo;    // CD Information per audio track
@@ -75,8 +73,10 @@ private:
     void GetCDText(const track_t track_no, CD_TEXT_T &cd_text);
     bool ReadTrack (TRACK_IDX_T trackidx);
     void SetSpeed (int speed);
-    TRACK_IDX_T GetTrackPlaylist (const LOGICAL_TRACK_IDX track) {
-        return mPlayList[track-1];
+    void SkipTimeFwd(lsn_t lsncnt);
+    void SkipTimeBack(lsn_t lsncnt);
+    TRACK_IDX_T GetTrackPlaylist (const TRACK_IDX_T track) {
+        return mPlayList[track];
     }
 #ifdef USE_PARANOIA
     bool ParanoiaLogMsg(void);
@@ -101,21 +101,25 @@ public:
 
     const string &GetErrorText(void) { return mErrtxt; };
 
-    LOGICAL_TRACK_IDX GetCurrTrack(int *total = NULL, int *curr=NULL);
+    TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr=NULL);
     static const char *GetCdTextField(const cdtext_field_t type);
     void GetCdInfo (CD_TEXT_T &txt) {
        mCdInfo.GetCdInfo(txt);
     }
-    void GetCdTextFields(const LOGICAL_TRACK_IDX track, CD_TEXT_T &txt) {
+    void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &txt) {
         mCdInfo.GetCdTextFields(GetTrackPlaylist(track), txt);
     };
-    lsn_t GetStartLsn (const LOGICAL_TRACK_IDX track) {
+    lsn_t GetStartLsn (const TRACK_IDX_T track) {
         return mCdInfo.GetStartLsn(GetTrackPlaylist(track));
     }
-    lsn_t GetEndLsn (const LOGICAL_TRACK_IDX track) {
+    lsn_t GetEndLsn (const TRACK_IDX_T track) {
         return mCdInfo.GetEndLsn(GetTrackPlaylist(track));
     }
-    void GetTrackTime (const LOGICAL_TRACK_IDX track, int *min, int *sec) {
+    lsn_t GetLengthLsn (const TRACK_IDX_T track) {
+        TRACK_IDX_T t = GetTrackPlaylist(track);
+        return (mCdInfo.GetEndLsn(t)-mCdInfo.GetStartLsn(t));
+    }
+    void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
         return mCdInfo.GetTrackTime (GetTrackPlaylist(track), min, sec);
     }
     TRACK_IDX_T GetNumTracks (void) {
@@ -126,7 +130,7 @@ public:
         return mState;
     };
     void Action(void);
-    void SetTrack (LOGICAL_TRACK_IDX newtrack);
+    void SetTrack (TRACK_IDX_T newtrack);
     void NextTrack(void) {
         cMutexLock MutexLock(&mCdMutex);
         SetTrack(mCurrTrackIdx+1);

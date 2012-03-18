@@ -118,7 +118,7 @@ I18Npot   = $(PODIR)/$(PLUGIN).pot
 	msgfmt -v -c -o $@ $<
 
 $(I18Npot): $(wildcard *.cc *.h)
-	xgettext -C -cTRANSLATORS --no-wrap -n -i -F --package-name="cdplayer plugin" -k -ktr -ktrNOOP --msgid-bugs-address='vdr@uli-eckhardt.de' -o $@ $^
+	xgettext -C -cTRANSLATORS --no-wrap -n -i -F --package-name="$(PLUGIN)" -k -ktr -ktrNOOP --msgid-bugs-address='vdr@uli-eckhardt.de' -o $@ $^
 
 %.po: $(I18Npot)
 	msgmerge -v -U --no-wrap --backup=none -q $@ $<

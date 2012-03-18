@@ -18,14 +18,16 @@ private:
     static int mMaxSpeed;
     static int mUseParanoia;
     static int mShowMainMenu;
+    static int mPlayMode;
 
 protected:
     virtual void Store(void);
 
 public:
     cMenuCDPlayer(void);
-    static int GetMaxSpeed(void) { return mMaxSpeed; }
-    static bool GetUseParanoia(void) { return mUseParanoia; }
-    static bool GetShowMainMenu(void) { return mShowMainMenu; }
+    static int GetMaxSpeed(void) { return mMaxSpeed;}
+    static bool GetUseParanoia(void) { return mUseParanoia;}
+    static bool GetShowMainMenu(void) { return mShowMainMenu;}
+    static bool GetPlayMode(void) { return mPlayMode; }
     static bool SetupParse(const char *Name, const char *Value);
 };

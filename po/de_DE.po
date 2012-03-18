@@ -7,13 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-03-11 19:13+0100\n"
+"POT-Creation-Date: 2012-03-18 14:57+0100\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: bufferedcdio.cc:48
@@ -42,7 +42,7 @@ msgstr ""
 
 #: bufferedcdio.cc:54
 msgid "Performer"
-msgstr "Künstler"
+msgstr "KÃ¼nstler"
 
 #: bufferedcdio.cc:55
 msgid "Size Info"
@@ -70,11 +70,11 @@ msgstr ""
 
 #: bufferedcdio.cc:61
 msgid "Invalid"
-msgstr "Ungültig"
+msgstr "UngÃ¼ltig"
 
 #: bufferedcdio.cc:208
 msgid "Can not open"
-msgstr "Kann device nicht öffnen"
+msgstr "Kann device nicht Ã¶ffnen"
 
 #: bufferedcdio.cc:245
 msgid "No disc in drive"
@@ -100,58 +100,74 @@ msgstr "Keine Audio disk"
 msgid "Read error"
 msgstr "Lesefehler"
 
-#: cd_control.cc:19
+#: cd_control.cc:27
 msgid "CD Player"
 msgstr ""
 
-#: cd_control.cc:22
-msgid "random"
-msgstr "zufällig"
-
-#: cd_control.cc:23
-msgid "1 min -"
-msgstr ""
-
-#: cd_control.cc:24
-msgid "1 min +"
-msgstr ""
-
-#: cd_control.cc:25
-msgid "playlist"
-msgstr ""
-
-#: cd_control.cc:26
-msgid "detail"
-msgstr ""
-
-#: cd_control.cc:147
+#: cd_control.cc:153
 msgid "CD Information"
 msgstr ""
 
-#: cd_control.cc:161
+#: cd_control.cc:167
 msgid "Song Information"
 msgstr ""
 
-#: cd_control.cc:288
+#: cd_control.cc:185
+msgid "random"
+msgstr "ZufÃ¤llig"
+
+#: cd_control.cc:186
+msgid "sort"
+msgstr "Sortiert"
+
+#: cd_control.cc:187
+msgid "1 min -"
+msgstr "1 Min -"
+
+#: cd_control.cc:188
+msgid "1 min +"
+msgstr "1 Min +"
+
+#: cd_control.cc:189
+msgid "playlist"
+msgstr "Liste"
+
+#: cd_control.cc:190
+msgid "detail"
+msgstr "Detail"
+
+#: cd_control.cc:311
 msgid "Playlist"
 msgstr "Titel"
 
-#: cd_control.cc:427
+#: cd_control.cc:452
 msgid "Can not open still picture: "
-msgstr "Kann device nicht öffnen"
+msgstr "Kann device nicht Ã¶ffnen"
 
-#: cdmenu.cc:30 cdplayer.cc:19 cdplayer.h:30
+#: cdmenu.cc:33
+msgid "Sorted"
+msgstr "Sortiert"
+
+#: cdmenu.cc:34
+msgid "Random"
+msgstr "ZufÃ¤llig"
+
+#: cdmenu.cc:37 cdplayer.cc:19 cdplayer.h:30
 msgid "CD-Player"
 msgstr ""
 
-#: cdmenu.cc:32
+#: cdmenu.cc:39
 msgid "Max CD Speed"
 msgstr ""
 
-#: cdmenu.cc:33
+#: cdmenu.cc:40
 msgid "Show in main menu"
-msgstr "Im Hauptmenü anzeigen"
+msgstr "Im HauptmenÃ¼ anzeigen"
 
-#: cdmenu.cc:35
+#: cdmenu.cc:41
+msgid "Play mode"
+msgstr "Modus"
+
+#: cdmenu.cc:45
 msgid "Enable Paranoia"
-msgstr "Paranoia Unterstützung aktivieren"
+msgstr "Paranoia UnterstÃ¼tzung aktivieren"

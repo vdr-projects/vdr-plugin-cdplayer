@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -27,6 +27,7 @@ protected:
     cBufferedCdio mBufCdio;
     uchar *pStillBuf;
     int mStillBufLen;
+    bool mPlayRandom;
     volatile int mSpeed;
     volatile bool mTrackChange;  // Indication for external track change
     volatile bool mPurge;
@@ -48,12 +49,18 @@ public:
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
-    void Random(void);
+    void RandomPlay(void);
+    void SortedPlay(void) {
+        mBufCdio.SetPlayList(mBufCdio.GetDefaultPlayList());
+        mBufCdio.SetTrack(0);
+        mPlayRandom = false;
+    }
     void NextTrack(void);
     void PrevTrack(void);
     void Stop(void);
     void Pause(void);
-    void Play(void);
+
+    void Play();
     void SpeedNormal(void) {mSpeed = 0;}
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
@@ -100,17 +107,14 @@ private:
     cSkinDisplayMenu *mMenuPlaylist;
     cMutex mControlMutex;
     bool mShowDetail;
+    bool mPlayRandom;
     TRACK_IDX_T mCurrtitle;
-    static const char *menutitle;
     static const char *menukindPlayList;
     static const char *menukindDetail;
-    static const char *redtxt;
-    static const char *greentxt;
-    static const char *yellowtxt;
-    static const char *bluetxtplay;
-    static const char *bluetxtdet;
+
     char *BuildOSDStr(TRACK_IDX_T);
     char *BuildMenuStr(TRACK_IDX_T);
+    void SetHelpkeys(void);
     void ShowDetail(void);
     void ShowList(void);
     void ShowPlaylist(void);
