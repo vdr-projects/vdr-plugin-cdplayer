@@ -89,6 +89,13 @@ void cCdInfo::GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &CdTextFields)
 }
 
 void cCdInfo::Action(void) {
+    while (!mCddbInfoAvail) {
+        Query();
+        cCondWait::SleepMs(10000);
+    }
+}
+
+void cCdInfo::Query(void) {
     TRACK_IDX_T i;
     int nrfound;
     cddb_conn_t *cddb_conn;

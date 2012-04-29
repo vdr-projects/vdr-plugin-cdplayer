@@ -439,11 +439,14 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 //
 void cBufferedCdio::Action(void)
 {
+    dsyslog ("cBufferedCdio::Action");
+    bool first_time = true;
     TRACK_IDX_T numTracks = GetNumTracks();
     mRingBuffer.Clear();
     SetTrack(0);
     mState = BCDIO_PLAY;
-    while (mRestart) {
+    while (mRestart || first_time) {
+        first_time = false;
         while (mCurrTrackIdx < numTracks) {
             mBufferStat = 0;
             mBufferCnt = 0;

@@ -19,7 +19,6 @@
 #include <string>
 #include <stdio.h>
 #include <stdint.h>
-#include <vdr/plugin.h>
 #include <cdio/cdda.h>
 #include <cdio/cd_types.h>
 #include <cdio/paranoia.h>

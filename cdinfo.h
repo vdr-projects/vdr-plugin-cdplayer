@@ -83,7 +83,7 @@ private:
     cMutex mInfoMutex;
     CD_TEXT_T mCdText;
     bool mCddbInfoAvail;
-
+    void Query(void);
     void SetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T CdTextFields) {
           cMutexLock MutexLock (&mInfoMutex);
           mTrackInfo[track].SetCdTextFields(CdTextFields);
