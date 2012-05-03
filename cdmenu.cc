@@ -33,9 +33,9 @@ int cMenuCDPlayer::mUseParanoia = false;
 
 cMenuCDPlayer::cMenuCDPlayer(void) : cMenuSetupPage()
 {
-    static const char *playmode_entry[] = {
+    static const char *playmode_entry[2] = {
             tr("sorted"),
-            tr("random"),
+            tr("random")
     };
 
     SetSection (tr("CD-Player"));

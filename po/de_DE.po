@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-03-18 16:53+0100\n"
+"POT-Creation-Date: 2012-05-03 13:22+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -145,7 +145,6 @@ msgid "Can not open still picture: "
 msgstr "Kann device nicht öffnen"
 
 #: cdmenu.cc:37
-#, fuzzy
 msgid "sorted"
 msgstr "Sortiert"
 
@@ -172,7 +171,7 @@ msgstr "Künstler anzeigen"
 
 #: cdmenu.cc:48
 msgid "Restart playback"
-msgstr ""
+msgstr "Wiedergabe neu starten"
 
 #: cdmenu.cc:50
 msgid "Enable Paranoia"
