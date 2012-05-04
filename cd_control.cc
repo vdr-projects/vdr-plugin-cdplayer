@@ -244,17 +244,17 @@ void cCdControl::ShowList()
         TRACK_IDX_T trk = i + offset;
         str = BuildMenuStr(trk);
         mMenuPlaylist->SetItem(str, i, (trk == mCdPlayer->GetCurrTrack()), true);
-        free( str);
+        free(str);
     }
 
     for (TRACK_IDX_T i = 0; i < numtrk; i++) {
         str = BuildOSDStr(i);
         cStatus::MsgOsdItem(str, i + 1);
-        free( str);
+        free(str);
     }
     if ((currtitle != INVALID_TRACK_IDX) && (numtrk > 0)) {
         str = BuildOSDStr(currtitle);
-        cStatus::MsgOsdCurrentItem( str);
+        cStatus::MsgOsdCurrentItem(str);
         free(str);
     }
     SetHelpkeys();
@@ -386,7 +386,7 @@ char *cCdControl::BuildOSDStr(TRACK_IDX_T idx)
     mCdPlayer->GetCdTextFields(idx, text);
     string title = text[CDTEXT_TITLE];
     mCdPlayer->GetTrackTime(idx, &min, &sec);
-    asprintf(&str, "%2d %2d:%02d %s", idx, min, sec, title.c_str());
+    asprintf(&str, "%2d %2d:%02d %s", idx+1, min, sec, title.c_str());
     return str;
 }
 
