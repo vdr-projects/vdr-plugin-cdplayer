@@ -65,8 +65,9 @@ VDR Plugin 'cdplayer' Revision History
 - Support for libcdio version 0.83.
 - Support for span plugin.
 
-2012-05-03: Version 1.1.1
+2012-05-04: Version 1.1.1
 
 - Fix startup problems.
 - Enhance CDDB Query after network problems.
 - Update german translations.
+- Fix track number display on OSDs.
