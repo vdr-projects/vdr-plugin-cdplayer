@@ -16,6 +16,7 @@
 
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
+#include <cdio/version.h>
 
 #ifdef VERSION
 #undef VERSION
@@ -25,6 +26,21 @@
 #include <cddb/cddb.h>
 #include <vector>
 #include <string>
+
+#if LIBCDIO_VERSION_NUM > 83
+
+#define CDTEXT_COMPOSER     CDTEXT_FIELD_COMPOSER
+#define CDTEXT_DISCID       CDTEXT_FIELD_DISCID
+#define CDTEXT_GENRE        CDTEXT_FIELD_GENRE
+#define CDTEXT_MESSAGE      CDTEXT_FIELD_MESSAGE
+#define CDTEXT_ISRC         CDTEXT_FIELD_ISRC
+#define CDTEXT_PERFORMER    CDTEXT_FIELD_PERFORMER
+#define CDTEXT_SONGWRITER   CDTEXT_FIELD_SONGWRITER
+#define CDTEXT_TITLE        CDTEXT_FIELD_TITLE
+#define CDTEXT_UPC_EAN      CDTEXT_FIELD_UPC_EAN
+#define CDTEXT_ARRANGER     CDTEXT_FIELD_ARRANGER
+#define CDTEXT_INVALID      CDTEXT_FIELD_INVALID
+#endif
 
 typedef std::string CD_TEXT_T[MAX_CDTEXT_FIELDS];
 typedef int TRACK_IDX_T;

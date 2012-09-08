@@ -15,6 +15,21 @@
 #include "bufferedcdio.h"
 #include "cdmenu.h"
 
+#if LIBCDIO_VERSION_NUM > 83
+const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
+        "Title",        /**< title of album name or track titles */
+        "Performer",    /**< name(s) of the performer(s) */
+        "Songwriter",   /**< name(s) of the songwriter(s) */
+        "Composer",     /**< name(s) of the composer(s) */
+        "Message",      /**< ISRC code of each track */
+        "Arranger",     /**< name(s) of the arranger(s) */
+        "Isrc",         /**< message(s) from the content provider or artist */
+        "Upc Ean",      /**< upc/european article number of disc, ISO-8859-1 encoded */
+        "Genre",        /**< genre identification and genre information */
+        "Disk ID",      /**< disc identification information */
+        "Invalid"
+};
+#else
 // Translated description of the cd text field
 const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
         "Arranger",     /**< name(s) of the arranger(s) */
@@ -32,7 +47,7 @@ const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
         "Upc Ean",
         "Invalid"
 };
-
+#endif
 cBufferedCdio::cBufferedCdio(void) :
         mRingBuffer(CCDIO_MAX_BLOCKS)
 {
@@ -52,13 +67,15 @@ cBufferedCdio::cBufferedCdio(void) :
     cd_text_field[CDTEXT_MESSAGE]   = tr("Message");
     cd_text_field[CDTEXT_ISRC]      = tr("Isrc");
     cd_text_field[CDTEXT_PERFORMER] = tr("Performer");
-    cd_text_field[CDTEXT_SIZE_INFO] = tr("Size Info");
     cd_text_field[CDTEXT_SONGWRITER] = tr("Songwriter");
     cd_text_field[CDTEXT_TITLE]     = tr("Title");
-    cd_text_field[CDTEXT_TOC_INFO]  = tr("Info1");
-    cd_text_field[CDTEXT_TOC_INFO2] = tr("Info2");
     cd_text_field[CDTEXT_UPC_EAN]   = tr("Upc Ean");
     cd_text_field[CDTEXT_INVALID]   = tr("Invalid");
+#if LIBCDIO_VERSION_NUM <= 83
+    cd_text_field[CDTEXT_SIZE_INFO] = tr("Size Info");
+    cd_text_field[CDTEXT_TOC_INFO]  = tr("Info1");
+    cd_text_field[CDTEXT_TOC_INFO2] = tr("Info2");
+#endif
     mSpanPlugin = cPluginManager::CallFirstService(SPAN_SET_PCM_DATA_ID, NULL);
 }
 
@@ -100,11 +117,28 @@ const char *cBufferedCdio::GetCdTextField(const cdtext_field_t type)
     return cd_text_field[type];
 }
 
+#if LIBCDIO_VERSION_NUM > 83
+// Get all available CD-Text for a track
+void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
+{
+    int i;
+    const char *txt;
+
+    for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
+        txt = cdtext_get_const (pCdioCdtext, (cdtext_field_t)i, track_no);
+        if (txt != NULL) {
+            cd_text[i] = txt;
+            dsyslog ("CD-Text %d: %s", i, cd_text[i].c_str());
+        }
+    }
+}
+#else
 // Get all available CD-Text for a track
 void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
 {
     int i;
     const cdtext_t *cdtext = cdio_get_cdtext(pCdio, track_no);
+
     if (cdtext == NULL) {
         dsyslog ("No CD-Text found");
         return;
@@ -116,7 +150,7 @@ void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
         }
     }
 }
-
+#endif
 // Close access and destroy and reset all internal buffers
 void cBufferedCdio::CloseDevice(void)
 {
@@ -202,13 +236,17 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     CloseDevice();
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
-    pCdio = cdio_open(FileName.c_str(), DRIVER_DEVICE);
+    pCdio = cdio_open(FileName.c_str(), DRIVER_UNKNOWN);
     if (pCdio == NULL) {
         mState = BCDIO_FAILED;
         txt = tr("Can not open");
         mErrtxt = txt  + " " + FileName;
         esyslog("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
         return false;
+    }
+    pCdioCdtext = cdio_get_cdtext(pCdio);
+    if (pCdioCdtext == NULL) {
+        dsyslog ("No CD-Text available");
     }
     SetSpeed (mSpeed);
 #ifdef USE_PARANOIA

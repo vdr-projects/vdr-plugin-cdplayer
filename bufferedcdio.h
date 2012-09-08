@@ -49,6 +49,9 @@ private:
     cdrom_drive_t   *pParanoiaDrive;
     cdrom_paranoia_t *pParanoiaCd;
 #endif
+#if LIBCDIO_VERSION_NUM > 83
+    const cdtext_t *pCdioCdtext;
+#endif
     CdIo_t          *pCdio;
     PlayList mPlayList;
     track_t mFirstTrackNum;  // CDIO first track
