@@ -71,3 +71,7 @@ VDR Plugin 'cdplayer' Revision History
 - Enhance CDDB Query after network problems.
 - Update german translations.
 - Fix track number display on OSDs.
+
+2012-09-09: Version 1.1.2
+
+- Support for new libcdio 0.84 API

@@ -236,7 +236,11 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     CloseDevice();
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
+#if LIBCDIO_VERSION_NUM > 83
     pCdio = cdio_open(FileName.c_str(), DRIVER_UNKNOWN);
+#else
+    pCdio = cdio_open(FileName.c_str(), DRIVER_DEVICE);
+#endif
     if (pCdio == NULL) {
         mState = BCDIO_FAILED;
         txt = tr("Can not open");
@@ -244,10 +248,12 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
         esyslog("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
         return false;
     }
+#if LIBCDIO_VERSION_NUM > 83
     pCdioCdtext = cdio_get_cdtext(pCdio);
     if (pCdioCdtext == NULL) {
         dsyslog ("No CD-Text available");
     }
+#endif
     SetSpeed (mSpeed);
 #ifdef USE_PARANOIA
     if (cMenuCDPlayer::GetUseParanoia()) {
