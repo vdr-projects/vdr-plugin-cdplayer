@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-09-08 12:35+0200\n"
+"POT-Creation-Date: 2012-09-15 16:57+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -72,31 +72,31 @@ msgstr ""
 msgid "Info2"
 msgstr ""
 
-#: bufferedcdio.cc:242
+#: bufferedcdio.cc:246
 msgid "Can not open"
 msgstr "Kann device nicht öffnen"
 
-#: bufferedcdio.cc:283
+#: bufferedcdio.cc:289
 msgid "No disc in drive"
 msgstr "Keine CD im Laufwerk"
 
-#: bufferedcdio.cc:293
+#: bufferedcdio.cc:299
 msgid "Problem on read"
 msgstr "Problem beim lesen"
 
-#: bufferedcdio.cc:311
+#: bufferedcdio.cc:317
 msgid "Problem on read lsn"
 msgstr ""
 
-#: bufferedcdio.cc:319
+#: bufferedcdio.cc:325
 msgid "Problem on read lba"
 msgstr ""
 
-#: bufferedcdio.cc:340
+#: bufferedcdio.cc:346
 msgid "Not an audio disk"
 msgstr "Keine Audio disk"
 
-#: bufferedcdio.cc:407 bufferedcdio.cc:418
+#: bufferedcdio.cc:413 bufferedcdio.cc:424
 msgid "Read error"
 msgstr "Lesefehler"
 
@@ -104,78 +104,82 @@ msgstr "Lesefehler"
 msgid "CD Player"
 msgstr ""
 
-#: cd_control.cc:169
+#: cd_control.cc:170
 msgid "CD Information"
 msgstr ""
 
-#: cd_control.cc:183
+#: cd_control.cc:184
 msgid "Song Information"
 msgstr ""
 
-#: cd_control.cc:201 cdmenu.cc:38
+#: cd_control.cc:202 cdmenu.cc:40
 msgid "random"
 msgstr "Zufällig"
 
-#: cd_control.cc:202
+#: cd_control.cc:203
 msgid "sort"
 msgstr "Sortiert"
 
-#: cd_control.cc:203
+#: cd_control.cc:204
 msgid "1 min -"
 msgstr "1 Min -"
 
-#: cd_control.cc:204
+#: cd_control.cc:205
 msgid "1 min +"
 msgstr "1 Min +"
 
-#: cd_control.cc:205
+#: cd_control.cc:206
 msgid "playlist"
 msgstr "Liste"
 
-#: cd_control.cc:206
+#: cd_control.cc:207
 msgid "detail"
 msgstr "Detail"
 
-#: cd_control.cc:329
+#: cd_control.cc:343
 msgid "Playlist"
 msgstr "Titel"
 
-#: cd_control.cc:482
+#: cd_control.cc:513
 msgid "Can not open still picture: "
 msgstr "Kann device nicht öffnen"
 
-#: cdmenu.cc:37
+#: cdmenu.cc:39
 msgid "sorted"
 msgstr "Sortiert"
 
-#: cdmenu.cc:41 cdplayer.cc:19 cdplayer.h:30
+#: cdmenu.cc:43 cdplayer.cc:19 cdplayer.h:30
 msgid "CD-Player"
 msgstr ""
 
-#: cdmenu.cc:43
+#: cdmenu.cc:45
 msgid "Max CD speed"
 msgstr ""
 
-#: cdmenu.cc:44
+#: cdmenu.cc:46
 msgid "Show in main menu"
 msgstr "Im Hauptmenü anzeigen"
 
-#: cdmenu.cc:45
+#: cdmenu.cc:47
 msgid "Play mode"
 msgstr "Modus"
 
-#: cdmenu.cc:47
+#: cdmenu.cc:49
 #, fuzzy
 msgid "Show artist"
 msgstr "Künstler anzeigen"
 
-#: cdmenu.cc:48
+#: cdmenu.cc:50
 msgid "Restart playback"
 msgstr "Wiedergabe neu starten"
 
-#: cdmenu.cc:50
+#: cdmenu.cc:52
 msgid "Enable Paranoia"
 msgstr "Paranoia Unterstützung aktivieren"
+
+#: cdmenu.cc:56
+msgid "Use GraphTFT special characters"
+msgstr "Spezielle GraphTFT Symbole benutzen"
 
 #~ msgid "Random"
 #~ msgstr "Zufällig"

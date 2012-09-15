@@ -22,6 +22,20 @@
 #define CDMAXFRAMESIZE  (KILOBYTE(1024) / TS_SIZE * TS_SIZE) // multiple of TS_SIZE to avoid breaking up TS packets
 #define MAX_SPEED 2
 
+#define CD_CHAR_PAUSE   "\u01c1"     // ǁ
+#define CD_CHAR_PLAY    "\u00BB"     // »
+#define CD_CHAR_RESTART "\u21BA"     // ↺
+#define CD_CHAR_NORMAL  "\u21A6"     // ↦
+#define CD_CHAR_RANDOM  "\u21AD"     // ↭
+#define CD_CHAR_SORTED  "\u21F5"     // ⇵
+
+#define GRAPHTFT_CHAR_DISK      "\u0081"
+#define GRAPHTFT_CHAR_PAUSE     "\u0088"
+#define GRAPHTFT_CHAR_RESTART   "\u0002"
+#define GRAPHTFT_CHAR_NORMAL    "\u00ff"
+#define GRAPHTFT_CHAR_RANDOM    "\u0001"
+#define GRAPHTFT_CHAR_SORTED    "\u0085"
+
 class cCdPlayer: public cPlayer, public cThread {
 protected:
     cBufferedCdio mBufCdio;
@@ -119,6 +133,7 @@ private:
     static const char *menukindPlayList;
     static const char *menukindDetail;
 
+    void Replace (std::string &, const char *, const char *);
     char *BuildOSDStr(TRACK_IDX_T);
     char *BuildMenuStr(TRACK_IDX_T);
     void SetHelpkeys(void);

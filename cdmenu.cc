@@ -18,12 +18,14 @@ static const char *ENABLEMAINMENU = "EnableMainMenu";
 static const char *PLAYMODE = "PlayMode";
 static const char *SHOWPERFORMER ="ShowArtist";
 static const char *RESTART="Restart";
+static const char *GRAPHTFT = "GraphTFT";
 
 int cMenuCDPlayer::mMaxSpeed = 8;
 int cMenuCDPlayer::mShowMainMenu = true;
 int cMenuCDPlayer::mPlayMode = false;
 int cMenuCDPlayer::mShowArtist = true;
 int cMenuCDPlayer::mRestart = false;
+int cMenuCDPlayer::mGraphTFT = false;
 
 #ifdef USE_PARANOIA
 int cMenuCDPlayer::mUseParanoia = true;
@@ -51,6 +53,7 @@ cMenuCDPlayer::cMenuCDPlayer(void) : cMenuSetupPage()
 #else
     mUseParanoia = false;
 #endif
+    Add(new cMenuEditBoolItem(tr("Use GraphTFT special characters"), &mGraphTFT));
 }
 
 bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
@@ -77,6 +80,9 @@ bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
   else if (strcasecmp(Name, RESTART) == 0) {
       mRestart = atoi(Value);
   }
+  else if (strcasecmp(Name, GRAPHTFT) == 0) {
+      mGraphTFT  = atoi(Value);
+  }
   else {
      return false;
   }
@@ -86,9 +92,10 @@ bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
 void cMenuCDPlayer::Store(void)
 {
     SetupStore(MAXCDSPEED, mMaxSpeed);
-    SetupStore(ENABLEPARANOIA, (int)mUseParanoia);
-    SetupStore(ENABLEMAINMENU, (int)mShowMainMenu);
-    SetupStore(PLAYMODE, (int)mPlayMode);
-    SetupStore(SHOWPERFORMER, (int)mShowArtist);
-    SetupStore(RESTART, (int)mRestart);
+    SetupStore(ENABLEPARANOIA, mUseParanoia);
+    SetupStore(ENABLEMAINMENU, mShowMainMenu);
+    SetupStore(PLAYMODE, mPlayMode);
+    SetupStore(SHOWPERFORMER, mShowArtist);
+    SetupStore(RESTART, mRestart);
+    SetupStore(GRAPHTFT, mGraphTFT);
 }

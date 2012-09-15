@@ -33,6 +33,7 @@ cCdControl::cCdControl(void)
         mCdPlayer->SortedPlay();
     }
     mRestart = cMenuCDPlayer::GetRestart();
+    mCdPlayer->SetRestartMode(mRestart);
 }
 
 cCdControl::~cCdControl()
@@ -259,6 +260,15 @@ void cCdControl::ShowList()
     }
     SetHelpkeys();
 }
+void cCdControl::Replace (string &s, const char *repl, const char *with)
+{
+    string::size_type idx;
+    int len = strlen (repl);
+
+    while ((idx = s.find(repl)) != string::npos) {
+        s.replace (idx, len, with);
+    }
+}
 
 void cCdControl::ShowPlaylist()
 {
@@ -271,12 +281,15 @@ void cCdControl::ShowPlaylist()
     static bool cddbinfo = false;
     static bool detail = false;
     static bool restart = false;
+    static bool playrandom = false;
+
     if ((mCurrtitle != mCdPlayer->GetCurrTrack()) ||
         (numtrk != mCdPlayer->GetNumTracks()) ||
         (state != mCdPlayer->GetState()) ||
         (cddbinfo != mCdPlayer->CDDBInfoAvailable()) ||
         (detail != mShowDetail) ||
         (restart != mRestart) ||
+        (playrandom != mPlayRandom) ||
         (speed != mCdPlayer->GetSpeed())) {
         render_all = true;
     }
@@ -307,6 +320,7 @@ void cCdControl::ShowPlaylist()
         if (detail != mShowDetail) {
             mMenuPlaylist->Clear();
         }
+        playrandom = mPlayRandom;
         restart = mRestart;
         detail = mShowDetail;
         mCurrtitle = mCdPlayer->GetCurrTrack();
@@ -333,39 +347,56 @@ void cCdControl::ShowPlaylist()
         switch (mCdPlayer->GetState()) {
         case BCDIO_FAILED:
         case BCDIO_STARTING:
-            title += "--";
+            title += "-";
             break;
         case BCDIO_STOP:
         case BCDIO_PAUSE:
-            title += "||";
+            title += CD_CHAR_PAUSE;
             break;
         case BCDIO_PLAY:
-            title += ">>";
+            title += CD_CHAR_PLAY;
             break;
         default:
             break;
         }
 
+        title += " ";
         if (mRestart) {
-            title += " R";
+            title += CD_CHAR_RESTART;
         }
         else {
-            title += " S";
+            title += CD_CHAR_NORMAL;
         }
 
         switch (mCdPlayer->GetSpeed()) {
         case 1:
-            title += "  x1,1";
+            title += " x1,1";
             break;
         case 2:
-            title += "  x2";
+            title += " x2";
             break;
         default:
             break;
         }
+
+        title += " ";
+        if (mPlayRandom) {
+            title += CD_CHAR_RANDOM;
+        }
+        else {
+            title += CD_CHAR_SORTED;
+        }
         Skins.Message(mtStatus, NULL);
         mMenuPlaylist->SetTitle(title.c_str());
         cStatus::MsgOsdClear();
+        if (cMenuCDPlayer::GetGraphTFT()) {
+            Replace(title, CD_CHAR_PLAY, GRAPHTFT_CHAR_DISK);
+            Replace(title, CD_CHAR_PAUSE, GRAPHTFT_CHAR_PAUSE);
+            Replace(title, CD_CHAR_RESTART, GRAPHTFT_CHAR_RESTART);
+            Replace(title, CD_CHAR_NORMAL, GRAPHTFT_CHAR_NORMAL);
+            Replace(title, CD_CHAR_RANDOM, GRAPHTFT_CHAR_RANDOM);
+            Replace(title, CD_CHAR_SORTED, GRAPHTFT_CHAR_SORTED);
+        }
         cStatus::MsgOsdTitle(title.c_str());
 
         if (mShowDetail) {

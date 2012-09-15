@@ -21,6 +21,7 @@ private:
     static int mPlayMode;
     static int mShowArtist;
     static int mRestart;
+    static int mGraphTFT;
 protected:
     virtual void Store(void);
 
@@ -32,5 +33,6 @@ public:
     static bool GetPlayMode(void) {return mPlayMode; }
     static bool GetShowArtist(void) {return mShowArtist;}
     static bool GetRestart(void) {return mRestart;}
+    static bool GetGraphTFT(void) {return mGraphTFT;}
     static bool SetupParse(const char *Name, const char *Value);
 };

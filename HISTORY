@@ -74,4 +74,8 @@ VDR Plugin 'cdplayer' Revision History
 
 2012-09-09: Version 1.1.2
 
-- Support for new libcdio 0.84 API
+- Support for new libcdio 0.84 API.
+
+2012-09-15: Version 1.1.3
+
+- Enhancements on OSD.
