@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-09-15 16:57+0200\n"
+"POT-Creation-Date: 2012-10-07 16:56+0200\n"
 "PO-Revision-Date: 2010-04-02 17:05+0200\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
@@ -100,47 +100,47 @@ msgstr "Keine Audio disk"
 msgid "Read error"
 msgstr "Lesefehler"
 
-#: cd_control.cc:27
+#: cd_control.cc:39
 msgid "CD Player"
 msgstr ""
 
-#: cd_control.cc:170
+#: cd_control.cc:187
 msgid "CD Information"
 msgstr ""
 
-#: cd_control.cc:184
+#: cd_control.cc:201
 msgid "Song Information"
 msgstr ""
 
-#: cd_control.cc:202 cdmenu.cc:40
+#: cd_control.cc:219 cdmenu.cc:40
 msgid "random"
 msgstr "Zufällig"
 
-#: cd_control.cc:203
+#: cd_control.cc:220
 msgid "sort"
 msgstr "Sortiert"
 
-#: cd_control.cc:204
+#: cd_control.cc:221
 msgid "1 min -"
 msgstr "1 Min -"
 
-#: cd_control.cc:205
+#: cd_control.cc:222
 msgid "1 min +"
 msgstr "1 Min +"
 
-#: cd_control.cc:206
+#: cd_control.cc:223
 msgid "playlist"
 msgstr "Liste"
 
-#: cd_control.cc:207
+#: cd_control.cc:224
 msgid "detail"
 msgstr "Detail"
 
-#: cd_control.cc:343
+#: cd_control.cc:360
 msgid "Playlist"
 msgstr "Titel"
 
-#: cd_control.cc:513
+#: cd_control.cc:530
 msgid "Can not open still picture: "
 msgstr "Kann device nicht öffnen"
 

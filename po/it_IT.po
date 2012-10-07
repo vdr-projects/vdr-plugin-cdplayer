@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-09-15 16:57+0200\n"
+"POT-Creation-Date: 2012-10-07 16:56+0200\n"
 "PO-Revision-Date: 2010-08-08 20:06+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -103,47 +103,47 @@ msgstr "Disco audio non trovato"
 msgid "Read error"
 msgstr "Errore di lettura"
 
-#: cd_control.cc:27
+#: cd_control.cc:39
 msgid "CD Player"
 msgstr "Lettore CD audio"
 
-#: cd_control.cc:170
+#: cd_control.cc:187
 msgid "CD Information"
 msgstr "Informazioni CD"
 
-#: cd_control.cc:184
+#: cd_control.cc:201
 msgid "Song Information"
 msgstr "Informazioni brano"
 
-#: cd_control.cc:202 cdmenu.cc:40
+#: cd_control.cc:219 cdmenu.cc:40
 msgid "random"
 msgstr ""
 
-#: cd_control.cc:203
+#: cd_control.cc:220
 msgid "sort"
 msgstr ""
 
-#: cd_control.cc:204
+#: cd_control.cc:221
 msgid "1 min -"
 msgstr "1 min -"
 
-#: cd_control.cc:205
+#: cd_control.cc:222
 msgid "1 min +"
 msgstr "1 min +"
 
-#: cd_control.cc:206
+#: cd_control.cc:223
 msgid "playlist"
 msgstr "lista esecuzione"
 
-#: cd_control.cc:207
+#: cd_control.cc:224
 msgid "detail"
 msgstr "dettagli"
 
-#: cd_control.cc:343
+#: cd_control.cc:360
 msgid "Playlist"
 msgstr "Lista esecuzione"
 
-#: cd_control.cc:513
+#: cd_control.cc:530
 msgid "Can not open still picture: "
 msgstr "Impossibile aprire fermo immagine:"
 

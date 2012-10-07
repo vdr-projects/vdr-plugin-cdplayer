@@ -16,14 +16,24 @@
 #include "cdmenu.h"
 #include <time.h>
 #include <assert.h>
+#include <langinfo.h>
 
 const char *cCdControl::menukindPlayList = "MenuCDPlayList";
 const char *cCdControl::menukindDetail = "NormalDetail";
+const char *cCdControl::specialMenu[CD_DISPLAY_LAST][CH_CHAR_LAST] =
+{
+    {ASCII_CHAR_PAUSE, ASCII_CHAR_PLAY, ASCII_CHAR_RESTART,
+     ASCII_CHAR_NORMAL,ASCII_CHAR_RANDOM, ASCII_CHAR_SORTED},
+    {UTF8_CHAR_PAUSE, UTF8_CHAR_PLAY, UTF8_CHAR_RESTART,
+     UTF8_CHAR_NORMAL,UTF8_CHAR_RANDOM, UTF8_CHAR_SORTED}
+};
 
 cCdControl::cCdControl(void)
     : cControl(mCdPlayer = new cCdPlayer), mMenuPlaylist(NULL),
       mShowDetail(false), mCurrtitle(INVALID_TRACK_IDX)
 {
+    char *codeset = nl_langinfo(CODESET);
+
     cStatus::MsgReplaying(this,tr("CD Player"), NULL,true);
     mPlayRandom = cMenuCDPlayer::GetPlayMode();
     if (mPlayRandom) {
@@ -34,6 +44,11 @@ cCdControl::cCdControl(void)
     }
     mRestart = cMenuCDPlayer::GetRestart();
     mCdPlayer->SetRestartMode(mRestart);
+    mIsUTF8 = false;
+    dsyslog("Codeset %s", codeset);
+    if (strcmp(codeset, "UTF-8") == 0) {
+        mIsUTF8 = true;
+    }
 }
 
 cCdControl::~cCdControl()
@@ -351,10 +366,10 @@ void cCdControl::ShowPlaylist()
             break;
         case BCDIO_STOP:
         case BCDIO_PAUSE:
-            title += CD_CHAR_PAUSE;
+            title += GetString(CD_CHAR_PAUSE);
             break;
         case BCDIO_PLAY:
-            title += CD_CHAR_PLAY;
+            title += GetString(CD_CHAR_PLAY);
             break;
         default:
             break;
@@ -362,10 +377,10 @@ void cCdControl::ShowPlaylist()
 
         title += " ";
         if (mRestart) {
-            title += CD_CHAR_RESTART;
+            title += GetString(CD_CHAR_RESTART);
         }
         else {
-            title += CD_CHAR_NORMAL;
+            title += GetString(CD_CHAR_NORMAL);
         }
 
         switch (mCdPlayer->GetSpeed()) {
@@ -381,21 +396,21 @@ void cCdControl::ShowPlaylist()
 
         title += " ";
         if (mPlayRandom) {
-            title += CD_CHAR_RANDOM;
+            title += GetString(CD_CHAR_RANDOM);
         }
         else {
-            title += CD_CHAR_SORTED;
+            title += GetString(CD_CHAR_SORTED);
         }
         Skins.Message(mtStatus, NULL);
         mMenuPlaylist->SetTitle(title.c_str());
         cStatus::MsgOsdClear();
-        if (cMenuCDPlayer::GetGraphTFT()) {
-            Replace(title, CD_CHAR_PLAY, GRAPHTFT_CHAR_DISK);
-            Replace(title, CD_CHAR_PAUSE, GRAPHTFT_CHAR_PAUSE);
-            Replace(title, CD_CHAR_RESTART, GRAPHTFT_CHAR_RESTART);
-            Replace(title, CD_CHAR_NORMAL, GRAPHTFT_CHAR_NORMAL);
-            Replace(title, CD_CHAR_RANDOM, GRAPHTFT_CHAR_RANDOM);
-            Replace(title, CD_CHAR_SORTED, GRAPHTFT_CHAR_SORTED);
+        if (cMenuCDPlayer::GetGraphTFT() && mIsUTF8) {
+            Replace(title, UTF8_CHAR_PLAY, GRAPHTFT_CHAR_DISK);
+            Replace(title, UTF8_CHAR_PAUSE, GRAPHTFT_CHAR_PAUSE);
+            Replace(title, UTF8_CHAR_RESTART, GRAPHTFT_CHAR_RESTART);
+            Replace(title, UTF8_CHAR_NORMAL, GRAPHTFT_CHAR_NORMAL);
+            Replace(title, UTF8_CHAR_RANDOM, GRAPHTFT_CHAR_RANDOM);
+            Replace(title, UTF8_CHAR_SORTED, GRAPHTFT_CHAR_SORTED);
         }
         cStatus::MsgOsdTitle(title.c_str());
 

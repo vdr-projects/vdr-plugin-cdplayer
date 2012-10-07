@@ -79,3 +79,8 @@ VDR Plugin 'cdplayer' Revision History
 2012-09-15: Version 1.1.3
 
 - Enhancements on OSD.
+
+2012-10-07: Version 1.1.4
+
+- Detect if system runs on UTF-8 before using UTF-8 characters on OSD.
+
