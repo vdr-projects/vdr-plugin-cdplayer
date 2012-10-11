@@ -60,4 +60,5 @@ cPesAudioConverter::cPesAudioConverter() :
         mPeslen(0), mFreq(PCM_FREQ_44100)
 {
     memset (&mPesPcmStream, 0, sizeof(PES_PCM_STREAM_T));
+    mPesPcmStream.start_of_first_audio_frame = 0x400;
 }

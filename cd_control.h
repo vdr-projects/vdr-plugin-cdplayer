@@ -36,14 +36,14 @@
 #define UTF8_CHAR_RANDOM  "\u21AD"     // ↭
 #define UTF8_CHAR_SORTED  "\u21F5"     // ⇵
 
-#define GRAPHTFT_CHAR_PAUSE     "\u0088"
+#define GRAPHTFT_CHAR_PAUSE     "\x88"
 #define GRAPHTFT_CHAR_PLAY      "\u00BB"     // »
-#define GRAPHTFT_CHAR_RESTART   "\u0002"
+#define GRAPHTFT_CHAR_RESTART   "\x02"
 #define GRAPHTFT_CHAR_NORMAL    "\u00ff"
-#define GRAPHTFT_CHAR_RANDOM    "\u0001"
-#define GRAPHTFT_CHAR_SORTED    "\u0085"
+#define GRAPHTFT_CHAR_RANDOM    "\x01"
+#define GRAPHTFT_CHAR_SORTED    "\x85"
 
-#define GRAPHTFT_CHAR_DISK      "\u0081"
+#define GRAPHTFT_CHAR_DISK      "\x81"
 
 class cCdPlayer: public cPlayer, public cThread {
 protected:
