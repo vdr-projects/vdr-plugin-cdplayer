@@ -73,7 +73,8 @@ typedef struct _pes_pcm_stream {
     uint8_t number_of_frame_headers;
     // 5
 //    uint16_t lpcm_header_len;
-    uint16_t start_of_first_audio_frame;
+    uint8_t start_of_first_audio_frame_high;
+    uint8_t start_of_first_audio_frame_low;
     // Byte 3
     // audio_emphasis :1;
     // audio_mute :1;
