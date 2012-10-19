@@ -84,3 +84,7 @@ VDR Plugin 'cdplayer' Revision History
 
 - Detect if system runs on UTF-8 before using UTF-8 characters on OSD.
 
+2012-10-19: Version 1.1.5
+
+- Works with Reel eHD.
+- Fix invalid character encoding.
