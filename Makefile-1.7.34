@@ -62,6 +62,10 @@ endif
 
 APIVERSION = $(call PKGCFG,apiversion)
 
+### Allow user defined options to overwrite defaults:
+
+-include $(PLGCFG)
+
 ### The name of the distribution archive:
 
 ARCHIVE = $(PLUGIN)-$(VERSION)
