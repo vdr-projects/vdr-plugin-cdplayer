@@ -19,6 +19,8 @@ static const char *PLAYMODE = "PlayMode";
 static const char *SHOWPERFORMER ="ShowArtist";
 static const char *RESTART="Restart";
 static const char *GRAPHTFT = "GraphTFT";
+static const char *KEY_OK = "KeyOk";
+static const char *KEY_BACK = "KeyBack";
 
 int cMenuCDPlayer::mMaxSpeed = 8;
 int cMenuCDPlayer::mShowMainMenu = true;
@@ -26,6 +28,8 @@ int cMenuCDPlayer::mPlayMode = false;
 int cMenuCDPlayer::mShowArtist = true;
 int cMenuCDPlayer::mRestart = false;
 int cMenuCDPlayer::mGraphTFT = false;
+cMenuCDPlayer::KEY_ASSIGNMENT cMenuCDPlayer::mOK_Key = KEY_EXIT;
+cMenuCDPlayer::KEY_ASSIGNMENT cMenuCDPlayer::mBACK_Key = KEY_EXIT;
 
 #ifdef USE_PARANOIA
 int cMenuCDPlayer::mUseParanoia = true;
@@ -36,10 +40,14 @@ int cMenuCDPlayer::mUseParanoia = false;
 cMenuCDPlayer::cMenuCDPlayer(void) : cMenuSetupPage()
 {
     static const char *playmode_entry[2] = {
-            tr("sorted"),
-            tr("random")
+            tr("Sorted"),
+            tr("Random")
     };
-
+    static const char *key_assignment[KEY_LAST] = {
+            tr ("No Function"),
+            tr ("Pause"),
+            tr ("Exit")
+    };
     SetSection (tr("CD-Player"));
 
     Add(new cMenuEditIntItem(tr("Max CD speed"), &mMaxSpeed));
@@ -54,6 +62,10 @@ cMenuCDPlayer::cMenuCDPlayer(void) : cMenuSetupPage()
     mUseParanoia = false;
 #endif
     Add(new cMenuEditBoolItem(tr("Use GraphTFT special characters"), &mGraphTFT));
+    Add(new cMenuEditStraItem(tr("Back Key"), (int *)&mBACK_Key, KEY_LAST,
+                              key_assignment));
+    Add(new cMenuEditStraItem(tr("OK Key"), (int *)&mOK_Key, KEY_LAST,
+                                  key_assignment));
 }
 
 bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
@@ -83,6 +95,12 @@ bool cMenuCDPlayer::SetupParse(const char *Name, const char *Value)
   else if (strcasecmp(Name, GRAPHTFT) == 0) {
       mGraphTFT  = atoi(Value);
   }
+  else if (strcasecmp(Name, KEY_OK) == 0) {
+      mOK_Key = (cMenuCDPlayer::KEY_ASSIGNMENT)atoi(Value);
+  }
+  else if (strcasecmp(Name, KEY_BACK) == 0) {
+      mBACK_Key = (cMenuCDPlayer::KEY_ASSIGNMENT)atoi(Value);
+  }
   else {
      return false;
   }
@@ -98,4 +116,16 @@ void cMenuCDPlayer::Store(void)
     SetupStore(SHOWPERFORMER, mShowArtist);
     SetupStore(RESTART, mRestart);
     SetupStore(GRAPHTFT, mGraphTFT);
+    SetupStore(KEY_OK, (int)mOK_Key);
+    SetupStore(KEY_BACK, (int)mBACK_Key);
+}
+
+eKeys cMenuCDPlayer::TranslateKey (KEY_ASSIGNMENT key) {
+    if (key == KEY_PAUSE) {
+        return (kPause);
+    }
+    else if (key == KEY_EXIT) {
+        return (kStop);
+    }
+    return (kNone);
 }

@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
-"Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-10-11 18:50+0200\n"
+"Report-Msgid-Bugs-To: <see README>\n"
+"POT-Creation-Date: 2013-02-12 13:53+0100\n"
 "PO-Revision-Date: 2010-08-08 20:06+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: Italian\n"
@@ -19,167 +19,144 @@ msgstr ""
 "X-Poedit-Country: ITALY\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: bufferedcdio.cc:63
 msgid "Arranger"
 msgstr "Regista"
 
-#: bufferedcdio.cc:64
 msgid "Composer"
 msgstr "Compositore"
 
-#: bufferedcdio.cc:65
 msgid "Disk ID"
 msgstr "ID disco"
 
-#: bufferedcdio.cc:66
 msgid "Genre"
 msgstr "Genere"
 
-#: bufferedcdio.cc:67
 msgid "Message"
 msgstr "Messaggio"
 
-#: bufferedcdio.cc:68
 msgid "Isrc"
 msgstr "ISRC"
 
-#: bufferedcdio.cc:69
 msgid "Performer"
 msgstr "Interprete"
 
-#: bufferedcdio.cc:70
 msgid "Songwriter"
 msgstr "Autore"
 
-#: bufferedcdio.cc:71
 msgid "Title"
 msgstr "Titolo"
 
-#: bufferedcdio.cc:72
 msgid "Upc Ean"
 msgstr "Upc Ean"
 
-#: bufferedcdio.cc:73
 msgid "Invalid"
 msgstr "Non valido"
 
-#: bufferedcdio.cc:75
 msgid "Size Info"
 msgstr "Info dimensione"
 
-#: bufferedcdio.cc:76
 msgid "Info1"
 msgstr "Info 1"
 
-#: bufferedcdio.cc:77
 msgid "Info2"
 msgstr "Info 2"
 
-#: bufferedcdio.cc:246
 msgid "Can not open"
 msgstr "Impossibile aprire"
 
-#: bufferedcdio.cc:289
 msgid "No disc in drive"
 msgstr "Non c'è alcun disco nell'unità"
 
-#: bufferedcdio.cc:299
 msgid "Problem on read"
 msgstr "Errore di lettura"
 
-#: bufferedcdio.cc:317
 msgid "Problem on read lsn"
 msgstr "Errore di lettura LSN"
 
-#: bufferedcdio.cc:325
 msgid "Problem on read lba"
 msgstr "Errore di lettura LBA"
 
-#: bufferedcdio.cc:346
 msgid "Not an audio disk"
 msgstr "Disco audio non trovato"
 
-#: bufferedcdio.cc:413 bufferedcdio.cc:424
 msgid "Read error"
 msgstr "Errore di lettura"
 
-#: cd_control.cc:37
 msgid "CD Player"
 msgstr "Lettore CD audio"
 
-#: cd_control.cc:185
 msgid "CD Information"
 msgstr "Informazioni CD"
 
-#: cd_control.cc:199
 msgid "Song Information"
 msgstr "Informazioni brano"
 
-#: cd_control.cc:217 cdmenu.cc:40
 msgid "random"
 msgstr ""
 
-#: cd_control.cc:218
 msgid "sort"
 msgstr ""
 
-#: cd_control.cc:219
 msgid "1 min -"
 msgstr "1 min -"
 
-#: cd_control.cc:220
 msgid "1 min +"
 msgstr "1 min +"
 
-#: cd_control.cc:221
 msgid "playlist"
 msgstr "lista esecuzione"
 
-#: cd_control.cc:222
 msgid "detail"
 msgstr "dettagli"
 
-#: cd_control.cc:358
 msgid "Playlist"
 msgstr "Lista esecuzione"
 
-#: cd_control.cc:528
 msgid "Can not open still picture: "
 msgstr "Impossibile aprire fermo immagine:"
 
-#: cdmenu.cc:39
-msgid "sorted"
+msgid "Sorted"
 msgstr ""
 
-#: cdmenu.cc:43 cdplayer.cc:19 cdplayer.h:30
+msgid "Random"
+msgstr ""
+
+msgid "No Function"
+msgstr ""
+
+msgid "Pause"
+msgstr ""
+
+msgid "Exit"
+msgstr ""
+
 msgid "CD-Player"
 msgstr "Lettore CD audio"
 
-#: cdmenu.cc:45
 #, fuzzy
 msgid "Max CD speed"
 msgstr "Velocità massima CD"
 
-#: cdmenu.cc:46
 msgid "Show in main menu"
 msgstr "Mostra nel menu principale"
 
-#: cdmenu.cc:47
 msgid "Play mode"
 msgstr ""
 
-#: cdmenu.cc:49
 msgid "Show artist"
 msgstr ""
 
-#: cdmenu.cc:50
 msgid "Restart playback"
 msgstr ""
 
-#: cdmenu.cc:52
 msgid "Enable Paranoia"
 msgstr "Abilita paranoia"
 
-#: cdmenu.cc:56
 msgid "Use GraphTFT special characters"
+msgstr ""
+
+msgid "Back Key"
+msgstr ""
+
+msgid "OK Key"
 msgstr ""

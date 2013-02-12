@@ -1,14 +1,14 @@
 # CD-Player plugin language source file.
-# Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+# Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
 # This file is distributed under the same license as the VDR package.
 # Ulrich Eckhardt
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
-"Report-Msgid-Bugs-To: vdr@uli-eckhardt.de\n"
-"POT-Creation-Date: 2012-10-11 18:50+0200\n"
-"PO-Revision-Date: 2010-04-02 17:05+0200\n"
+"Report-Msgid-Bugs-To: <see README>\n"
+"POT-Creation-Date: 2013-02-12 13:53+0100\n"
+"PO-Revision-Date: 2013-02-12 13:53+0100\n"
 "Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
 "Language-Team: German\n"
 "Language: \n"
@@ -16,170 +16,145 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: bufferedcdio.cc:63
 msgid "Arranger"
 msgstr "Bearbeiter"
 
-#: bufferedcdio.cc:64
 msgid "Composer"
 msgstr "Komponist"
 
-#: bufferedcdio.cc:65
 msgid "Disk ID"
 msgstr ""
 
-#: bufferedcdio.cc:66
 msgid "Genre"
 msgstr ""
 
-#: bufferedcdio.cc:67
 msgid "Message"
 msgstr ""
 
-#: bufferedcdio.cc:68
 msgid "Isrc"
 msgstr ""
 
-#: bufferedcdio.cc:69
 msgid "Performer"
 msgstr "Künstler"
 
-#: bufferedcdio.cc:70
 msgid "Songwriter"
 msgstr "Songschreiber"
 
-#: bufferedcdio.cc:71
 msgid "Title"
 msgstr "Titel"
 
-#: bufferedcdio.cc:72
 msgid "Upc Ean"
 msgstr ""
 
-#: bufferedcdio.cc:73
 msgid "Invalid"
 msgstr "Ungültig"
 
-#: bufferedcdio.cc:75
 msgid "Size Info"
 msgstr ""
 
-#: bufferedcdio.cc:76
 msgid "Info1"
 msgstr ""
 
-#: bufferedcdio.cc:77
 msgid "Info2"
 msgstr ""
 
-#: bufferedcdio.cc:246
 msgid "Can not open"
 msgstr "Kann device nicht öffnen"
 
-#: bufferedcdio.cc:289
 msgid "No disc in drive"
 msgstr "Keine CD im Laufwerk"
 
-#: bufferedcdio.cc:299
 msgid "Problem on read"
 msgstr "Problem beim lesen"
 
-#: bufferedcdio.cc:317
 msgid "Problem on read lsn"
 msgstr ""
 
-#: bufferedcdio.cc:325
 msgid "Problem on read lba"
 msgstr ""
 
-#: bufferedcdio.cc:346
 msgid "Not an audio disk"
 msgstr "Keine Audio disk"
 
-#: bufferedcdio.cc:413 bufferedcdio.cc:424
 msgid "Read error"
 msgstr "Lesefehler"
 
-#: cd_control.cc:37
 msgid "CD Player"
 msgstr ""
 
-#: cd_control.cc:185
 msgid "CD Information"
 msgstr ""
 
-#: cd_control.cc:199
 msgid "Song Information"
 msgstr ""
 
-#: cd_control.cc:217 cdmenu.cc:40
 msgid "random"
 msgstr "Zufällig"
 
-#: cd_control.cc:218
 msgid "sort"
 msgstr "Sortiert"
 
-#: cd_control.cc:219
 msgid "1 min -"
 msgstr "1 Min -"
 
-#: cd_control.cc:220
 msgid "1 min +"
 msgstr "1 Min +"
 
-#: cd_control.cc:221
 msgid "playlist"
 msgstr "Liste"
 
-#: cd_control.cc:222
 msgid "detail"
 msgstr "Detail"
 
-#: cd_control.cc:358
 msgid "Playlist"
 msgstr "Titel"
 
-#: cd_control.cc:528
 msgid "Can not open still picture: "
 msgstr "Kann device nicht öffnen"
 
-#: cdmenu.cc:39
-msgid "sorted"
+msgid "Sorted"
 msgstr "Sortiert"
 
-#: cdmenu.cc:43 cdplayer.cc:19 cdplayer.h:30
+msgid "Random"
+msgstr "Zufällig"
+
+msgid "No Function"
+msgstr "Keine Funktion"
+
+msgid "Pause"
+msgstr ""
+
+msgid "Exit"
+msgstr "Beenden"
+
 msgid "CD-Player"
 msgstr ""
 
-#: cdmenu.cc:45
 msgid "Max CD speed"
 msgstr ""
 
-#: cdmenu.cc:46
 msgid "Show in main menu"
 msgstr "Im Hauptmenü anzeigen"
 
-#: cdmenu.cc:47
 msgid "Play mode"
 msgstr "Modus"
 
-#: cdmenu.cc:49
 #, fuzzy
 msgid "Show artist"
 msgstr "Künstler anzeigen"
 
-#: cdmenu.cc:50
 msgid "Restart playback"
 msgstr "Wiedergabe neu starten"
 
-#: cdmenu.cc:52
 msgid "Enable Paranoia"
 msgstr "Paranoia Unterstützung aktivieren"
 
-#: cdmenu.cc:56
 msgid "Use GraphTFT special characters"
 msgstr "Spezielle GraphTFT Symbole benutzen"
 
-#~ msgid "Random"
-#~ msgstr "Zufällig"
+msgid "Back Key"
+msgstr "Back-Taste"
+
+msgid "OK Key"
+msgstr "OK-Taste"
+

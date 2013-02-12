@@ -94,3 +94,9 @@ VDR Plugin 'cdplayer' Revision History
 - Support for new make system of VDR 1.7.35. The new make file is now the 
   default. For compiling on older VDR Versions change the link of Makefile
   to Makefile-1.6.
+
+2013-02-12: Version 1.1.7
+
+- Additonal Makefile fixes
+- Back and OK Key are now configurable if they stop the plugin, pause the
+  current playback or if there is no function.

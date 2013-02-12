@@ -14,6 +14,8 @@
 #include "cdplayer.h"
 
 class cMenuCDPlayer: public cMenuSetupPage {
+public:
+    enum KEY_ASSIGNMENT {KEY_NO_FUNCTION, KEY_PAUSE, KEY_EXIT, KEY_LAST};
 private:
     static int mMaxSpeed;
     static int mUseParanoia;
@@ -22,6 +24,9 @@ private:
     static int mShowArtist;
     static int mRestart;
     static int mGraphTFT;
+    static KEY_ASSIGNMENT mOK_Key;
+    static KEY_ASSIGNMENT mBACK_Key;
+    static eKeys TranslateKey (KEY_ASSIGNMENT key);
 protected:
     virtual void Store(void);
 
@@ -34,5 +39,7 @@ public:
     static bool GetShowArtist(void) {return mShowArtist;}
     static bool GetRestart(void) {return mRestart;}
     static bool GetGraphTFT(void) {return mGraphTFT;}
+    static eKeys GetOkKey(void) {return TranslateKey(mOK_Key);}
+    static eKeys GetBackKey(void) {return TranslateKey(mBACK_Key);}
     static bool SetupParse(const char *Name, const char *Value);
 };

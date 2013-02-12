@@ -82,7 +82,18 @@ void cCdControl::Hide(void)
 eOSState cCdControl::ProcessKey(eKeys Key)
 {
     eOSState state = osContinue;
-    //Key = Key & ~k_Repeat;
+
+    switch (Key) {
+    case kOk:
+        Key = cMenuCDPlayer::GetOkKey();
+        break;
+    case kBack:
+        Key = cMenuCDPlayer::GetBackKey();
+        break;
+    default:
+        break;
+    }
+
     switch (Key) {
     case kRed:
         if (mPlayRandom) {
@@ -121,7 +132,6 @@ eOSState cCdControl::ProcessKey(eKeys Key)
     case kPrev:
         mCdPlayer->PrevTrack();
         break;
-    case kOk:
     case kStop:
         state = osEnd;
         break;
