@@ -19,9 +19,15 @@
 #include <string>
 #include <stdio.h>
 #include <stdint.h>
+#include <cdio/version.h>
+#if LIBCDIO_VERSION_NUM < 90
 #include <cdio/cdda.h>
-#include <cdio/cd_types.h>
 #include <cdio/paranoia.h>
+#else
+#include <cdio/paranoia/cdda.h>
+#include <cdio/paranoia/paranoia.h>
+#endif
+#include <cdio/cd_types.h>
 #include <cdio/mmc.h>
 #include "cdioringbuf.h"
 #include "cdinfo.h"

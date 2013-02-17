@@ -100,3 +100,9 @@ VDR Plugin 'cdplayer' Revision History
 - Additional Makefile fixes.
 - Back and OK Key are now configurable if they stop the plugin, pause the
   current playback or if there is no function.
+  
+2013-02-17: Version
+
+- Bugfix in Makefile (Thanks to Lucian Muresan)
+- Support for CDIO 0.90 (Thanks to Lucian Muresan)
+- Romanian translation (Thanks to Lucian Muresan)
