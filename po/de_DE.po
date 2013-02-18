@@ -23,16 +23,16 @@ msgid "Composer"
 msgstr "Komponist"
 
 msgid "Disk ID"
-msgstr ""
+msgstr "Disk ID"
 
 msgid "Genre"
-msgstr ""
+msgstr "Genre"
 
 msgid "Message"
-msgstr ""
+msgstr "Message"
 
 msgid "Isrc"
-msgstr ""
+msgstr "Isrc"
 
 msgid "Performer"
 msgstr "Künstler"
@@ -44,19 +44,19 @@ msgid "Title"
 msgstr "Titel"
 
 msgid "Upc Ean"
-msgstr ""
+msgstr "Upc Ean"
 
 msgid "Invalid"
 msgstr "Ungültig"
 
 msgid "Size Info"
-msgstr ""
+msgstr "Größeninformatin"
 
 msgid "Info1"
-msgstr ""
+msgstr "Info1"
 
 msgid "Info2"
-msgstr ""
+msgstr "Info2"
 
 msgid "Can not open"
 msgstr "Kann device nicht öffnen"
@@ -68,10 +68,10 @@ msgid "Problem on read"
 msgstr "Problem beim lesen"
 
 msgid "Problem on read lsn"
-msgstr ""
+msgstr "Problem beim lesen des lsn"
 
 msgid "Problem on read lba"
-msgstr ""
+msgstr "Problem beim lesen des lba"
 
 msgid "Not an audio disk"
 msgstr "Keine Audio disk"
@@ -80,13 +80,13 @@ msgid "Read error"
 msgstr "Lesefehler"
 
 msgid "CD Player"
-msgstr ""
+msgstr "CD Player"
 
 msgid "CD Information"
-msgstr ""
+msgstr "CD Information"
 
 msgid "Song Information"
-msgstr ""
+msgstr "Song Information"
 
 msgid "random"
 msgstr "Zufällig"
@@ -110,7 +110,7 @@ msgid "Playlist"
 msgstr "Titel"
 
 msgid "Can not open still picture: "
-msgstr "Kann device nicht öffnen"
+msgstr "Kann Hintergrundbild nicht öffnen"
 
 msgid "Sorted"
 msgstr "Sortiert"
@@ -122,16 +122,16 @@ msgid "No Function"
 msgstr "Keine Funktion"
 
 msgid "Pause"
-msgstr ""
+msgstr "Pause"
 
 msgid "Exit"
 msgstr "Beenden"
 
 msgid "CD-Player"
-msgstr ""
+msgstr "CD-Player"
 
 msgid "Max CD speed"
-msgstr ""
+msgstr "Max CD Geschwindigkeit"
 
 msgid "Show in main menu"
 msgstr "Im Hauptmenü anzeigen"
@@ -139,7 +139,6 @@ msgstr "Im Hauptmenü anzeigen"
 msgid "Play mode"
 msgstr "Modus"
 
-#, fuzzy
 msgid "Show artist"
 msgstr "Künstler anzeigen"
 

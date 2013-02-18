@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2013-02-17 16:18+0100\n"
-"PO-Revision-Date: 2013-02-16 23:07+0100\n"
+"POT-Creation-Date: 2013-02-18 18:29+0100\n"
+"PO-Revision-Date: 2013-02-17 17:56+0100\n"
 "Last-Translator: Lucian Muresan <lucianm@users.sorceforge.net>\n"
 "Language-Team: Romanian\n"
 "Language: \n"
@@ -24,7 +24,7 @@ msgid "Composer"
 msgstr "Compozitor"
 
 msgid "Disk ID"
-msgstr ""
+msgstr "Identificator disc"
 
 msgid "Genre"
 msgstr "Gen"
@@ -33,7 +33,7 @@ msgid "Message"
 msgstr "Mesaj"
 
 msgid "Isrc"
-msgstr ""
+msgstr "Cod ISRC"
 
 msgid "Performer"
 msgstr "Interpret"
@@ -45,7 +45,7 @@ msgid "Title"
 msgstr "Titlu"
 
 msgid "Upc Ean"
-msgstr ""
+msgstr "Cod UPC / EAN"
 
 msgid "Invalid"
 msgstr "Invalid"
@@ -54,10 +54,10 @@ msgid "Size Info"
 msgstr "Info mărime"
 
 msgid "Info1"
-msgstr ""
+msgstr "Info1"
 
 msgid "Info2"
-msgstr ""
+msgstr "Info2"
 
 msgid "Can not open"
 msgstr "Nu pot deschide device-ul"
@@ -87,7 +87,7 @@ msgid "CD Information"
 msgstr "Informații disc"
 
 msgid "Song Information"
-msgstr "Informații cântec"
+msgstr "Informații piesă"
 
 msgid "random"
 msgstr "aleator"
@@ -129,7 +129,7 @@ msgid "Exit"
 msgstr "Ieșire"
 
 msgid "CD-Player"
-msgstr ""
+msgstr "CD Player"
 
 msgid "Max CD speed"
 msgstr "Viteza CD maximă"
@@ -153,7 +153,7 @@ msgid "Use GraphTFT special characters"
 msgstr "Utilizează simboluri GraphTFT"
 
 msgid "Back Key"
-msgstr "Tasta \"Înapoi\""
+msgstr "Tasta 'Înapoi'"
 
 msgid "OK Key"
-msgstr "Tasta \"OK\""
+msgstr "Tasta 'OK'"
