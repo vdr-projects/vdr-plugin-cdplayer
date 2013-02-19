@@ -105,6 +105,7 @@ VDR Plugin 'cdplayer' Revision History
 
 - Bugfix in Makefile (Thanks to Lucian Muresan)
 - Support for CDIO 0.90 (Thanks to Lucian Muresan)
-- Romanian translation (Thanks to Lucian Muresan)
-- French translation (Thanks to Bernard Jaulin)
-- Ukrainian translation (Thanks to Yarema aka Knedlyk)
+- Add Romanian translation (Thanks to Lucian Muresan)
+- Add French translation (Thanks to Bernard Jaulin)
+- Add Ukrainian translation (Thanks to Yarema aka Knedlyk)
+- Update Italian translation (Thanks to Diego Pierotto)

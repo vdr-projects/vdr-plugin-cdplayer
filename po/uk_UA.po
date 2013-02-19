@@ -17,10 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Arranger"
-msgstr "Аранжуваkmybr"
+msgstr "Аранжувальник"
 
 msgid "Composer"
-msgstr "Компоpbnjh"
+msgstr "Композитор"
 
 msgid "Disk ID"
 msgstr "ID диску"
