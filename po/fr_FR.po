@@ -15,7 +15,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-SourceCharset: utf-8\n"
 
 
 msgid "Arranger"
@@ -112,7 +111,7 @@ msgid "Playlist"
 msgstr "Liste de chansons"
 
 msgid "Can not open still picture: "
-msgstr "Impossibile d'ouvrir l'image: "
+msgstr "Impossible d'ouvrir l'image de fond: "
 
 msgid "Sorted"
 msgstr "Trié"
@@ -151,7 +150,7 @@ msgid "Enable Paranoia"
 msgstr "Activer le mode paranoïa"
 
 msgid "Use GraphTFT special characters"
-msgstr "Utiliser l'écran TFT"
+msgstr "Utiliser l'écran TFT "
 
 msgid "Back Key"
 msgstr "Touche Retour"
