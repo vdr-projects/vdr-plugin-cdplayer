@@ -101,9 +101,10 @@ VDR Plugin 'cdplayer' Revision History
 - Back and OK Key are now configurable if they stop the plugin, pause the
   current playback or if there is no function.
   
-2013-02-17: Version
+2013-02-17: Version 1.1.8
 
 - Bugfix in Makefile (Thanks to Lucian Muresan)
+- cd.mpg will be installed automatically.
 - Support for CDIO 0.90 (Thanks to Lucian Muresan)
 - Add Romanian translation (Thanks to Lucian Muresan)
 - Add French translation (Thanks to Bernard Jaulin)
