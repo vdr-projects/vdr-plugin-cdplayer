@@ -142,7 +142,11 @@ $(SOFILE): $(OBJS)
 install-lib: $(SOFILE)
 	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)
 
-install: install-lib install-i18n
+install-contrib: 
+	@mkdir -p $(CFGDIR)
+	@cp -n contrib/*.mpg $(CFGDIR)
+
+install: install-lib install-i18n install-contrib
 
 dist: clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
