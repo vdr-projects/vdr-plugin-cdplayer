@@ -143,8 +143,8 @@ install-lib: $(SOFILE)
 	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)
 
 install-contrib: 
-	@mkdir -p $(CFGDIR)
-	@cp -n contrib/*.mpg $(CFGDIR)
+	@mkdir -p $(DESTDIR)$(CFGDIR)
+	@cp -n contrib/*.mpg $(DESTDIR)$(CFGDIR)
 
 install: install-lib install-i18n install-contrib
 

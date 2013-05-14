@@ -57,7 +57,7 @@ private:
     lba_t mLba;
     CD_TEXT_T mCdTextFields;
 public:
-    cTrackInfo(void) : mTrackNo(0), mStartLsn(0), mEndLsn(0) {}
+    cTrackInfo(void) : mTrackNo(0), mStartLsn(0), mEndLsn(0), mLba(0) {}
     cTrackInfo(track_t TrackNo, lsn_t StartLsn, lsn_t EndLsn, lba_t lba,
                CD_TEXT_T CdTextFields);
     ~cTrackInfo() {}
@@ -105,7 +105,7 @@ private:
           mTrackInfo[track].SetCdTextFields(CdTextFields);
      }
 public:
-    cCdInfo(void) {mCddbInfoAvail = false; mLastTrackIdx = 0;}
+    cCdInfo(void) {mCddbInfoAvail = false; mLastTrackIdx = 0; mLeadOut = 0;}
     ~cCdInfo(void) {if (Active()) Cancel(3);}
 
     void Clear(void) {

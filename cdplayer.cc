@@ -28,7 +28,7 @@ std::string cPluginCdplayer::mCDDBCacheDir = "";
 bool cPluginCdplayer::mEnableCDDB = true;
 bool cPluginCdplayer::mEnableCDDBCache = true;
 
-cPluginCdplayer::cPluginCdplayer(void) : mCdControl(NULL)
+cPluginCdplayer::cPluginCdplayer(void) : mShowMainMenu(true), mCdControl(NULL)
 {
 
 }
