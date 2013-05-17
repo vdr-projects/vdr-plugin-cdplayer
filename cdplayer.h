@@ -26,7 +26,7 @@
 #include <string>
 #include "cd_control.h"
 
-static const char *VERSION        = "1.1.8";
+static const char *VERSION        = "1.2.0";
 static const char *DESCRIPTION    = trNOOP("CD-Player");
 
 class cPluginCdplayer: public cPlugin {
@@ -91,7 +91,6 @@ public:
     static bool GetCDDBCacheEnabled(void) {
         return mEnableCDDBCache;
     }
-
 };
 
 static inline const char *NotNull (const char *s) { return s ? s : ""; }

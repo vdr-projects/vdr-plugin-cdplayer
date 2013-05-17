@@ -145,5 +145,4 @@ public:
     void Action(void); // Start cddb query
 };
 
-
 #endif /* CDINFO_H_ */
