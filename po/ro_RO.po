@@ -7,50 +7,51 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2013-02-12 13:53+0100\n"
-"PO-Revision-Date: 2013-02-12 13:53+0100\n"
-"Last-Translator: Ulrich Eckhardt <vdr@uli-eckhardt.de>\n"
-"Language-Team: German\n"
-"Language: de_DE\n"
+"POT-Creation-Date: 2013-02-18 18:29+0100\n"
+"PO-Revision-Date: 2013-02-17 17:56+0100\n"
+"Last-Translator: Lucian Muresan <lucianm@users.sorceforge.net>\n"
+"Language-Team: Romanian\n"
+"Language: ro_RO\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
 
 msgid "Arranger"
-msgstr "Bearbeiter"
+msgstr "Aranjor"
 
 msgid "Composer"
-msgstr "Komponist"
+msgstr "Compozitor"
 
 msgid "Disk ID"
-msgstr "Disk ID"
+msgstr "Identificator disc"
 
 msgid "Genre"
-msgstr "Genre"
+msgstr "Gen"
 
 msgid "Message"
-msgstr "Message"
+msgstr "Mesaj"
 
 msgid "Isrc"
-msgstr "Isrc"
+msgstr "Cod ISRC"
 
 msgid "Performer"
-msgstr "Künstler"
+msgstr "Interpret"
 
 msgid "Songwriter"
-msgstr "Songschreiber"
+msgstr "Autor"
 
 msgid "Title"
-msgstr "Titel"
+msgstr "Titlu"
 
 msgid "Upc Ean"
-msgstr "Upc Ean"
+msgstr "Cod UPC / EAN"
 
 msgid "Invalid"
-msgstr "Ungültig"
+msgstr "Invalid"
 
 msgid "Size Info"
-msgstr "Größeninformatin"
+msgstr "Info mărime"
 
 msgid "Info1"
 msgstr "Info1"
@@ -59,101 +60,100 @@ msgid "Info2"
 msgstr "Info2"
 
 msgid "Can not open"
-msgstr "Kann device nicht öffnen"
+msgstr "Nu pot deschide device-ul"
 
 msgid "No disc in drive"
-msgstr "Keine CD im Laufwerk"
+msgstr "Nici un disc în unitate"
 
 msgid "Problem on read"
-msgstr "Problem beim lesen"
+msgstr "Problemă la citire"
 
 msgid "Problem on read lsn"
-msgstr "Problem beim lesen des lsn"
+msgstr "Problemă la citirea LSN"
 
 msgid "Problem on read lba"
-msgstr "Problem beim lesen des lba"
+msgstr "Problemă la citirea LBA"
 
 msgid "Not an audio disk"
-msgstr "Keine Audio disk"
+msgstr "Discul nu este de tip audio"
 
 msgid "Read error"
-msgstr "Lesefehler"
+msgstr "Eroare la citire"
 
 msgid "CD Player"
 msgstr "CD Player"
 
 msgid "CD Information"
-msgstr "CD Information"
+msgstr "Informații disc"
 
 msgid "Song Information"
-msgstr "Song Information"
+msgstr "Informații piesă"
 
 msgid "random"
-msgstr "Zufällig"
+msgstr "aleator"
 
 msgid "sort"
-msgstr "Sortiert"
+msgstr "sortează"
 
 msgid "1 min -"
-msgstr "1 Min -"
+msgstr "1 min -"
 
 msgid "1 min +"
-msgstr "1 Min +"
+msgstr "1 min +"
 
 msgid "playlist"
-msgstr "Liste"
+msgstr "lista de redare"
 
 msgid "detail"
-msgstr "Detail"
+msgstr "detaliu"
 
 msgid "Playlist"
-msgstr "Titel"
+msgstr "Lista de redare"
 
 msgid "Can not open still picture: "
-msgstr "Kann Hintergrundbild nicht öffnen"
+msgstr "Nu pot deschide imaginea"
 
 msgid "Sorted"
-msgstr "Sortiert"
+msgstr "Sortat"
 
 msgid "Random"
-msgstr "Zufällig"
+msgstr "Aleator"
 
 msgid "No Function"
-msgstr "Keine Funktion"
+msgstr "Fără funcție"
 
 msgid "Pause"
-msgstr "Pause"
+msgstr "Pauză"
 
 msgid "Exit"
-msgstr "Beenden"
+msgstr "Ieșire"
 
 msgid "CD-Player"
-msgstr "CD-Player"
+msgstr "CD Player"
 
 msgid "Max CD speed"
-msgstr "Max CD Geschwindigkeit"
+msgstr "Viteza CD maximă"
 
 msgid "Show in main menu"
-msgstr "Im Hauptmenü anzeigen"
+msgstr "Arată în meniul principal"
 
 msgid "Play mode"
-msgstr "Modus"
+msgstr "Mod de redare"
 
 msgid "Show artist"
-msgstr "Künstler anzeigen"
+msgstr "Arată artistul"
 
 msgid "Restart playback"
-msgstr "Wiedergabe neu starten"
+msgstr "Repornește redarea"
 
 msgid "Enable Paranoia"
-msgstr "Paranoia Unterstützung aktivieren"
+msgstr "Activează CD-Paranoia"
 
 msgid "Use GraphTFT special characters"
-msgstr "Spezielle GraphTFT Symbole benutzen"
+msgstr "Utilizează simboluri GraphTFT"
 
 msgid "Back Key"
-msgstr "Back-Taste"
+msgstr "Tasta 'Înapoi'"
 
 msgid "OK Key"
-msgstr "OK-Taste"
-
+msgstr "Tasta 'OK'"

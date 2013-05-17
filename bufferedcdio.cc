@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -15,6 +15,21 @@
 #include "bufferedcdio.h"
 #include "cdmenu.h"
 
+#if LIBCDIO_VERSION_NUM > 83
+const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
+        "Title",        /**< title of album name or track titles */
+        "Performer",    /**< name(s) of the performer(s) */
+        "Songwriter",   /**< name(s) of the songwriter(s) */
+        "Composer",     /**< name(s) of the composer(s) */
+        "Message",      /**< ISRC code of each track */
+        "Arranger",     /**< name(s) of the arranger(s) */
+        "Isrc",         /**< message(s) from the content provider or artist */
+        "Upc Ean",      /**< upc/european article number of disc, ISO-8859-1 encoded */
+        "Genre",        /**< genre identification and genre information */
+        "Disk ID",      /**< disc identification information */
+        "Invalid"
+};
+#else
 // Translated description of the cd text field
 const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
         "Arranger",     /**< name(s) of the arranger(s) */
@@ -32,7 +47,7 @@ const char *cBufferedCdio::cd_text_field[MAX_CDTEXT_FIELDS+1] = {
         "Upc Ean",
         "Invalid"
 };
-
+#endif
 cBufferedCdio::cBufferedCdio(void) :
         mRingBuffer(CCDIO_MAX_BLOCKS)
 {
@@ -52,15 +67,17 @@ cBufferedCdio::cBufferedCdio(void) :
     cd_text_field[CDTEXT_MESSAGE]   = tr("Message");
     cd_text_field[CDTEXT_ISRC]      = tr("Isrc");
     cd_text_field[CDTEXT_PERFORMER] = tr("Performer");
-    cd_text_field[CDTEXT_SIZE_INFO] = tr("Size Info");
     cd_text_field[CDTEXT_SONGWRITER] = tr("Songwriter");
     cd_text_field[CDTEXT_TITLE]     = tr("Title");
-    cd_text_field[CDTEXT_TOC_INFO]  = tr("Info1");
-    cd_text_field[CDTEXT_TOC_INFO2] = tr("Info2");
     cd_text_field[CDTEXT_UPC_EAN]   = tr("Upc Ean");
     cd_text_field[CDTEXT_INVALID]   = tr("Invalid");
+#if LIBCDIO_VERSION_NUM <= 83
+    cd_text_field[CDTEXT_SIZE_INFO] = tr("Size Info");
+    cd_text_field[CDTEXT_TOC_INFO]  = tr("Info1");
+    cd_text_field[CDTEXT_TOC_INFO2] = tr("Info2");
+#endif
     mSpanPlugin = cPluginManager::CallFirstService(SPAN_SET_PCM_DATA_ID, NULL);
-};
+}
 
 cBufferedCdio::~cBufferedCdio(void)
 {
@@ -80,7 +97,7 @@ cBufferedCdio::~cBufferedCdio(void)
     }
 }
 
-const TRACK_IDX_T cBufferedCdio::GetCurrTrack(int *total, int *curr)
+TRACK_IDX_T cBufferedCdio::GetCurrTrack(int *total, int *curr)
 {
     if (total != NULL) {
         *total = (GetEndLsn(mCurrTrackIdx) - GetStartLsn(mCurrTrackIdx))
@@ -100,11 +117,28 @@ const char *cBufferedCdio::GetCdTextField(const cdtext_field_t type)
     return cd_text_field[type];
 }
 
+#if LIBCDIO_VERSION_NUM > 83
+// Get all available CD-Text for a track
+void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
+{
+    int i;
+    const char *txt;
+
+    for (i = 0; i < MAX_CDTEXT_FIELDS; i++) {
+        txt = cdtext_get_const (pCdioCdtext, (cdtext_field_t)i, track_no);
+        if (txt != NULL) {
+            cd_text[i] = txt;
+            dsyslog ("CD-Text %d: %s", i, cd_text[i].c_str());
+        }
+    }
+}
+#else
 // Get all available CD-Text for a track
 void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
 {
     int i;
     const cdtext_t *cdtext = cdio_get_cdtext(pCdio, track_no);
+
     if (cdtext == NULL) {
         dsyslog ("No CD-Text found");
         return;
@@ -116,7 +150,7 @@ void cBufferedCdio::GetCDText (const track_t track_no, CD_TEXT_T &cd_text)
         }
     }
 }
-
+#endif
 // Close access and destroy and reset all internal buffers
 void cBufferedCdio::CloseDevice(void)
 {
@@ -202,7 +236,11 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
     CloseDevice();
     cMutexLock MutexLock(&mCdMutex);
     mState = BCDIO_OPEN_DEVICE;
+#if LIBCDIO_VERSION_NUM > 83
+    pCdio = cdio_open(FileName.c_str(), DRIVER_UNKNOWN);
+#else
     pCdio = cdio_open(FileName.c_str(), DRIVER_DEVICE);
+#endif
     if (pCdio == NULL) {
         mState = BCDIO_FAILED;
         txt = tr("Can not open");
@@ -210,6 +248,12 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
         esyslog("%s %d Can not open %s", __FILE__, __LINE__, FileName.c_str());
         return false;
     }
+#if LIBCDIO_VERSION_NUM > 83
+    pCdioCdtext = cdio_get_cdtext(pCdio);
+    if (pCdioCdtext == NULL) {
+        dsyslog ("No CD-Text available");
+    }
+#endif
     SetSpeed (mSpeed);
 #ifdef USE_PARANOIA
     if (cMenuCDPlayer::GetUseParanoia()) {
@@ -290,7 +334,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
             dsyslog ("get_track_info for track %d S %d E %d L %d",
                      track_no, startlsn, endlsn, lba);
             GetCDText (track_no, cdtextfields);
-            mCdInfo.Add(startlsn, endlsn, lba, cdtextfields);
+            mCdInfo.Add(track_no, startlsn, endlsn, lba, cdtextfields);
             hasaudiotrack = true;
         }
         else {
@@ -305,7 +349,7 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
                 __FILE__, __LINE__, FileName.c_str());
         return false;
     }
-
+    mPlayList = mCdInfo.GetDefaultPlayList();
     if (cPluginCdplayer::GetCDDBEnabled()) {
         mCdInfo.SetLeadOut (cdio_get_track_lba(pCdio, CDIO_CDROM_LEADOUT_TRACK));
         mCdInfo.Start(); // Start CDDB query
@@ -439,39 +483,51 @@ bool cBufferedCdio::ReadTrack (TRACK_IDX_T trackidx)
 //
 void cBufferedCdio::Action(void)
 {
+    dsyslog ("cBufferedCdio::Action");
+    bool first_time = true;
     TRACK_IDX_T numTracks = GetNumTracks();
     mRingBuffer.Clear();
     SetTrack(0);
     mState = BCDIO_PLAY;
-    while (mCurrTrackIdx < numTracks) {
-        mBufferStat = 0;
-        mBufferCnt = 0;
-        if (!ReadTrack (mCurrTrackIdx)) {
-            mState = BCDIO_FAILED;
-            return;
+    while (mRestart || first_time) {
+        first_time = false;
+        while (mCurrTrackIdx < numTracks) {
+            mBufferStat = 0;
+            mBufferCnt = 0;
+            if (!ReadTrack (mCurrTrackIdx)) {
+                mState = BCDIO_FAILED;
+                return;
+            }
+            // Output Buffer statistics
+            if (mBufferCnt == 0) {
+                dsyslog ("Buffer empty");
+            }
+            else {
+                dsyslog ("Av. buffer usage %d", (mBufferStat / mBufferCnt));
+            }
+            if (!Running()) {
+                mState = BCDIO_STOP;
+                return;
+            }
+            if (mTrackChange) {
+                mRingBuffer.Clear();
+                cCondWait::SleepMs(500);
+            }
+            else {
+                mCurrTrackIdx++;
+                mStartLsn = GetStartLsn(mCurrTrackIdx);
+            }
         }
-        // Output Buffer statistics
-        if (mBufferCnt == 0) {
-            dsyslog ("Buffer empty");
+        mRingBuffer.WaitEmpty();
+        cCondWait::SleepMs(500);
+        if (mPlayRandom) {
+            RandomPlay();
         }
         else {
-            dsyslog ("Av. buffer usage %d", (mBufferStat / mBufferCnt));
-        }
-        if (!Running()) {
-            mState = BCDIO_STOP;
-            return;
-        }
-        if (mTrackChange) {
-            mRingBuffer.Clear();
-            cCondWait::SleepMs(500);
-        }
-        else {
-            mCurrTrackIdx++;
-            mStartLsn = GetStartLsn(mCurrTrackIdx);
+            SortedPlay();
         }
     }
-    mRingBuffer.WaitEmpty();
-    cCondWait::SleepMs(1000);
+    cCondWait::SleepMs(500);
     mState = BCDIO_STOP;
 }
 
@@ -487,27 +543,79 @@ void cBufferedCdio::SetTrack (TRACK_IDX_T newtrack)
   mTrackChange = true;
 }
 
+void cBufferedCdio::SkipTimeFwd(lsn_t lsncnt) {
+    lsn_t cur;
+    cur = mCurrLsn - GetStartLsn(mCurrTrackIdx);
+    lsncnt += cur;
+    while (lsncnt > GetLengthLsn(mCurrTrackIdx)) {
+        cur = GetLengthLsn(mCurrTrackIdx);
+        mCurrTrackIdx++;
+        if (mCurrTrackIdx > GetNumTracks()) {
+            mCurrTrackIdx--;
+            mCurrLsn = GetEndLsn(mCurrTrackIdx)-CDIO_CD_FRAMES_PER_SEC;
+            mStartLsn = mCurrLsn;
+            return;
+        }
+        lsncnt -= cur;
+    }
+    mCurrLsn = GetStartLsn(mCurrTrackIdx) + lsncnt;
+    mStartLsn = mCurrLsn;
+}
+
+void cBufferedCdio::SkipTimeBack(lsn_t lsncnt) {
+    lsn_t cur;
+    cur = mCurrLsn - GetStartLsn(mCurrTrackIdx);
+    lsncnt -= cur;
+    while (lsncnt > 0) {
+        cur = GetLengthLsn(mCurrTrackIdx);
+        mCurrTrackIdx--;
+        if (mCurrTrackIdx < 0) {
+            mCurrTrackIdx = 0;
+            mCurrLsn = GetStartLsn(mCurrTrackIdx);
+            mStartLsn = mCurrLsn;
+            return;
+        }
+        lsncnt -= cur;
+    }
+    // NOTE: lsncnt is negative here
+    mCurrLsn = GetEndLsn(mCurrTrackIdx) + lsncnt;
+    mStartLsn = mCurrLsn;
+}
+
 void cBufferedCdio::SkipTime(int tm) {
     cMutexLock MutexLock(&mCdMutex);
-    lsn_t newlsn = mCurrLsn + (tm * CDIO_CD_FRAMES_PER_SEC);
-    lsn_t lastlsn = GetEndLsn(GetNumTracks()-1)-CDIO_CD_FRAMES_PER_SEC;
-    TRACK_IDX_T idx;
-    TRACK_IDX_T newtrack = 0;
+    lsn_t lsncnt = abs(tm * CDIO_CD_FRAMES_PER_SEC);
 
-    if (newlsn < GetStartLsn(0)) {
-        newlsn = GetStartLsn(0);
-    }
-    if (newlsn >= lastlsn) {
-        newlsn = lastlsn;
-    }
     // Find track which contains calculated lsn
-    for (idx = 0; idx < GetNumTracks(); idx++) {
-        if (newlsn < GetEndLsn(idx)) {
-            newtrack = idx;
-            break;
-        }
+    if (tm >= 0) {
+        SkipTimeFwd(lsncnt);
     }
-    mStartLsn = newlsn;
-    mCurrTrackIdx = newtrack;
+    else {
+        SkipTimeBack(lsncnt);
+    }
+
     mTrackChange = true;
+}
+
+void cBufferedCdio::SortedPlay(void) {
+    dsyslog("%s %d Sorted", __FILE__, __LINE__);
+    SetPlayList(GetDefaultPlayList());
+    SetTrack(0);
+    mPlayRandom = false;
+}
+
+void cBufferedCdio::RandomPlay(void)
+{
+    PlayList pl = GetDefaultPlayList();
+    PlayList newlist;
+    int idx;
+    dsyslog("%s %d Random", __FILE__, __LINE__);
+    while (!pl.empty()) {
+        idx = rand() % pl.size();
+        newlist.push_back(pl[idx]);
+        pl.erase(pl.begin() + idx);
+    }
+    SetPlayList(newlist);
+    SetTrack(0);
+    mPlayRandom = true;
 }

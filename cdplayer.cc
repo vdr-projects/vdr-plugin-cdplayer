@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -28,7 +28,7 @@ std::string cPluginCdplayer::mCDDBCacheDir = "";
 bool cPluginCdplayer::mEnableCDDB = true;
 bool cPluginCdplayer::mEnableCDDBCache = true;
 
-cPluginCdplayer::cPluginCdplayer(void) : mCdControl(NULL)
+cPluginCdplayer::cPluginCdplayer(void) : mShowMainMenu(true), mCdControl(NULL)
 {
 
 }
@@ -56,7 +56,7 @@ bool cPluginCdplayer::ProcessArgs(int argc, char *argv[])
         { "cddbcache",      required_argument, NULL, 'C' },
         { "disablecddb",        no_argument, NULL, 'n' },
         { "disablecddbcache",   no_argument, NULL, 'N' },
-        { NULL }
+        { NULL, no_argument, NULL, '\0' }
     };
     int c, option_index = 0;
 
@@ -207,7 +207,7 @@ const char **cPluginCdplayer::SVDRPHelpPages(void)
     return HelpPages;
 }
 
-cString cPluginCdplayer::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode)
+cString cPluginCdplayer::SVDRPCommand(const char *Command, UNUSED_ARG const char *Option, UNUSED_ARG int &ReplyCode)
 {
     cMutexLock MutexLock(&mCdMutex);
     if ((strcasecmp(Command, "PLAY") == 0) && (mCdControl == NULL)) {
@@ -238,4 +238,4 @@ cString cPluginCdplayer::SVDRPCommand(const char *Command, const char *Option, i
     return NULL;
 }
 
-VDRPLUGINCREATOR(cPluginCdplayer); // Don't touch this!
+VDRPLUGINCREATOR(cPluginCdplayer) // Don't touch this!

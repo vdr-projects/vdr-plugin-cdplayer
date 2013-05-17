@@ -63,7 +63,7 @@ Options for the plugin:
   
   -c DIR,    --configdir=DIR        Directory for config files  
                                         (default cdplayer)
-                                        
+
   -S SERVER  --cddbserver=SERVER    Hostname for CDDB server
                                         (default freedb.freedb.org)
                                         
@@ -72,7 +72,7 @@ Options for the plugin:
   -N         --disablecddbcache     Disable CDDB cache
   
   -n         --disablecddb          Disable CDDB query
-  
+
 SVDRP Commands
 -----------------------
     PLAY:  Play a disk
@@ -80,22 +80,23 @@ SVDRP Commands
     STOP:  Stop
     NEXT:  Next title
     PREV:  Previous title
-  
+
 Navigation
 -----------------------
 
-The following navigation keys are available 
+The following navigation keys are available:
 
 Key             Function
 -------------------------------------------------------------
-Green           1 min. backward 
-Yellow          1 min. forward  
-Blue            Toggle between detailed information and playlist
-
-Back,Ok, Menu   Stop Play - Exit
-
-
-Up, kNext       skip to previous title
-Down, kPrev     skip to next title
-kFastFwd        play faster
-kFastFwd        play slower
+Red             Toggle between suffle and sorted mode.
+Green           1 min. backward.
+Yellow          1 min. forward.
+Blue            Toggle between detailed information and playlist.
+Back, Ok        Can be configured to either exit the plugin, pause the
+                playback or have no function.
+Menu            Stop Play - Exit.
+Left            Toggel repeat mode.
+Up, kNext       skip to previous title.
+Down, kPrev     skip to next title.
+kFastFwd        play faster.
+kFastFwd        play slower.

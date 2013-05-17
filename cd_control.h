@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -22,11 +22,35 @@
 #define CDMAXFRAMESIZE  (KILOBYTE(1024) / TS_SIZE * TS_SIZE) // multiple of TS_SIZE to avoid breaking up TS packets
 #define MAX_SPEED 2
 
+#define ASCII_CHAR_PAUSE   "||"
+#define ASCII_CHAR_PLAY    ">"
+#define ASCII_CHAR_RESTART "R"
+#define ASCII_CHAR_NORMAL  "N"
+#define ASCII_CHAR_RANDOM  "r"
+#define ASCII_CHAR_SORTED  "S"
+
+#define UTF8_CHAR_PAUSE   "\u01c1"     // ǁ
+#define UTF8_CHAR_PLAY    "\u00BB"     // »
+#define UTF8_CHAR_RESTART "\u21BA"     // ↺
+#define UTF8_CHAR_NORMAL  "\u21A6"     // ↦
+#define UTF8_CHAR_RANDOM  "\u21AD"     // ↭
+#define UTF8_CHAR_SORTED  "\u21F5"     // ⇵
+
+#define GRAPHTFT_CHAR_PAUSE     "\x88"
+#define GRAPHTFT_CHAR_PLAY      "\u00BB"     // »
+#define GRAPHTFT_CHAR_RESTART   "\x02"
+#define GRAPHTFT_CHAR_NORMAL    "\u00ff"
+#define GRAPHTFT_CHAR_RANDOM    "\x01"
+#define GRAPHTFT_CHAR_SORTED    "\x85"
+
+#define GRAPHTFT_CHAR_DISK      "\x81"
+
 class cCdPlayer: public cPlayer, public cThread {
 protected:
-    cBufferedCdio cdio;
+    cBufferedCdio mBufCdio;
     uchar *pStillBuf;
     int mStillBufLen;
+    bool mPlayRandom;
     volatile int mSpeed;
     volatile bool mTrackChange;  // Indication for external track change
     volatile bool mPurge;
@@ -48,67 +72,105 @@ public:
     virtual bool GetReplayMode(bool &Play, bool &Forward, int &Speed);
     void LoadStillPicture (const std::string FileName);
 
+    void SetRestartMode (bool restart) {mBufCdio.SetRestartMode(restart);}
+    void RandomPlay(void)
+    {
+        mBufCdio.RandomPlay();
+        mPlayRandom = true;
+    }
+    void SortedPlay(void) {
+        mBufCdio.SortedPlay();
+        mPlayRandom = false;
+    }
+
+    void SetTrack(TRACK_IDX_T track);
     void NextTrack(void);
     void PrevTrack(void);
     void Stop(void);
     void Pause(void);
-    void Play(void);
+
+    void Play();
     void SpeedNormal(void) {mSpeed = 0;}
     void SpeedFaster(void) {if (mSpeed < MAX_SPEED) mSpeed++;}
     void SpeedSlower(void) {if (mSpeed > 0) mSpeed--;}
     void ChangeTime(int tm);
-    const TRACK_IDX_T GetNumTracks (void) {
+    TRACK_IDX_T GetNumTracks (void) {
         cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetNumTracks();
+        return mBufCdio.GetNumTracks();
     };
     // Return current track index and optional the total length in seconds and
     // the current second
-    const TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr = NULL) {
+    TRACK_IDX_T GetCurrTrack(int *total = NULL, int *curr = NULL) {
         cMutexLock MutexLock(&mPlayerMutex);
-        return cdio.GetCurrTrack(total, curr);
+        return mBufCdio.GetCurrTrack(total, curr);
     };
     void GetCdTextFields(const TRACK_IDX_T track, CD_TEXT_T &txt) {
         cMutexLock MutexLock(&mPlayerMutex);
-        cdio.GetCdTextFields(track, txt);
+        mBufCdio.GetCdTextFields(track, txt);
     };
     void GetCdInfo (CD_TEXT_T &txt) {
         cMutexLock MutexLock(&mPlayerMutex);
-        cdio.GetCdInfo(txt);
+        mBufCdio.GetCdInfo(txt);
     }
     int GetSpeed(void) {
         return mSpeed;
     }
     BUFCDIO_STATE_T GetState(void) {
-        return cdio.GetState();
+        return mBufCdio.GetState();
     }
     const string &GetErrorText(void) {
-        return cdio.GetErrorText();
+        return mBufCdio.GetErrorText();
     }
     void GetTrackTime (const TRACK_IDX_T track, int *min, int *sec) {
-        cdio.GetTrackTime (track, min, sec);
+        mBufCdio.GetTrackTime (track, min, sec);
     }
 
     bool CDDBInfoAvailable(void) {
-        return cdio.CDDBInfoAvailable();
+        return mBufCdio.CDDBInfoAvailable();
     }
 };
 
 class cCdControl: public cControl {
 private:
+    typedef enum {
+        CD_CHAR_PAUSE,
+        CD_CHAR_PLAY,
+        CD_CHAR_RESTART,
+        CD_CHAR_NORMAL,
+        CD_CHAR_RANDOM,
+        CD_CHAR_SORTED,
+        CH_CHAR_LAST
+    } CD_MENU_CHAR;
+
+    typedef enum {
+        CD_DISPLAY_ASCII,
+        CD_DISPLAY_UTF8,
+        CD_DISPLAY_LAST
+    } CD_DISPLAY_TYPE;
+
     cCdPlayer *mCdPlayer;
     cSkinDisplayMenu *mMenuPlaylist;
     cMutex mControlMutex;
     bool mShowDetail;
-    static const char *menutitle;
+    bool mPlayRandom;
+    bool mRestart;
+    bool mIsUTF8;
+    TRACK_IDX_T mCurrtitle;
     static const char *menukindPlayList;
     static const char *menukindDetail;
-    static const char *redtxt;
-    static const char *greentxt;
-    static const char *yellowtxt;
-    static const char *bluetxtplay;
-    static const char *bluetxtdet;
+    static const char *specialMenu[CD_DISPLAY_LAST][CH_CHAR_LAST];
+
+    void Replace (std::string &, const char *, const char *);
+    const char *GetString(CD_MENU_CHAR cdchar)
+    {
+        if (mIsUTF8){
+            return (specialMenu[CD_DISPLAY_UTF8][cdchar]);
+        }
+        return (specialMenu[CD_DISPLAY_ASCII][cdchar]);
+    };
     char *BuildOSDStr(TRACK_IDX_T);
     char *BuildMenuStr(TRACK_IDX_T);
+    void SetHelpkeys(void);
     void ShowDetail(void);
     void ShowList(void);
     void ShowPlaylist(void);

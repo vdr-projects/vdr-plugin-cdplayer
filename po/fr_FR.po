@@ -8,52 +8,50 @@ msgstr ""
 "Project-Id-Version: VDR 1.7.x\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2013-02-12 13:53+0100\n"
-"PO-Revision-Date: 2013-02-18 23:58+0100\n"
-"Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
-"Language-Team: Italian\n"
-"Language: \n"
+"PO-Revision-Date: 2013-02-17 19:47+0100\n"
+"Last-Translator: Bernard Jaulin <bernard.jaulin@gmail.com>\n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Italian\n"
-"X-Poedit-Country: ITALY\n"
-"X-Poedit-SourceCharset: utf-8\n"
+
 
 msgid "Arranger"
-msgstr "Regista"
+msgstr "Arrangeur"
 
 msgid "Composer"
-msgstr "Compositore"
+msgstr "Compositeur"
 
 msgid "Disk ID"
-msgstr "ID disco"
+msgstr "ID du disque"
 
 msgid "Genre"
-msgstr "Genere"
+msgstr "Genre"
 
 msgid "Message"
-msgstr "Messaggio"
+msgstr "Message"
 
 msgid "Isrc"
 msgstr "ISRC"
 
 msgid "Performer"
-msgstr "Interprete"
+msgstr "Interprète"
 
 msgid "Songwriter"
-msgstr "Autore"
+msgstr "Auteur"
 
 msgid "Title"
-msgstr "Titolo"
+msgstr "Titre"
 
 msgid "Upc Ean"
 msgstr "Upc Ean"
 
 msgid "Invalid"
-msgstr "Non valido"
+msgstr "Invalide"
 
 msgid "Size Info"
-msgstr "Info dimensione"
+msgstr "Info sur la taille"
 
 msgid "Info1"
 msgstr "Info 1"
@@ -62,40 +60,40 @@ msgid "Info2"
 msgstr "Info 2"
 
 msgid "Can not open"
-msgstr "Impossibile aprire"
+msgstr "Ouverture impossible"
 
 msgid "No disc in drive"
-msgstr "Non c'è alcun disco nell'unità"
+msgstr "Pas de disque dans le lecteur"
 
 msgid "Problem on read"
-msgstr "Errore di lettura"
+msgstr "Problème à la lecture"
 
 msgid "Problem on read lsn"
-msgstr "Errore di lettura LSN"
+msgstr "Problème à la lecture du LSN"
 
 msgid "Problem on read lba"
-msgstr "Errore di lettura LBA"
+msgstr "Problème à la lecture du LBA"
 
 msgid "Not an audio disk"
-msgstr "Disco audio non trovato"
+msgstr "Disque audio non trouvé"
 
 msgid "Read error"
-msgstr "Errore di lettura"
+msgstr "Erreur de lecture"
 
 msgid "CD Player"
-msgstr "Lettore CD audio"
+msgstr "Lecture CD"
 
 msgid "CD Information"
-msgstr "Informazioni CD"
+msgstr "Information sur le CD"
 
 msgid "Song Information"
-msgstr "Informazioni brano"
+msgstr "Information sur la chanson"
 
 msgid "random"
-msgstr "casuale"
+msgstr "aléatoire"
 
 msgid "sort"
-msgstr "ordina "
+msgstr "trier"
 
 msgid "1 min -"
 msgstr "1 min -"
@@ -104,59 +102,58 @@ msgid "1 min +"
 msgstr "1 min +"
 
 msgid "playlist"
-msgstr "lista esecuzione"
+msgstr "liste de chansons"
 
 msgid "detail"
-msgstr "dettagli"
+msgstr "détail"
 
 msgid "Playlist"
-msgstr "Lista esecuzione"
+msgstr "Liste de chansons"
 
 msgid "Can not open still picture: "
-msgstr "Impossibile aprire fermo immagine:"
+msgstr "Impossible d'ouvrir l'image de fond: "
 
 msgid "Sorted"
-msgstr "Ordinato"
+msgstr "Trié"
 
 msgid "Random"
-msgstr "Casuale"
+msgstr "Aléatoire"
 
 msgid "No Function"
-msgstr "Nessuna funzione"
+msgstr "Pas de fonction"
 
 msgid "Pause"
-msgstr "Pausa"
+msgstr "Pause"
 
 msgid "Exit"
-msgstr "Esci"
+msgstr "Sortir"
 
 msgid "CD-Player"
-msgstr "Lettore CD audio"
+msgstr "Lecture de CD audio"
 
 msgid "Max CD speed"
-msgstr "Velocità massima CD"
+msgstr "Vitesse maxi du CD"
 
 msgid "Show in main menu"
-msgstr "Mostra nel menu principale"
+msgstr "Afficher dans le menu principale"
 
 msgid "Play mode"
-msgstr "Modalità riproduzione"
+msgstr "Mode lecture"
 
 msgid "Show artist"
-msgstr "Mostra artista"
+msgstr "Afficher l'artiste"
 
 msgid "Restart playback"
-msgstr "Riavvia riproduzione"
+msgstr "Réécouter"
 
 msgid "Enable Paranoia"
-msgstr "Abilita paranoia"
+msgstr "Activer le mode paranoïa"
 
 msgid "Use GraphTFT special characters"
-msgstr "Usa caratteri speciali GraphTFT"
+msgstr "Utiliser l'écran TFT "
 
 msgid "Back Key"
-msgstr "Tasto Indietro"
+msgstr "Touche Retour"
 
 msgid "OK Key"
-msgstr "Tasto OK"
-
+msgstr "Touche OK"

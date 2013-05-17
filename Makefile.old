@@ -15,22 +15,28 @@ PLUGIN = cdplayer
 
 VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).h | awk '{ print $$6 }' | sed -e 's/[";]//g')
 
+### The C++ compiler and options:
+
+CXX      ?= g++
+CXXFLAGS ?= -g -O2 -Wall -Woverloaded-virtual -Wno-parentheses 
+CEXTRA    = -Wextra -pedantic -Wnormalized=nfc
+
 ### The directory environment:
 
-# Use package data if installed...otherwise assume we're under the VDR source directory:
-PKGCFG = $(if $(VDRDIR),$(shell pkg-config --variable=$(1) $(VDRDIR)/vdr.pc),$(shell pkg-config --variable=$(1) vdr || pkg-config --variable=$(1) ../../../vdr.pc))
-LIBDIR = $(call PKGCFG,libdir)
-LOCDIR = $(call PKGCFG,locdir)
-CFGDIR = $(call PKGCFG,configdir)/plugins/$(PLUGIN)
-PLGCFG = $(call PKGCFG,plgcfg)
-#
+VDRDIR = ../../..
+LIBDIR = ../../lib
 TMPDIR = /tmp
 
 ### Uncomment if you use graphtft
 #DEFINES += -DUSE_GRAPHTFT
 
-export CFLAGS   = $(call PKGCFG,cflags)
-export CXXFLAGS = $(call PKGCFG,cxxflags)
+### Make sure that necessary options are included:
+
+-include $(VDRDIR)/Make.global
+
+### Allow user defined options to overwrite defaults:
+
+-include $(VDRDIR)/Make.config
 
 ifneq (exists, $(shell pkg-config libcdio_cdda && echo exists))
   $(warning ******************************************************************)
@@ -60,25 +66,18 @@ endif
 endif
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 
-APIVERSION = $(call PKGCFG,apiversion)
-
-### Allow user defined options to overwrite defaults:
-
--include $(PLGCFG)
+APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
 
 ### The name of the distribution archive:
 
 ARCHIVE = $(PLUGIN)-$(VERSION)
 PACKAGE = vdr-$(ARCHIVE)
 
-### The name of the shared object file:
+### Includes and Defines (add further entries here):
 
-SOFILE = libvdr-$(PLUGIN).so
+INCLUDES += -isystem$(VDRDIR)/include
 
- ### Includes and Defines (add further entries here):
- 
-INCLUDES +=
-DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 ### The object files (add further files here):
 
@@ -89,10 +88,9 @@ LIBS += $(shell pkg-config --libs libcdio_cdda)
 ifdef USE_PARANOIA
 LIBS += $(shell pkg-config --libs libcdio_paranoia)
 endif
-
 ### The main target:
 
-all: $(SOFILE) i18n
+all: libvdr-$(PLUGIN).so i18n
 
 ### Implicit rules:
 
@@ -111,42 +109,33 @@ $(DEPFILE): Makefile
 ### Internationalization (I18N):
 
 PODIR     = po
+LOCALEDIR = $(VDRDIR)/locale
 I18Npo    = $(wildcard $(PODIR)/*.po)
-I18Nmo    = $(addsuffix .mo, $(foreach file, $(I18Npo), $(basename $(file))))
-I18Nmsgs  = $(addprefix $(DESTDIR)$(LOCDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
+I18Nmsgs  = $(addprefix $(LOCALEDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
 I18Npot   = $(PODIR)/$(PLUGIN).pot
 
 %.mo: %.po
 	msgfmt -v -c -o $@ $<
 
 $(I18Npot): $(wildcard *.cc *.h)
-	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name=vdr-$(PLUGIN) --package-version=$(VERSION) --msgid-bugs-address='<see README>' -o $@ `ls $^`
+	xgettext -C -cTRANSLATORS --no-wrap -n -i -F --package-name="$(PLUGIN)" -k -ktr -ktrNOOP --msgid-bugs-address='vdr@uli-eckhardt.de' -o $@ $^
 
 %.po: $(I18Npot)
-	msgmerge -U --no-wrap --no-location --backup=none -q -N $@ $<
+	msgmerge -v -U --no-wrap --backup=none -q $@ $<
 	@touch $@
 
-$(I18Nmsgs): $(DESTDIR)$(LOCDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
-	install -D -m644 $< $@
+$(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
+	@mkdir -p $(dir $@)
+	cp $< $@
 
 .PHONY: i18n
-i18n: $(I18Nmo) $(I18Npot)
-
-install-i18n: $(I18Nmsgs)
+i18n: $(I18Nmsgs) $(I18Npot)
 
 ### Targets:
 
-$(SOFILE): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
-
-install-lib: $(SOFILE)
-	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)
-
-install-contrib: 
-	@mkdir -p $(DESTDIR)$(CFGDIR)
-	@cp -n contrib/*.mpg $(DESTDIR)$(CFGDIR)
-
-install: install-lib install-i18n install-contrib
+libvdr-$(PLUGIN).so: $(OBJS)
+	$(CXX) $(CXXFLAGS) -shared $(OBJS) $(LIBS) -o $@
+	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
 dist: clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
@@ -157,5 +146,4 @@ dist: clean
 	@echo Distribution package created as $(PACKAGE).tgz
 
 clean:
-	@-rm -f $(PODIR)/*.mo $(PODIR)/*.pot
-	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~
+	@-rm -f $(OBJS) $(DEPFILE) *.so *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot

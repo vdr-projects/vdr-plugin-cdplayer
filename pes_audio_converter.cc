@@ -39,6 +39,8 @@ void cPesAudioConverter::SetData(const uint8_t *payload, int length)
     mPesPcmStream.number_of_frame_headers = 0xFF;
     mPesPcmStream.sample = mFreq | PCM_CHAN2;
     mPesPcmStream.dynamic_range_control = PES_DYNAMIC_RANGE_OFF;
+    mPesPcmStream.start_of_first_audio_frame_low = 4;
+    mPesPcmStream.start_of_first_audio_frame_high = 0;
 //    memcpy(m_pes_pcm_stream.payload, payload, length);
     mPeslen = length + PES_HEADER_LEN + LPCM_HEADER_LEN;
 
@@ -60,4 +62,5 @@ cPesAudioConverter::cPesAudioConverter() :
         mPeslen(0), mFreq(PCM_FREQ_44100)
 {
     memset (&mPesPcmStream, 0, sizeof(PES_PCM_STREAM_T));
-};
+
+}
