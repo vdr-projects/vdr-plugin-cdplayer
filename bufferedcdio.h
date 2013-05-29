@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <cdio/version.h>
+
+#if USE_PARANOIA
 #if LIBCDIO_VERSION_NUM < 90
 #include <cdio/cdda.h>
 #include <cdio/paranoia.h>
@@ -27,6 +29,10 @@
 #include <cdio/paranoia/cdda.h>
 #include <cdio/paranoia/paranoia.h>
 #endif
+#endif
+
+#include <cdio/cdio.h>
+#include <cdio/track.h>
 #include <cdio/cd_types.h>
 #include <cdio/mmc.h>
 #include "cdioringbuf.h"
