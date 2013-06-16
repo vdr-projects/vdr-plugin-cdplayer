@@ -32,10 +32,20 @@ TMPDIR = /tmp
 export CFLAGS   = $(call PKGCFG,cflags)
 export CXXFLAGS = $(call PKGCFG,cxxflags)
 
+ifneq (exists, $(shell pkg-config libcdio && echo exists))
+  $(warning ******************************************************************)
+  $(warning 'libcdio' not detected!)
+  $(warning ******************************************************************)
+else
+  USE_CDIO=1
+endif
+
 ifneq (exists, $(shell pkg-config libcdio_cdda && echo exists))
   $(warning ******************************************************************)
   $(warning 'libcdio_cdda' not detected! ')
   $(warning ******************************************************************)
+else
+  USE_CDIOCDDA=1
 endif
 
 ifneq (exists, $(shell pkg-config libcddb && echo exists))
@@ -84,11 +94,20 @@ DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 OBJS = $(PLUGIN).o cd_control.o pes_audio_converter.o bufferedcdio.o \
 				   cdioringbuf.o cdinfo.o cdmenu.o
-LIBS = $(shell pkg-config --libs libcddb)  
+
+ifdef USE_CDIO
+LIBS += $(shell pkg-config --libs libcdio)
+endif
+
+ifdef USE_CDIOCDDA
 LIBS += $(shell pkg-config --libs libcdio_cdda)
+endif
+
 ifdef USE_PARANOIA
 LIBS += $(shell pkg-config --libs libcdio_paranoia)
 endif
+
+LIBS += $(shell pkg-config --libs libcddb)
 
 ### The main target:
 
