@@ -110,3 +110,12 @@ VDR Plugin 'cdplayer' Revision History
 - Add French translation (Thanks to Bernard Jaulin)
 - Add Ukrainian translation (Thanks to Yarema aka Knedlyk)
 - Update Italian translation (Thanks to Diego Pierotto)
+
+2013-05-17: Version 1.2.0
+
+- Fix some initializations.
+- Makefile fixes.
+
+2013-06-29: Version 1.2.1
+
+- Fix compile problems when libparanoia is not available.
