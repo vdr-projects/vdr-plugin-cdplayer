@@ -1,7 +1,7 @@
 /*
  * Plugin for VDR to act as CD-Player
  *
- * Copyright (C) 2010-2012 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
+ * Copyright (C) 2010-2014 Ulrich Eckhardt <uli-vdr@uli-eckhardt.de>
  *
  * This code is distributed under the terms and conditions of the
  * GNU GENERAL PUBLIC LICENSE. See the file COPYING for details.
@@ -422,6 +422,10 @@ void cCdControl::ShowPlaylist()
             Replace(title, UTF8_CHAR_RANDOM, GRAPHTFT_CHAR_RANDOM);
             Replace(title, UTF8_CHAR_SORTED, GRAPHTFT_CHAR_SORTED);
         }
+#if VDRVERSNUM >= 10734
+        mMenuPlaylist->SetMenuCategory(mcUnknown);
+#endif
+
         cStatus::MsgOsdTitle(title.c_str());
 
         if (mShowDetail) {

@@ -119,3 +119,7 @@ VDR Plugin 'cdplayer' Revision History
 2013-06-29: Version 1.2.1
 
 - Fix compile problems when libparanoia is not available.
+
+2014-01-05: Version 1.2.2
+
+- Incorporate patch from kamel5 for correct display of the LCARS skin.
