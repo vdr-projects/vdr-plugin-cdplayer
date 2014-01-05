@@ -335,6 +335,9 @@ void cCdControl::ShowPlaylist()
         dsyslog("Show OSD");
         render_all = true;
         mMenuPlaylist = Skins.Current()->DisplayMenu();
+#if VDRVERSNUM >= 10734
+        mMenuPlaylist->SetMenuCategory(mcUnknown);
+#endif
 #ifdef USE_GRAPHTFT
         cStatus::MsgOsdMenuDestroy();
         cStatus::MsgOsdMenuDisplay(menukindPlayList);
@@ -422,10 +425,6 @@ void cCdControl::ShowPlaylist()
             Replace(title, UTF8_CHAR_RANDOM, GRAPHTFT_CHAR_RANDOM);
             Replace(title, UTF8_CHAR_SORTED, GRAPHTFT_CHAR_SORTED);
         }
-#if VDRVERSNUM >= 10734
-        mMenuPlaylist->SetMenuCategory(mcUnknown);
-#endif
-
         cStatus::MsgOsdTitle(title.c_str());
 
         if (mShowDetail) {
