@@ -229,6 +229,7 @@ void cBufferedCdio::SetSpeed (int speed)
 bool cBufferedCdio::OpenDevice (const string &FileName)
 {
     bool hasaudiotrack = false;
+    char *str;
     string txt;
     CD_TEXT_T cdtxt;
 
@@ -281,8 +282,9 @@ bool cBufferedCdio::OpenDevice (const string &FileName)
                              PARANOIA_MODE_FULL^PARANOIA_MODE_NEVERSKIP);
 #endif
     dsyslog("The driver selected is %s", cdio_get_driver_name(pCdio));
-    dsyslog("The default device for this driver is %s",
-            cdio_get_default_device(pCdio));
+    str = cdio_get_default_device(pCdio);
+    dsyslog("The default device for this driver is %s", str);
+    free(str);
 
     mFirstTrackNum = cdio_get_first_track_num(pCdio);
     if (mFirstTrackNum == CDIO_INVALID_TRACK) {

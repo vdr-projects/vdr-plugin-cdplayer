@@ -123,3 +123,8 @@ VDR Plugin 'cdplayer' Revision History
 2014-01-05: Version 1.2.2
 
 - Incorporate patch from kamel5 for correct display of the LCARS skin.
+
+2015-04-11: Version 1.2.3
+
+- Fix some valgrind errors / memory leaks.
+

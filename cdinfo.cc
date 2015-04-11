@@ -166,7 +166,7 @@ void cCdInfo::Query(void) {
      txt[CDTEXT_TITLE] = NotNull(cddb_disc_get_title(cddb_disc));
      txt[CDTEXT_SONGWRITER] = NotNull(cddb_disc_get_artist(cddb_disc));
      txt[CDTEXT_PERFORMER] = NotNull(cddb_disc_get_artist(cddb_disc));
-     txt[CDTEXT_GENRE] = NotNull( cddb_disc_get_category_str(cddb_disc));
+     txt[CDTEXT_GENRE] = NotNull(cddb_disc_get_category_str(cddb_disc));
      SetCdInfo (txt);
      dsyslog("category: %s (%d) %08x",
              cddb_disc_get_category_str(cddb_disc),
@@ -186,6 +186,8 @@ void cCdInfo::Query(void) {
             SetCdTextFields(i, txt);
         }
      }
+
+     cddb_disc_destroy(cddb_disc);
      cddb_destroy(cddb_conn);
      dsyslog("CDDB Query finished");
      mCddbInfoAvail = true;

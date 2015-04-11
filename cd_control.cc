@@ -546,7 +546,7 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
         return;
     }
 
-    pStillBuf = (uchar *)malloc (CDMAXFRAMESIZE);
+    pStillBuf = (uchar *)malloc (CDMAXFRAMESIZE * 2);
     if (pStillBuf == NULL) {
         esyslog("%s %d Out of memory", __FILE__, __LINE__);
         close(fd);
@@ -566,7 +566,7 @@ void cCdPlayer::LoadStillPicture (const std::string FileName)
             mStillBufLen += len;
             if (mStillBufLen >= size) {
                 size += CDMAXFRAMESIZE;
-                pStillBuf = (uchar *) realloc(pStillBuf, size);
+                pStillBuf = (uchar *) realloc(pStillBuf, size + CDMAXFRAMESIZE);
                 if (pStillBuf == NULL) {
                     close(fd);
                     mStillBufLen = 0;
