@@ -340,7 +340,11 @@ void cCdControl::ShowPlaylist()
 #endif
 #ifdef USE_GRAPHTFT
         cStatus::MsgOsdMenuDestroy();
+#if VDRVERSNUM >= 20200
+        cStatus::MsgOsdMenuDisplay(mcText);
+#else
         cStatus::MsgOsdMenuDisplay(menukindPlayList);
+#endif
 #endif
     }
 

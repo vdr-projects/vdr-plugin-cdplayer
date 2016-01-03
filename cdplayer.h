@@ -26,7 +26,7 @@
 #include <string>
 #include "cd_control.h"
 
-static const char *VERSION        = "1.2.3";
+static const char *VERSION        = "1.2.4";
 static const char *DESCRIPTION    = trNOOP("CD-Player");
 
 class cPluginCdplayer: public cPlugin {

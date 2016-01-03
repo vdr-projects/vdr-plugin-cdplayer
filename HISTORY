@@ -128,3 +128,10 @@ VDR Plugin 'cdplayer' Revision History
 
 - Fix some valgrind errors / memory leaks.
 
+2015-01-03: Version 1.2.4
+
+- Fix compile problems with VDR-2.2.0 and graphtft-ng support.
+- Update contrib/convert.sh to use ffmpeg only and works better with
+  softdhdevice.
+- Recode default background picture cd.mpg to work better with softdhdevice.
+
